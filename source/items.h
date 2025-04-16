@@ -20,6 +20,7 @@
 
 #include "filehandle.h"
 #include "brush_enums.h"
+#include <toml++/toml.hpp>
 
 class Brush;
 class GroundBrush;
@@ -36,7 +37,6 @@ class FlagBrush;
 class RAWBrush;
 
 class ItemType;
-class GameSprite;
 class GameSprite;
 class ItemDatabase;
 
@@ -308,6 +308,7 @@ public:
 	std::string name;
 	std::string editorsuffix;
 	std::string description;
+	std::string article;
 
 	float weight;
 	// It might be useful to be able to extrapolate this information in the future
@@ -371,6 +372,10 @@ public:
 	bool loadFromGameXml(const FileName& datafile, wxString& error, wxArrayString& warnings);
 	bool loadItemFromGameXml(pugi::xml_node itemNode, uint16_t id);
 	bool loadMetaItem(pugi::xml_node node);
+	
+	bool loadFromGameToml(const wxString& filename, wxString& error, wxArrayString& warnings);
+	bool loadFromGameTomlDir(const wxString& dirPath, wxString& error, wxArrayString& warnings);
+	bool loadItems(const wxString& dataDir, wxString& error, wxArrayString& warnings);
 
 	//typedef std::map<int32_t, ItemType*> ItemMap;
 	typedef contigous_vector<ItemType*> ItemMap;
@@ -385,6 +390,8 @@ protected:
 	bool loadFromOtbVer1(BinaryNode* itemNode, wxString& error, wxArrayString& warnings);
 	bool loadFromOtbVer2(BinaryNode* itemNode, wxString& error, wxArrayString& warnings);
 	bool loadFromOtbVer3(BinaryNode* itemNode, wxString& error, wxArrayString& warnings);
+	
+	void setItemAttributes(ItemType* item, const toml::table* attrs);
 
 protected:
 	ItemMap items;

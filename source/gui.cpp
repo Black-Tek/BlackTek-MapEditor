@@ -386,9 +386,10 @@ bool GUI::LoadDataFiles(wxString& error, wxArrayString& warnings)
 		return false;
 	}
 
-	g_gui.SetLoadDone(30, "Loading items.xml ...");
-	if(!g_items.loadFromGameXml(wxString(data_path.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR) + "items.xml"), error, warnings)) {
-		warnings.push_back("Couldn't load items.xml: " + error);
+	g_gui.SetLoadDone(30, "Loading items data...");
+	wxString dataDir = data_path.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
+	if(!g_items.loadItems(dataDir, error, warnings)) {
+		warnings.push_back("Couldn't load items: " + error);
 	}
 
 	g_gui.SetLoadDone(45, "Loading creatures.xml ...");

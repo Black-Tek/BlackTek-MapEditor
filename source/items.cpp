@@ -16,10 +16,12 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "main.h"
+#include <wx/dir.h>
 
 #include "materials.h"
 #include "gui.h"
 #include <string.h> // memcpy
+#include <toml++/toml.hpp>
 
 #include "items.h"
 #include "item.h"
@@ -40,7 +42,6 @@ ItemType::ItemType() :
 	type(ITEM_TYPE_NONE),
 	volume(0),
 	maxTextLen(0),
-	//writeOnceItemID(0),
 	ground_equivalent(0),
 	border_group(0),
 	has_equivalent(false),
@@ -55,7 +56,6 @@ ItemType::ItemType() :
 	client_chargeable(false),
 	extra_chargeable(false),
 	ignoreLook(false),
-
 	isHangable(false),
 	hookEast(false),
 	hookSouth(false),
@@ -75,20 +75,17 @@ ItemType::ItemType() :
 	isOpen(false),
 	isTable(false),
 	isCarpet(false),
-
 	floorChangeDown(false),
 	floorChangeNorth(false),
 	floorChangeSouth(false),
 	floorChangeEast(false),
 	floorChangeWest(false),
 	floorChange(false),
-
 	unpassable(false),
 	blockPickupable(false),
 	blockMissiles(false),
 	blockPathfinder(false),
 	hasElevation(false),
-
 	alwaysOnTopOrder(0),
 	rotateTo(0),
 	border_alignment(BORDER_NONE)
@@ -107,20 +104,15 @@ bool ItemType::isFloorChange() const noexcept
 }
 
 ItemDatabase::ItemDatabase() :
-	// Version information
 	MajorVersion(0),
 	MinorVersion(0),
 	BuildNumber(0),
-
-	// Count of GameSprite types
 	item_count(0),
 	effect_count(0),
 	monster_count(0),
 	distance_count(0),
-
 	minClientID(0),
 	maxClientID(0),
-
 	maxItemId(0)
 {
 	////
@@ -144,7 +136,6 @@ bool ItemDatabase::loadFromOtbVer1(BinaryNode* itemNode, wxString& error, wxArra
 	for(; itemNode != nullptr; itemNode = itemNode->advance()) {
 		uint8_t group;
 		if(!itemNode->getU8(group)) {
-			// Invalid!
 			warnings.push_back("Invalid item type encountered...");
 			continue;
 		}
@@ -192,7 +183,6 @@ bool ItemDatabase::loadFromOtbVer1(BinaryNode* itemNode, wxString& error, wxArra
 			item->blockMissiles = ((flags & FLAG_BLOCK_MISSILES) == FLAG_BLOCK_MISSILES);
 			item->blockPathfinder = ((flags & FLAG_BLOCK_PATHFINDER) == FLAG_BLOCK_PATHFINDER);
 			item->hasElevation = ((flags & FLAG_HAS_ELEVATION) == FLAG_HAS_ELEVATION);
-			//t->useable = ((flags & FLAG_USEABLE) == FLAG_USEABLE);
 			item->pickupable = ((flags & FLAG_PICKUPABLE) == FLAG_PICKUPABLE);
 			item->moveable = ((flags & FLAG_MOVEABLE) == FLAG_MOVEABLE);
 			item->stackable = ((flags & FLAG_STACKABLE) == FLAG_STACKABLE);
@@ -202,7 +192,6 @@ bool ItemDatabase::loadFromOtbVer1(BinaryNode* itemNode, wxString& error, wxArra
 			item->floorChangeSouth = ((flags & FLAG_FLOORCHANGESOUTH) == FLAG_FLOORCHANGESOUTH);
 			item->floorChangeWest = ((flags & FLAG_FLOORCHANGEWEST) == FLAG_FLOORCHANGEWEST);
 			item->floorChange = item->floorChangeDown || item->floorChangeNorth || item->floorChangeEast || item->floorChangeSouth || item->floorChangeWest;
-			// Now this is confusing, just accept that the ALWAYSONTOP flag means it's always on bottom, got it?!
 			item->alwaysOnBottom = ((flags & FLAG_ALWAYSONTOP) == FLAG_ALWAYSONTOP);
 			item->isHangable = ((flags & FLAG_HANGABLE) == FLAG_HANGABLE);
 			item->hookEast = ((flags & FLAG_HOOK_EAST) == FLAG_HOOK_EAST);
@@ -253,8 +242,7 @@ bool ItemDatabase::loadFromOtbVer1(BinaryNode* itemNode, wxString& error, wxArra
 						return false;
 					}
 
-					//t->speed = itemNode->getU16();
-					if(!itemNode->skip(2)) // Just skip two bytes, we don't need speed
+					if(!itemNode->skip(2))
 						warnings.push_back("Invalid item type property (3)");
 					break;
 				}
@@ -265,11 +253,8 @@ bool ItemDatabase::loadFromOtbVer1(BinaryNode* itemNode, wxString& error, wxArra
 						break;
 					}
 
-					if(!itemNode->skip(4)) // Just skip two bytes, we don't need light
+					if(!itemNode->skip(4))
 						warnings.push_back("Invalid item type property (4)");
-
-					//t->lightLevel = itemNode->getU16();
-					//t->lightColor = itemNode->getU16();
 					break;
 				}
 
@@ -384,15 +369,12 @@ bool ItemDatabase::loadFromOtbVer1(BinaryNode* itemNode, wxString& error, wxArra
 						break;
 					}
 
-					//t->readOnlyId = wb3->readOnlyId;
 					item->maxTextLen = maxTextLen;
 					break;
 				}
 
 				default: {
-					//skip unknown attributes
 					itemNode->skip(datalen);
-					//warnings.push_back("items.otb: Skipped unknown attribute");
 					break;
 				}
 			}
@@ -412,7 +394,6 @@ bool ItemDatabase::loadFromOtbVer2(BinaryNode* itemNode, wxString& error, wxArra
 	uint8_t group;
 	for(; itemNode != nullptr; itemNode = itemNode->advance()) {
 		if(!itemNode->getU8(group)) {
-			// Invalid!
 			warnings.push_back("Invalid item type encountered...");
 			continue;
 		}
@@ -420,7 +401,7 @@ bool ItemDatabase::loadFromOtbVer2(BinaryNode* itemNode, wxString& error, wxArra
 		if(group == ITEM_GROUP_DEPRECATED)
 			continue;
 
-		ItemType* item = newd ItemType();
+		ItemType* item = new ItemType();
 		item->group = static_cast<ItemGroup_t>(group);
 
 		switch(item->group) {
@@ -464,7 +445,6 @@ bool ItemDatabase::loadFromOtbVer2(BinaryNode* itemNode, wxString& error, wxArra
 			item->floorChangeSouth = ((flags & FLAG_FLOORCHANGESOUTH) == FLAG_FLOORCHANGESOUTH);
 			item->floorChangeWest = ((flags & FLAG_FLOORCHANGEWEST) == FLAG_FLOORCHANGEWEST);
 			item->floorChange = item->floorChangeDown || item->floorChangeNorth || item->floorChangeEast || item->floorChangeSouth || item->floorChangeWest;
-			// Now this is confusing, just accept that the ALWAYSONTOP flag means it's always on bottom, got it?!
 			item->alwaysOnBottom = ((flags & FLAG_ALWAYSONTOP) == FLAG_ALWAYSONTOP);
 			item->isHangable = ((flags & FLAG_HANGABLE) == FLAG_HANGABLE);
 			item->hookEast = ((flags & FLAG_HOOK_EAST) == FLAG_HOOK_EAST);
@@ -516,8 +496,7 @@ bool ItemDatabase::loadFromOtbVer2(BinaryNode* itemNode, wxString& error, wxArra
 						return false;
 					}
 
-					//t->speed = itemNode->getU16();
-					if(!itemNode->skip(2)) // Just skip two bytes, we don't need speed
+					if(!itemNode->skip(2))
 						warnings.push_back("Invalid item type property (3)");
 					break;
 				}
@@ -528,11 +507,8 @@ bool ItemDatabase::loadFromOtbVer2(BinaryNode* itemNode, wxString& error, wxArra
 						break;
 					}
 
-					if(!itemNode->skip(4)) // Just skip two bytes, we don't need light
+					if(!itemNode->skip(4))
 						warnings.push_back("Invalid item type property (4)");
-
-					//t->lightLevel = itemNode->getU16();
-					//t->lightColor = itemNode->getU16();
 					break;
 				}
 
@@ -551,9 +527,7 @@ bool ItemDatabase::loadFromOtbVer2(BinaryNode* itemNode, wxString& error, wxArra
 				}
 
 				default: {
-					//skip unknown attributes
 					itemNode->skip(datalen);
-					//warnings.push_back("items.otb: Skipped unknown attribute");
 					break;
 				}
 			}
@@ -573,7 +547,6 @@ bool ItemDatabase::loadFromOtbVer3(BinaryNode* itemNode, wxString& error, wxArra
 	uint8_t group;
 	for(; itemNode != nullptr; itemNode = itemNode->advance()) {
 		if(!itemNode->getU8(group)) {
-			// Invalid!
 			warnings.push_back("Invalid item type encountered...");
 			continue;
 		}
@@ -581,7 +554,7 @@ bool ItemDatabase::loadFromOtbVer3(BinaryNode* itemNode, wxString& error, wxArra
 		if(group == ITEM_GROUP_DEPRECATED)
 			continue;
 
-		ItemType* item = newd ItemType();
+		ItemType* item = new ItemType();
 		item->group = static_cast<ItemGroup_t>(group);
 
 		switch(item->group) {
@@ -613,7 +586,6 @@ bool ItemDatabase::loadFromOtbVer3(BinaryNode* itemNode, wxString& error, wxArra
 			item->floorChangeSouth = ((flags & FLAG_FLOORCHANGESOUTH) == FLAG_FLOORCHANGESOUTH);
 			item->floorChangeWest = ((flags & FLAG_FLOORCHANGEWEST) == FLAG_FLOORCHANGEWEST);
 			item->floorChange = item->floorChangeDown || item->floorChangeNorth || item->floorChangeEast || item->floorChangeSouth || item->floorChangeWest;
-			// Now this is confusing, just accept that the ALWAYSONTOP flag means it's always on bottom, got it?!
 			item->alwaysOnBottom = ((flags & FLAG_ALWAYSONTOP) == FLAG_ALWAYSONTOP);
 			item->isHangable = ((flags & FLAG_HANGABLE) == FLAG_HANGABLE);
 			item->hookEast = ((flags & FLAG_HOOK_EAST) == FLAG_HOOK_EAST);
@@ -667,8 +639,7 @@ bool ItemDatabase::loadFromOtbVer3(BinaryNode* itemNode, wxString& error, wxArra
 						return false;
 					}
 
-					//t->speed = itemNode->getU16();
-					if(!itemNode->skip(2)) // Just skip two bytes, we don't need speed
+					if(!itemNode->skip(2))
 						warnings.push_back("Invalid item type property (3)");
 					break;
 				}
@@ -679,11 +650,8 @@ bool ItemDatabase::loadFromOtbVer3(BinaryNode* itemNode, wxString& error, wxArra
 						warnings.push_back("items.otb: Unexpected data length of item light (2) block (Should be " + i2ws(sizeof(lightBlock2)) + " bytes)");
 						break;
 					}
-					if(!itemNode->skip(4)) // Just skip two bytes, we don't need light
+					if(!itemNode->skip(4))
 						warnings.push_back("Invalid item type property (4)");
-
-					//t->lightLevel = itemNode->getU16();
-					//t->lightColor = itemNode->getU16();
 					break;
 				}
 
@@ -702,9 +670,7 @@ bool ItemDatabase::loadFromOtbVer3(BinaryNode* itemNode, wxString& error, wxArra
 				}
 
 				default: {
-					//skip unknown attributes
 					itemNode->skip(datalen);
-					//warnings.push_back("items.otb: Skipped unknown attribute");
 					break;
 				}
 			}
@@ -738,11 +704,8 @@ bool ItemDatabase::loadFromOtb(const FileName& datafile, wxString& error, wxArra
 		} \
 	} while(false)
 
-	// Read root flags
-	root->skip(1); // Type info
-	//uint32_t flags =
-
-	root->skip(4); // Unused?
+	root->skip(1);
+	root->skip(4);
 
 	uint8_t attr;
 	safe_get(root, U8, attr);
@@ -752,13 +715,13 @@ bool ItemDatabase::loadFromOtb(const FileName& datafile, wxString& error, wxArra
 			error = "items.otb: Size of version header is invalid, updated .otb version?";
 			return false;
 		}
-		safe_get(root, U32, MajorVersion);	// items otb format file version
-		safe_get(root, U32, MinorVersion);	// client version
-		safe_get(root, U32, BuildNumber);	// revision
+		safe_get(root, U32, MajorVersion);
+		safe_get(root, U32, MinorVersion);
+		safe_get(root, U32, BuildNumber);
 		std::string csd;
 		csd.resize(128);
 
-		if(!root->getRAW((uint8_t*)csd.data(), 128)) { // CSDVersion ??
+		if(!root->getRAW((uint8_t*)csd.data(), 128)) {
 			error = wxstr(f.getErrorMessage());
 			return false;
 		}
@@ -843,7 +806,7 @@ bool ItemDatabase::loadItemFromGameXml(pugi::xml_node itemNode, uint16_t id)
 			if((attribute = itemAttributesNode.attribute("value"))) {
 				item.description = attribute.as_string();
 			}
-		}else if(key == "runespellName") {
+		} else if(key == "runespellName") {
 			/*if((attribute = itemAttributesNode.attribute("value"))) {
 				it.runeSpellName = attribute.as_string();
 			}*/
@@ -933,6 +896,7 @@ bool ItemDatabase::loadItemFromGameXml(pugi::xml_node itemNode, uint16_t id)
 
 bool ItemDatabase::loadFromGameXml(const FileName& identifier, wxString& error, wxArrayString& warnings)
 {
+	(void)warnings;
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file(identifier.GetFullPath().mb_str());
 	if(!result) {
@@ -973,6 +937,182 @@ bool ItemDatabase::loadFromGameXml(const FileName& identifier, wxString& error, 
 		}
 	}
 	return true;
+}
+
+bool ItemDatabase::loadFromGameToml(const wxString& filename, wxString& error, wxArrayString& warnings)
+{
+    try {
+        auto table = toml::parse_file(filename.ToStdString());
+        auto itemsArray = table["items"].as_array();
+        if (!itemsArray) {
+            error = "No 'items' array found in " + filename;
+            return false;
+        }
+
+        for (const auto& itemNode : *itemsArray) {
+            auto* itemTable = itemNode.as_table();
+            if (!itemTable) {
+                warnings.push_back("Invalid item entry in " + filename);
+                continue;
+            }
+
+            auto idNode = (*itemTable)["id"];
+            if (!idNode || !idNode.is_integer()) {
+                warnings.push_back("Item missing 'id' or 'id' is not an integer in " + filename);
+                continue;
+            }
+            auto idValue = idNode.value<uint16_t>();
+            if (!idValue) {
+                warnings.push_back("Invalid 'id' value in " + filename);
+                continue;
+            }
+            uint16_t id = *idValue;
+            if (!isValidID(id)) {
+                warnings.push_back("Invalid item id: " + wxString::Format("%d", id) + " in " + filename);
+                continue;
+            }
+
+            ItemType* item = items[id];
+
+            if (auto nameNode = (*itemTable)["name"]) {
+                if (auto name = nameNode.value<std::string>()) {
+                    item->name = *name;
+                }
+            }
+
+            if (auto articleNode = (*itemTable)["article"]) {
+                if (auto article = articleNode.value<std::string>()) {
+                    item->article = *article;
+                }
+            }
+
+            if (auto attrsNode = (*itemTable)["attributes"]) {
+                if (auto attrs = attrsNode.as_table()) {
+                    setItemAttributes(item, attrs);
+                }
+            }
+        }
+        return true;
+    } catch (const toml::parse_error& e) {
+        error = "Error parsing TOML file " + filename + ": " + e.what();
+        return false;
+    }
+}
+
+void ItemDatabase::setItemAttributes(ItemType* item, const toml::table* attrs)
+{
+	if (!attrs) return;
+
+	if (auto type = attrs->get("type")) {
+		if (auto typeValue = type->value<std::string>()) {
+			std::string val = *typeValue;
+			if (val == "depot") item->type = ITEM_TYPE_DEPOT;
+			else if (val == "mailbox") item->type = ITEM_TYPE_MAILBOX;
+			else if (val == "trashholder") item->type = ITEM_TYPE_TRASHHOLDER;
+			else if (val == "container") item->type = ITEM_TYPE_CONTAINER;
+			else if (val == "door") item->type = ITEM_TYPE_DOOR;
+			else if (val == "magicfield") { item->group = ITEM_GROUP_MAGICFIELD; item->type = ITEM_TYPE_MAGICFIELD; }
+			else if (val == "teleport") item->type = ITEM_TYPE_TELEPORT;
+			else if (val == "bed") item->type = ITEM_TYPE_BED;
+			else if (val == "key") item->type = ITEM_TYPE_KEY;
+		}
+	}
+	if (auto description = attrs->get("description")) {
+		if (auto desc = description->value<std::string>()) item->description = *desc;
+	}
+	if (auto weight = attrs->get("weight")) {
+		if (auto w = weight->value<int>()) item->weight = *w / 100.f;
+	}
+	if (auto armor = attrs->get("armor")) {
+		if (auto a = armor->value<int>()) item->armor = *a;
+	}
+	if (auto defense = attrs->get("defense")) {
+		if (auto d = defense->value<int>()) item->defense = *d;
+	}
+	if (auto rotateTo = attrs->get("rotateTo")) {
+		if (auto r = rotateTo->value<uint16_t>()) item->rotateTo = *r;
+	}
+	if (auto containerSize = attrs->get("containerSize")) {
+		if (auto cs = containerSize->value<uint16_t>()) item->volume = *cs;
+	}
+	if (auto readable = attrs->get("readable")) {
+		if (auto r = readable->value<bool>()) item->canReadText = *r;
+	}
+	if (auto writeable = attrs->get("writeable")) {
+		if (auto w = writeable->value<bool>()) item->canWriteText = item->canReadText = *w;
+	}
+	if (attrs->contains("decayTo")) {
+		item->decays = true;
+	}
+	if (auto maxTextLen = attrs->get("maxtextlen")) {
+		if (auto mtl = maxTextLen->value<uint16_t>()) {
+			item->maxTextLen = *mtl;
+			item->canReadText = *mtl > 0;
+		}
+	}
+	if (auto allowDistRead = attrs->get("allowDistRead")) {
+		if (auto adr = allowDistRead->value<bool>()) item->allowDistRead = *adr;
+	}
+	if (auto charges = attrs->get("charges")) {
+		if (auto c = charges->value<uint32_t>()) {
+			item->charges = *c;
+			item->extra_chargeable = true;
+		}
+	}
+	if (auto floorchange = attrs->get("floorchange")) {
+		if (auto fc = floorchange->value<std::string>()) {
+			std::string value = *fc;
+			if (value == "down") {
+				item->floorChangeDown = true;
+				item->floorChange = true;
+			} else if (value == "north") {
+				item->floorChangeNorth = true;
+				item->floorChange = true;
+			} else if (value == "south") {
+				item->floorChangeSouth = true;
+				item->floorChange = true;
+			} else if (value == "west") {
+				item->floorChangeWest = true;
+				item->floorChange = true;
+			} else if (value == "east") {
+				item->floorChangeEast = true;
+				item->floorChange = true;
+			}
+		}
+	}
+	if (auto blockprojectile = attrs->get("blockprojectile")) {
+		if (auto bp = blockprojectile->value<bool>()) item->blockMissiles = *bp;
+	}
+}
+
+bool ItemDatabase::loadFromGameTomlDir(const wxString& dirPath, wxString& error, wxArrayString& warnings)
+{
+	wxDir dir(dirPath);
+	if (!dir.IsOpened()) {
+		error = "Could not open directory: " + dirPath;
+		return false;
+	}
+
+	wxString filename;
+	bool found = false;
+	for (bool cont = dir.GetFirst(&filename, "*.toml", wxDIR_FILES); cont; cont = dir.GetNext(&filename)) {
+		found = true;
+		wxString fullPath = dirPath + wxFileName::GetPathSeparator() + filename;
+		if (!loadFromGameToml(fullPath, error, warnings)) {
+			return false;
+		}
+	}
+	return found;
+}
+
+bool ItemDatabase::loadItems(const wxString& dataDir, wxString& error, wxArrayString& warnings)
+{
+	wxString tomlDir = dataDir + "items";
+	if (loadFromGameTomlDir(tomlDir, error, warnings)) {
+		return true;
+	}
+	wxString xmlFile = dataDir + "/items.xml";
+	return loadFromGameXml(FileName(xmlFile), error, warnings);
 }
 
 bool ItemDatabase::loadMetaItem(pugi::xml_node node)
