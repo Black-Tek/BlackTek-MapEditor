@@ -42,6 +42,7 @@ ItemType::ItemType() :
 	type(ITEM_TYPE_NONE),
 	volume(0),
 	maxTextLen(0),
+	//writeOnceItemID(0),
 	ground_equivalent(0),
 	border_group(0),
 	has_equivalent(false),
@@ -104,9 +105,12 @@ bool ItemType::isFloorChange() const noexcept
 }
 
 ItemDatabase::ItemDatabase() :
+	// The version of the otb file
 	MajorVersion(0),
 	MinorVersion(0),
 	BuildNumber(0),
+
+	// Count of gamsprites types
 	item_count(0),
 	effect_count(0),
 	monster_count(0),
@@ -183,6 +187,7 @@ bool ItemDatabase::loadFromOtbVer1(BinaryNode* itemNode, wxString& error, wxArra
 			item->blockMissiles = ((flags & FLAG_BLOCK_MISSILES) == FLAG_BLOCK_MISSILES);
 			item->blockPathfinder = ((flags & FLAG_BLOCK_PATHFINDER) == FLAG_BLOCK_PATHFINDER);
 			item->hasElevation = ((flags & FLAG_HAS_ELEVATION) == FLAG_HAS_ELEVATION);
+			//t->useable = ((flags & FLAG_USEABLE) == FLAG_USEABLE);
 			item->pickupable = ((flags & FLAG_PICKUPABLE) == FLAG_PICKUPABLE);
 			item->moveable = ((flags & FLAG_MOVEABLE) == FLAG_MOVEABLE);
 			item->stackable = ((flags & FLAG_STACKABLE) == FLAG_STACKABLE);
@@ -192,6 +197,7 @@ bool ItemDatabase::loadFromOtbVer1(BinaryNode* itemNode, wxString& error, wxArra
 			item->floorChangeSouth = ((flags & FLAG_FLOORCHANGESOUTH) == FLAG_FLOORCHANGESOUTH);
 			item->floorChangeWest = ((flags & FLAG_FLOORCHANGEWEST) == FLAG_FLOORCHANGEWEST);
 			item->floorChange = item->floorChangeDown || item->floorChangeNorth || item->floorChangeEast || item->floorChangeSouth || item->floorChangeWest;
+			// Now this is confusing, just accept that the ALWAYSONTOP flag means it's always on bottom, got it?!
 			item->alwaysOnBottom = ((flags & FLAG_ALWAYSONTOP) == FLAG_ALWAYSONTOP);
 			item->isHangable = ((flags & FLAG_HANGABLE) == FLAG_HANGABLE);
 			item->hookEast = ((flags & FLAG_HOOK_EAST) == FLAG_HOOK_EAST);
@@ -241,8 +247,8 @@ bool ItemDatabase::loadFromOtbVer1(BinaryNode* itemNode, wxString& error, wxArra
 						error = "items.otb: Unexpected data length of speed block (Should be 2 bytes)";
 						return false;
 					}
-
-					if(!itemNode->skip(2))
+					//t->speed = itemNode->getU16();
+					if(!itemNode->skip(2)) // Just skip two bytes, we don't need speed
 						warnings.push_back("Invalid item type property (3)");
 					break;
 				}
@@ -253,8 +259,11 @@ bool ItemDatabase::loadFromOtbVer1(BinaryNode* itemNode, wxString& error, wxArra
 						break;
 					}
 
-					if(!itemNode->skip(4))
+					if(!itemNode->skip(4)) // Just skip two bytes, we don't need light
 						warnings.push_back("Invalid item type property (4)");
+
+					//t->lightLevel = itemNode->getU16();
+					//t->lightColor = itemNode->getU16();
 					break;
 				}
 
@@ -368,13 +377,15 @@ bool ItemDatabase::loadFromOtbVer1(BinaryNode* itemNode, wxString& error, wxArra
 						warnings.push_back("Invalid item type property (10)");
 						break;
 					}
-
+					//t->readOnlyId = wb3->readOnlyId;
 					item->maxTextLen = maxTextLen;
 					break;
 				}
 
 				default: {
+					//skip unknown attributes
 					itemNode->skip(datalen);
+					//warnings.push_back("items.otb: Skipped unknown attribute");
 					break;
 				}
 			}
@@ -394,6 +405,7 @@ bool ItemDatabase::loadFromOtbVer2(BinaryNode* itemNode, wxString& error, wxArra
 	uint8_t group;
 	for(; itemNode != nullptr; itemNode = itemNode->advance()) {
 		if(!itemNode->getU8(group)) {
+			// Invalid!
 			warnings.push_back("Invalid item type encountered...");
 			continue;
 		}
@@ -445,6 +457,7 @@ bool ItemDatabase::loadFromOtbVer2(BinaryNode* itemNode, wxString& error, wxArra
 			item->floorChangeSouth = ((flags & FLAG_FLOORCHANGESOUTH) == FLAG_FLOORCHANGESOUTH);
 			item->floorChangeWest = ((flags & FLAG_FLOORCHANGEWEST) == FLAG_FLOORCHANGEWEST);
 			item->floorChange = item->floorChangeDown || item->floorChangeNorth || item->floorChangeEast || item->floorChangeSouth || item->floorChangeWest;
+			// Now this is confusing, just accept that the ALWAYSONTOP flag means it's always on bottom, got it?!
 			item->alwaysOnBottom = ((flags & FLAG_ALWAYSONTOP) == FLAG_ALWAYSONTOP);
 			item->isHangable = ((flags & FLAG_HANGABLE) == FLAG_HANGABLE);
 			item->hookEast = ((flags & FLAG_HOOK_EAST) == FLAG_HOOK_EAST);
@@ -496,7 +509,8 @@ bool ItemDatabase::loadFromOtbVer2(BinaryNode* itemNode, wxString& error, wxArra
 						return false;
 					}
 
-					if(!itemNode->skip(2))
+					//t->speed = itemNode->getU16();
+					if(!itemNode->skip(2)) // Just skip two bytes, we don't need speed
 						warnings.push_back("Invalid item type property (3)");
 					break;
 				}
@@ -507,8 +521,10 @@ bool ItemDatabase::loadFromOtbVer2(BinaryNode* itemNode, wxString& error, wxArra
 						break;
 					}
 
-					if(!itemNode->skip(4))
+					if(!itemNode->skip(4)) // Just skip two bytes, we don't need light
 						warnings.push_back("Invalid item type property (4)");
+					//t->lightLevel = itemNode->getU16();
+					//t->lightColor = itemNode->getU16();
 					break;
 				}
 
@@ -527,7 +543,9 @@ bool ItemDatabase::loadFromOtbVer2(BinaryNode* itemNode, wxString& error, wxArra
 				}
 
 				default: {
+					//skip unknown attributes
 					itemNode->skip(datalen);
+					//warnings.push_back("items.otb: Skipped unknown attribute");
 					break;
 				}
 			}
@@ -586,6 +604,7 @@ bool ItemDatabase::loadFromOtbVer3(BinaryNode* itemNode, wxString& error, wxArra
 			item->floorChangeSouth = ((flags & FLAG_FLOORCHANGESOUTH) == FLAG_FLOORCHANGESOUTH);
 			item->floorChangeWest = ((flags & FLAG_FLOORCHANGEWEST) == FLAG_FLOORCHANGEWEST);
 			item->floorChange = item->floorChangeDown || item->floorChangeNorth || item->floorChangeEast || item->floorChangeSouth || item->floorChangeWest;
+			// Now this is confusing, just accept that the ALWAYSONTOP flag means it's always on bottom, got it?!
 			item->alwaysOnBottom = ((flags & FLAG_ALWAYSONTOP) == FLAG_ALWAYSONTOP);
 			item->isHangable = ((flags & FLAG_HANGABLE) == FLAG_HANGABLE);
 			item->hookEast = ((flags & FLAG_HOOK_EAST) == FLAG_HOOK_EAST);
@@ -639,7 +658,8 @@ bool ItemDatabase::loadFromOtbVer3(BinaryNode* itemNode, wxString& error, wxArra
 						return false;
 					}
 
-					if(!itemNode->skip(2))
+					//t->speed = itemNode->getU16();
+					if(!itemNode->skip(2)) // Just skip two bytes, we don't need speed
 						warnings.push_back("Invalid item type property (3)");
 					break;
 				}
@@ -650,8 +670,11 @@ bool ItemDatabase::loadFromOtbVer3(BinaryNode* itemNode, wxString& error, wxArra
 						warnings.push_back("items.otb: Unexpected data length of item light (2) block (Should be " + i2ws(sizeof(lightBlock2)) + " bytes)");
 						break;
 					}
-					if(!itemNode->skip(4))
+					if(!itemNode->skip(4)) // Just skip two bytes, we don't need light
 						warnings.push_back("Invalid item type property (4)");
+
+					//t->lightLevel = itemNode->getU16();
+					//t->lightColor = itemNode->getU16();
 					break;
 				}
 
@@ -670,7 +693,9 @@ bool ItemDatabase::loadFromOtbVer3(BinaryNode* itemNode, wxString& error, wxArra
 				}
 
 				default: {
+					//skip unknown attributes
 					itemNode->skip(datalen);
+					//warnings.push_back("items.otb: Skipped unknown attribute");
 					break;
 				}
 			}
@@ -704,8 +729,11 @@ bool ItemDatabase::loadFromOtb(const FileName& datafile, wxString& error, wxArra
 		} \
 	} while(false)
 
-	root->skip(1);
-	root->skip(4);
+	// Read root flags
+	root->skip(1); // Type info
+	//uint32_t flags =
+
+	root->skip(4); // Unused?
 
 	uint8_t attr;
 	safe_get(root, U8, attr);
@@ -715,13 +743,13 @@ bool ItemDatabase::loadFromOtb(const FileName& datafile, wxString& error, wxArra
 			error = "items.otb: Size of version header is invalid, updated .otb version?";
 			return false;
 		}
-		safe_get(root, U32, MajorVersion);
-		safe_get(root, U32, MinorVersion);
-		safe_get(root, U32, BuildNumber);
+		safe_get(root, U32, MajorVersion);	// items otb format file version
+		safe_get(root, U32, MinorVersion);	// client version
+		safe_get(root, U32, BuildNumber);	// revision
 		std::string csd;
 		csd.resize(128);
 
-		if(!root->getRAW((uint8_t*)csd.data(), 128)) {
+		if(!root->getRAW((uint8_t*)csd.data(), 128)) { // CSDVersion ??
 			error = wxstr(f.getErrorMessage());
 			return false;
 		}
