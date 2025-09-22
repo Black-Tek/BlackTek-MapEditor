@@ -439,14 +439,12 @@ bool GraphicManager::loadSpriteMetadata(const FileName& datafile, wxString& erro
 
 		ItemType* iType = nullptr;
 
-		if(id < (item_count + 1)) {
-			if(datOnlyLoad) {
-				iType = new ItemType();
-				iType->id = id;
-				iType->clientID = id;
-				iType->sprite = static_cast<GameSprite*>(g_gui.gfx.getSprite(iType->clientID));
-				g_items.getItemMap().set(iType->id, iType);
-			}
+		if((id < (item_count + 1)) && datOnlyLoad) {
+			iType = new ItemType();
+			iType->id = id;
+			iType->clientID = id;
+			iType->sprite = static_cast<GameSprite*>(g_gui.gfx.getSprite(iType->clientID));
+			g_items.getItemMap().set(iType->id, iType);
 		}
 
 		// Load the sprite flags
@@ -618,20 +616,24 @@ bool GraphicManager::loadSpriteMetadataFlags(FileReadHandle& file, GameSprite* s
 				flag = DatFlagMultiUse;
 		}
 
+		// Comment about alwaysOnBottom - accept that the [ALWAYSONTOP flag (otb) === alwaysOnTopOrder != 0 (dat)], means it's always on bottom.
 		switch (flag) {
 			case DatFlagGroundBorder:
 				if(iType) {
 					iType->alwaysOnTopOrder = 1;
+					iType->alwaysOnBottom = true;
 				}
 				break;
 			case DatFlagOnBottom:
 				if(iType) {
 					iType->alwaysOnTopOrder = 2;
+					iType->alwaysOnBottom = true;
 				}
 				break;
 			case DatFlagOnTop:
 				if(iType) {
 					iType->alwaysOnTopOrder = 3;
+					iType->alwaysOnBottom = true;
 				}
 				break;
 			case DatFlagContainer:
@@ -808,12 +810,6 @@ bool GraphicManager::loadSpriteMetadataFlags(FileReadHandle& file, GameSprite* s
 				break;
 			}
 		}
-	}
-
-	if(datOnlyLoad && iType) {
-		// Manual assignment of some item data based on earlier switch + by analysing 'flags' that were used in .otb.
-		// RME: Now this is confusing, just accept that the ALWAYSONTOP flag means it's always on bottom, got it?!
-		iType->alwaysOnBottom = (iType->alwaysOnTopOrder != 0);
 	}
 
 	return true;

@@ -393,7 +393,8 @@ bool GUI::LoadDataFiles(wxString& error, wxArrayString& warnings)
 
 	// to-do Make maybe a checkbox - just copy over spr signatures checkbox.
 	// And split this below into 2 checks: if items.dat exists + if checkbox is enabled.
-	bool datOnlyLoad = wxFileExists(wxString(data_path.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR) + "items.dat"));
+	// Current behavior: if items.otb is not in the folder, it loads all from `.dat` (usually Tibia.dat), path specified in preferences/client version/
+	bool datOnlyLoad = !wxFileExists(wxString(data_path.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR) + "items.otb"));
 
 	g_gui.SetLoadDone(5, "Loading metadata file...");
 	wxFileName metadata_path = g_gui.gfx.getMetadataFileName();
