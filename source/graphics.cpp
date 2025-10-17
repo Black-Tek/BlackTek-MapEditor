@@ -714,6 +714,7 @@ bool GraphicManager::loadSpriteMetadataFlags(FileReadHandle& file, GameSprite* s
 			case DatFlagWrappable:
 			case DatFlagUnwrappable:
 			case DatFlagTopEffect:
+				break;
 			case DatFlagFloorChange:
 				// verify as idk how to do floorChangeDown etc.
 				//item->floorChange = item->floorChangeDown || item->floorChangeNorth || item->floorChangeEast || item->floorChangeSouth || item->floorChangeWest;
@@ -728,15 +729,15 @@ bool GraphicManager::loadSpriteMetadataFlags(FileReadHandle& file, GameSprite* s
 			case DatFlagWritable:
 				file.skip(2);
 				if(iType) {
-					iType->allowDistRead = true;
 					iType->canReadText = true;
+					iType->canWriteText = true;
 				}
 				break;
 			case DatFlagWritableOnce:
 				file.skip(2);
 				if(iType) {
-					iType->allowDistRead = true;
 					iType->canReadText = true;
+					iType->canWriteText = true;
 				}
 				break;
 			case DatFlagCloth:
@@ -745,7 +746,7 @@ bool GraphicManager::loadSpriteMetadataFlags(FileReadHandle& file, GameSprite* s
 				file.skip(2);
 				break;
 
-			case DatFlagGround:
+			case DatFlagGround: {
 				if(iType) {
 					iType->group = ITEM_GROUP_GROUND;
 				}
@@ -753,6 +754,7 @@ bool GraphicManager::loadSpriteMetadataFlags(FileReadHandle& file, GameSprite* s
 				file.getU16(speed);
                 sType->ground_speed = speed;
 				break;
+			}
 
 			case DatFlagLight: {
 				SpriteLight light;
