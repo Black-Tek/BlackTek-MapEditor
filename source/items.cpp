@@ -62,6 +62,7 @@ ItemType::ItemType() :
 	hookSouth(false),
 	canReadText(false),
 	canWriteText(false),
+	allowDistRead(false),
 	replaceable(true),
 	decays(false),
 	stackable(false),
