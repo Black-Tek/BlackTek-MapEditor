@@ -53,7 +53,8 @@ static void BuildItemNameCache() {
 		if (g_items.isValidID(id)) {
 			std::string name = g_items.getItemType(id).name;
 			if (!name.empty()) {
-				std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+				std::transform(name.begin(), name.end(), name.begin(),
+							   ::tolower);
 				s_itemNameToIdCache[name] = id;
 			}
 		}
@@ -69,7 +70,7 @@ static uint16_t LookupItemIdByName(const std::string &name) {
 
 	std::string lowerName = name;
 	std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(),
-								 ::tolower);
+				   ::tolower);
 
 	auto it = s_itemNameToIdCache.find(lowerName);
 	if (it != s_itemNameToIdCache.end()) {
@@ -83,13 +84,13 @@ static uint16_t LookupItemIdByName(const std::string &name) {
 // ============================================================================
 
 MonsterListBox::MonsterListBox(wxWindow *parent, wxWindowID id)
-		: wxVListBox(parent, id, wxDefaultPosition, wxSize(480, 200)),
-			m_monsters(nullptr) {
+	: wxVListBox(parent, id, wxDefaultPosition, wxSize(480, 200)),
+	  m_monsters(nullptr) {
 	SetBackgroundColour(wxColour(45, 45, 48));
 }
 
 void MonsterListBox::SetMonsters(
-		const std::vector<HuntingMonsterData> *monsters) {
+	const std::vector<HuntingMonsterData> *monsters) {
 	m_monsters = monsters;
 	SetItemCount(monsters ? monsters->size() : 0);
 	Refresh();
@@ -116,7 +117,8 @@ void MonsterListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 	// Draw creature sprite with outfit colors
 	if (monster.outfit.lookType > 0) {
 		try {
-			GameSprite *sprite = g_gui.gfx.getCreatureSprite(monster.outfit.lookType);
+			GameSprite *sprite =
+				g_gui.gfx.getCreatureSprite(monster.outfit.lookType);
 			if (sprite) {
 				wxRect spriteRect(rect.GetX() + 2, rect.GetY() + 2, 32, 32);
 				sprite->DrawTo(&dc, spriteRect, monster.outfit);
@@ -128,7 +130,7 @@ void MonsterListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 
 	// Text color
 	dc.SetTextForeground(IsSelected(n) ? wxColour(255, 255, 255)
-																		 : wxColour(220, 220, 220));
+									   : wxColour(220, 220, 220));
 
 	// Draw monster info columns
 	int x = rect.GetX() + 38;
@@ -143,8 +145,8 @@ void MonsterListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 	x += 50;
 
 	// Exp
-	dc.DrawText(wxString::Format("%llu", (unsigned long long)monster.experience),
-							x, y);
+	dc.DrawText(
+		wxString::Format("%llu", (unsigned long long)monster.experience), x, y);
 	x += 70;
 
 	// Regen time
@@ -172,9 +174,9 @@ EVT_MENU(ID_HUNTING_CALC_LOOT_EXPECTED_TIME, LootListBox::OnShowExpectedTime)
 END_EVENT_TABLE()
 
 LootListBox::LootListBox(wxWindow *parent, wxWindowID id,
-												 HuntingCalculatorWindow *calculator)
-		: wxVListBox(parent, id, wxDefaultPosition, wxSize(380, 200)),
-			m_loot(nullptr), m_calculator(calculator), m_rightClickedItem(-1) {
+						 HuntingCalculatorWindow *calculator)
+	: wxVListBox(parent, id, wxDefaultPosition, wxSize(380, 200)),
+	  m_loot(nullptr), m_calculator(calculator), m_rightClickedItem(-1) {
 	SetBackgroundColour(wxColour(45, 45, 48));
 }
 
@@ -209,8 +211,9 @@ void LootListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 			if (g_items.isValidID(loot.id)) {
 				const ItemType &itemType = g_items.getItemType(loot.id);
 				if (itemType.sprite) {
-					itemType.sprite->DrawTo(&dc, SPRITE_SIZE_32x32, rect.GetX() + 2,
-																	rect.GetY() + 2, 32, 32);
+					itemType.sprite->DrawTo(&dc, SPRITE_SIZE_32x32,
+											rect.GetX() + 2, rect.GetY() + 2,
+											32, 32);
 				}
 			}
 		} catch (...) {
@@ -220,7 +223,7 @@ void LootListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 
 	// Text color
 	dc.SetTextForeground(IsSelected(n) ? wxColour(255, 255, 255)
-																		 : wxColour(220, 220, 220));
+									   : wxColour(220, 220, 220));
 
 	int x = rect.GetX() + 38;
 	int y = rect.GetY() + 10;
@@ -248,7 +251,7 @@ void LootListBox::OnRightClick(wxMouseEvent &event) {
 	// Find which item was clicked
 	int item = VirtualHitTest(event.GetY());
 	if (item == wxNOT_FOUND || item < 0 ||
-			static_cast<size_t>(item) >= m_loot->size())
+		static_cast<size_t>(item) >= m_loot->size())
 		return;
 
 	m_rightClickedItem = item;
@@ -265,7 +268,7 @@ void LootListBox::OnRightClick(wxMouseEvent &event) {
 
 void LootListBox::OnShowExpectedTime(wxCommandEvent &event) {
 	if (!m_loot || m_rightClickedItem < 0 ||
-			static_cast<size_t>(m_rightClickedItem) >= m_loot->size())
+		static_cast<size_t>(m_rightClickedItem) >= m_loot->size())
 		return;
 	if (!m_calculator)
 		return;
@@ -284,17 +287,17 @@ void LootListBox::OnShowExpectedTime(wxCommandEvent &event) {
 	message += wxString::Format("Drop Rate: %.4f%%\n\n", item.dropRate);
 	message += "--- Expected Time ---\n";
 	message += wxString::Format("Average (E[T]): %s\n\n",
-															m_calculator->FormatTime(expectedTime));
+								m_calculator->FormatTime(expectedTime));
 	message += "--- Probability Thresholds ---\n";
 	message +=
-			wxString::Format("50%% chance: %s\n", m_calculator->FormatTime(time50));
+		wxString::Format("50%% chance: %s\n", m_calculator->FormatTime(time50));
 	message +=
-			wxString::Format("90%% chance: %s\n", m_calculator->FormatTime(time90));
+		wxString::Format("90%% chance: %s\n", m_calculator->FormatTime(time90));
 	message +=
-			wxString::Format("95%% chance: %s\n", m_calculator->FormatTime(time95));
+		wxString::Format("95%% chance: %s\n", m_calculator->FormatTime(time95));
 
 	wxMessageBox(message, "Expected Time to Drop: " + item.name,
-							 wxOK | wxICON_INFORMATION);
+				 wxOK | wxICON_INFORMATION);
 }
 
 // ============================================================================
@@ -305,25 +308,25 @@ BEGIN_EVENT_TABLE(HuntingCalculatorWindow, wxDialog)
 EVT_BUTTON(ID_HUNTING_CALC_CALCULATE, HuntingCalculatorWindow::OnCalculate)
 EVT_BUTTON(ID_HUNTING_CALC_CLOSE, HuntingCalculatorWindow::OnClose)
 EVT_BUTTON(ID_HUNTING_CALC_SAVE_ANALYSIS,
-					 HuntingCalculatorWindow::OnSaveAnalysis)
+		   HuntingCalculatorWindow::OnSaveAnalysis)
 EVT_CHOICE(ID_HUNTING_CALC_LOAD_ANALYSIS,
-					 HuntingCalculatorWindow::OnLoadAnalysis)
+		   HuntingCalculatorWindow::OnLoadAnalysis)
 EVT_DIRPICKER_CHANGED(ID_HUNTING_CALC_MONSTER_DIR,
-											HuntingCalculatorWindow::OnMonsterDirChanged)
+					  HuntingCalculatorWindow::OnMonsterDirChanged)
 EVT_FILEPICKER_CHANGED(ID_HUNTING_CALC_CONFIG_FILE,
-											 HuntingCalculatorWindow::OnConfigFileChanged)
+					   HuntingCalculatorWindow::OnConfigFileChanged)
 EVT_CHECKBOX(ID_HUNTING_CALC_APPLY_MULTIPLIERS,
-						 HuntingCalculatorWindow::OnApplyMultipliersChanged)
+			 HuntingCalculatorWindow::OnApplyMultipliersChanged)
 EVT_CHECKBOX(ID_HUNTING_CALC_USE_DPS_MODE,
-						 HuntingCalculatorWindow::OnKillModeChanged)
+			 HuntingCalculatorWindow::OnKillModeChanged)
 END_EVENT_TABLE()
 
 HuntingCalculatorWindow::HuntingCalculatorWindow(wxWindow *parent,
-																								 Editor &editor)
-		: wxDialog(parent, wxID_ANY, "Hunting Calculator", wxDefaultPosition,
-							 wxSize(950, 750), wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER),
-			m_editor(editor), m_cacheValid(false), m_cachedCurrentFloor(7),
-			m_cachedTileCount(0) {
+												 Editor &editor)
+	: wxDialog(parent, wxID_ANY, "Hunting Calculator", wxDefaultPosition,
+			   wxSize(950, 750), wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER),
+	  m_editor(editor), m_cacheValid(false), m_cachedCurrentFloor(7),
+	  m_cachedTileCount(0) {
 	SetBackgroundColour(wxColour(37, 37, 38));
 
 	try {
@@ -372,32 +375,35 @@ void HuntingCalculatorWindow::CreateControls() {
 	coordGrid->Add(createLabel("Start:"), 0, wxALIGN_CENTER_VERTICAL);
 	coordGrid->Add(createLabel("X:"), 0, wxALIGN_CENTER_VERTICAL);
 	m_startX =
-			newd wxSpinCtrl(this, ID_HUNTING_CALC_START_X, "0", wxDefaultPosition,
-											wxSize(80, -1), wxSP_ARROW_KEYS, 0, 65535);
+		newd wxSpinCtrl(this, ID_HUNTING_CALC_START_X, "0", wxDefaultPosition,
+						wxSize(80, -1), wxSP_ARROW_KEYS, 0, 65535);
 	coordGrid->Add(m_startX, 0);
 	coordGrid->Add(createLabel("Y:"), 0, wxALIGN_CENTER_VERTICAL);
 	m_startY =
-			newd wxSpinCtrl(this, ID_HUNTING_CALC_START_Y, "0", wxDefaultPosition,
-											wxSize(80, -1), wxSP_ARROW_KEYS, 0, 65535);
+		newd wxSpinCtrl(this, ID_HUNTING_CALC_START_Y, "0", wxDefaultPosition,
+						wxSize(80, -1), wxSP_ARROW_KEYS, 0, 65535);
 	coordGrid->Add(m_startY, 0);
 	coordGrid->Add(createLabel("Z:"), 0, wxALIGN_CENTER_VERTICAL);
 	m_startZ =
-			newd wxSpinCtrl(this, ID_HUNTING_CALC_START_Z, "7", wxDefaultPosition,
-											wxSize(60, -1), wxSP_ARROW_KEYS, 0, 15);
+		newd wxSpinCtrl(this, ID_HUNTING_CALC_START_Z, "7", wxDefaultPosition,
+						wxSize(60, -1), wxSP_ARROW_KEYS, 0, 15);
 	coordGrid->Add(m_startZ, 0);
 
 	coordGrid->Add(createLabel("End:"), 0, wxALIGN_CENTER_VERTICAL);
 	coordGrid->Add(createLabel("X:"), 0, wxALIGN_CENTER_VERTICAL);
-	m_endX = newd wxSpinCtrl(this, ID_HUNTING_CALC_END_X, "0", wxDefaultPosition,
-													 wxSize(80, -1), wxSP_ARROW_KEYS, 0, 65535);
+	m_endX =
+		newd wxSpinCtrl(this, ID_HUNTING_CALC_END_X, "0", wxDefaultPosition,
+						wxSize(80, -1), wxSP_ARROW_KEYS, 0, 65535);
 	coordGrid->Add(m_endX, 0);
 	coordGrid->Add(createLabel("Y:"), 0, wxALIGN_CENTER_VERTICAL);
-	m_endY = newd wxSpinCtrl(this, ID_HUNTING_CALC_END_Y, "0", wxDefaultPosition,
-													 wxSize(80, -1), wxSP_ARROW_KEYS, 0, 65535);
+	m_endY =
+		newd wxSpinCtrl(this, ID_HUNTING_CALC_END_Y, "0", wxDefaultPosition,
+						wxSize(80, -1), wxSP_ARROW_KEYS, 0, 65535);
 	coordGrid->Add(m_endY, 0);
 	coordGrid->Add(createLabel("Z:"), 0, wxALIGN_CENTER_VERTICAL);
-	m_endZ = newd wxSpinCtrl(this, ID_HUNTING_CALC_END_Z, "7", wxDefaultPosition,
-													 wxSize(60, -1), wxSP_ARROW_KEYS, 0, 15);
+	m_endZ =
+		newd wxSpinCtrl(this, ID_HUNTING_CALC_END_Z, "7", wxDefaultPosition,
+						wxSize(60, -1), wxSP_ARROW_KEYS, 0, 15);
 	coordGrid->Add(m_endZ, 0);
 
 	m_coordBox->Add(coordGrid, 0, wxALL, 5);
@@ -407,14 +413,15 @@ void HuntingCalculatorWindow::CreateControls() {
 	// Selection Info (shown when using lasso selection)
 	// ========================================================================
 	m_selectionInfoBox =
-			newd wxStaticBoxSizer(wxVERTICAL, this, "Selection Info");
+		newd wxStaticBoxSizer(wxVERTICAL, this, "Selection Info");
 	m_selectionInfoBox->GetStaticBox()->SetForegroundColour(
-			wxColour(200, 200, 200));
+		wxColour(200, 200, 200));
 
 	m_selectionInfoLabel = newd wxStaticText(this, wxID_ANY, "No selection");
 	m_selectionInfoLabel->SetForegroundColour(wxColour(100, 200, 100));
 	m_selectionInfoLabel->SetFont(m_selectionInfoLabel->GetFont().Bold());
-	m_selectionInfoBox->Add(m_selectionInfoLabel, 0, wxALL | wxALIGN_CENTER, 10);
+	m_selectionInfoBox->Add(m_selectionInfoLabel, 0, wxALL | wxALIGN_CENTER,
+							10);
 
 	// Initially hidden (shown only when using lasso selection)
 	m_selectionInfoBox->GetStaticBox()->Hide();
@@ -426,22 +433,22 @@ void HuntingCalculatorWindow::CreateControls() {
 	// Calculation Parameters with Multipliers
 	// ========================================================================
 	wxStaticBoxSizer *paramBox =
-			newd wxStaticBoxSizer(wxHORIZONTAL, this, "Calculation Parameters");
+		newd wxStaticBoxSizer(wxHORIZONTAL, this, "Calculation Parameters");
 	paramBox->GetStaticBox()->SetForegroundColour(wxColour(200, 200, 200));
 
 	// Left side - basic params
 	wxFlexGridSizer *paramGrid = newd wxFlexGridSizer(4, 2, 5, 10);
 
 	paramGrid->Add(createLabel("Hunting Duration (min):"), 0,
-								 wxALIGN_CENTER_VERTICAL);
+				   wxALIGN_CENTER_VERTICAL);
 	m_huntingDuration = newd wxSpinCtrlDouble(
-			this, ID_HUNTING_CALC_DURATION, "60", wxDefaultPosition, wxSize(100, -1),
-			wxSP_ARROW_KEYS, 1.0, 1440.0, 60.0, 5.0);
+		this, ID_HUNTING_CALC_DURATION, "60", wxDefaultPosition,
+		wxSize(100, -1), wxSP_ARROW_KEYS, 1.0, 1440.0, 60.0, 5.0);
 	paramGrid->Add(m_huntingDuration, 0);
 
 	// Kill time mode checkbox
 	m_useDPSMode =
-			newd wxCheckBox(this, ID_HUNTING_CALC_USE_DPS_MODE, "Use DPS mode");
+		newd wxCheckBox(this, ID_HUNTING_CALC_USE_DPS_MODE, "Use DPS mode");
 	m_useDPSMode->SetForegroundColour(wxColour(200, 200, 200));
 	m_useDPSMode->SetValue(false);
 	paramGrid->Add(m_useDPSMode, 0, wxALIGN_CENTER_VERTICAL);
@@ -451,17 +458,17 @@ void HuntingCalculatorWindow::CreateControls() {
 	m_timePerKillLabel = createLabel("Time per Kill (s):");
 	paramGrid->Add(m_timePerKillLabel, 0, wxALIGN_CENTER_VERTICAL);
 	m_timePerKill = newd wxSpinCtrlDouble(
-			this, ID_HUNTING_CALC_TIME_PER_KILL, "10.0", wxDefaultPosition,
-			wxSize(100, -1), wxSP_ARROW_KEYS, 1.0, 300.0, 10.0, 1.0);
+		this, ID_HUNTING_CALC_TIME_PER_KILL, "10.0", wxDefaultPosition,
+		wxSize(100, -1), wxSP_ARROW_KEYS, 1.0, 300.0, 10.0, 1.0);
 	paramGrid->Add(m_timePerKill, 0);
 
 	// Player DPS (shown when using DPS mode)
 	m_dpsLabel = createLabel("Your DPS:");
 	m_dpsLabel->Hide();
 	paramGrid->Add(m_dpsLabel, 0, wxALIGN_CENTER_VERTICAL);
-	m_playerDPS = newd wxSpinCtrlDouble(this, ID_HUNTING_CALC_PLAYER_DPS, "1000",
-																			wxDefaultPosition, wxSize(100, -1),
-																			wxSP_ARROW_KEYS, 100, 100000, 1000, 100);
+	m_playerDPS = newd wxSpinCtrlDouble(
+		this, ID_HUNTING_CALC_PLAYER_DPS, "1000", wxDefaultPosition,
+		wxSize(100, -1), wxSP_ARROW_KEYS, 100, 100000, 1000, 100);
 	m_playerDPS->Hide();
 	paramGrid->Add(m_playerDPS, 0);
 
@@ -469,14 +476,15 @@ void HuntingCalculatorWindow::CreateControls() {
 
 	// Separator
 	paramBox->Add(newd wxStaticLine(this, wxID_ANY, wxDefaultPosition,
-																	wxDefaultSize, wxLI_VERTICAL),
-								0, wxEXPAND | wxALL, 10);
+									wxDefaultSize, wxLI_VERTICAL),
+				  0, wxEXPAND | wxALL, 10);
 
 	// Right side - multipliers
 	wxBoxSizer *multSizer = newd wxBoxSizer(wxVERTICAL);
 
-	m_applyMultipliers = newd wxCheckBox(this, ID_HUNTING_CALC_APPLY_MULTIPLIERS,
-																			 "Apply config.lua multipliers");
+	m_applyMultipliers =
+		newd wxCheckBox(this, ID_HUNTING_CALC_APPLY_MULTIPLIERS,
+						"Apply config.lua multipliers");
 	m_applyMultipliers->SetForegroundColour(wxColour(200, 200, 200));
 	m_applyMultipliers->SetValue(false);
 	m_applyMultipliers->Enable(false);
@@ -508,7 +516,7 @@ void HuntingCalculatorWindow::CreateControls() {
 	// Data Sources Section
 	// ========================================================================
 	wxStaticBoxSizer *dataBox =
-			newd wxStaticBoxSizer(wxVERTICAL, this, "Data Sources");
+		newd wxStaticBoxSizer(wxVERTICAL, this, "Data Sources");
 	dataBox->GetStaticBox()->SetForegroundColour(wxColour(200, 200, 200));
 
 	wxFlexGridSizer *dataGrid = newd wxFlexGridSizer(2, 2, 5, 10);
@@ -516,29 +524,32 @@ void HuntingCalculatorWindow::CreateControls() {
 
 	// Monster directory
 	wxStaticText *monsterDirLabel =
-			newd wxStaticText(this, wxID_ANY, "Monsters Directory:");
+		newd wxStaticText(this, wxID_ANY, "Monsters Directory:");
 	monsterDirLabel->SetForegroundColour(wxColour(255, 255, 255));
 	dataGrid->Add(monsterDirLabel, 0, wxALIGN_CENTER_VERTICAL);
 	m_monsterDirPicker = newd wxDirPickerCtrl(
-			this, ID_HUNTING_CALC_MONSTER_DIR, wxEmptyString,
-			"Select monster data directory", wxDefaultPosition, wxDefaultSize,
-			wxDIRP_USE_TEXTCTRL | wxDIRP_DIR_MUST_EXIST);
+		this, ID_HUNTING_CALC_MONSTER_DIR, wxEmptyString,
+		"Select monster data directory", wxDefaultPosition, wxDefaultSize,
+		wxDIRP_USE_TEXTCTRL | wxDIRP_DIR_MUST_EXIST);
 	m_monsterDirPicker->GetTextCtrl()->SetForegroundColour(
-			wxColour(255, 255, 255));
-	m_monsterDirPicker->GetTextCtrl()->SetBackgroundColour(wxColour(45, 45, 48));
+		wxColour(255, 255, 255));
+	m_monsterDirPicker->GetTextCtrl()->SetBackgroundColour(
+		wxColour(45, 45, 48));
 	dataGrid->Add(m_monsterDirPicker, 1, wxEXPAND);
 
 	// Config.lua file
-	wxStaticText *configLabel = newd wxStaticText(this, wxID_ANY, "Config Lua:");
+	wxStaticText *configLabel =
+		newd wxStaticText(this, wxID_ANY, "Config Lua:");
 	configLabel->SetForegroundColour(wxColour(255, 255, 255));
 	dataGrid->Add(configLabel, 0, wxALIGN_CENTER_VERTICAL);
 	m_configFilePicker = newd wxFilePickerCtrl(
-			this, ID_HUNTING_CALC_CONFIG_FILE, wxEmptyString,
-			"Select config.lua file", "Lua files (*.lua)|*.lua", wxDefaultPosition,
-			wxDefaultSize, wxFLP_USE_TEXTCTRL | wxFLP_OPEN | wxFLP_FILE_MUST_EXIST);
+		this, ID_HUNTING_CALC_CONFIG_FILE, wxEmptyString,
+		"Select config.lua file", "Lua files (*.lua)|*.lua", wxDefaultPosition,
+		wxDefaultSize, wxFLP_USE_TEXTCTRL | wxFLP_OPEN | wxFLP_FILE_MUST_EXIST);
 	m_configFilePicker->GetTextCtrl()->SetForegroundColour(
-			wxColour(255, 255, 255));
-	m_configFilePicker->GetTextCtrl()->SetBackgroundColour(wxColour(45, 45, 48));
+		wxColour(255, 255, 255));
+	m_configFilePicker->GetTextCtrl()->SetBackgroundColour(
+		wxColour(45, 45, 48));
 	dataGrid->Add(m_configFilePicker, 1, wxEXPAND);
 
 	dataBox->Add(dataGrid, 0, wxEXPAND | wxALL, 5);
@@ -548,7 +559,7 @@ void HuntingCalculatorWindow::CreateControls() {
 	// Calculate Button
 	// ========================================================================
 	m_calculateButton =
-			newd wxButton(this, ID_HUNTING_CALC_CALCULATE, "Calculate");
+		newd wxButton(this, ID_HUNTING_CALC_CALCULATE, "Calculate");
 	m_calculateButton->SetBackgroundColour(wxColour(76, 175, 80));
 	m_calculateButton->SetForegroundColour(*wxWHITE);
 	m_calculateButton->SetMinSize(wxSize(150, 35));
@@ -560,10 +571,11 @@ void HuntingCalculatorWindow::CreateControls() {
 	wxBoxSizer *progressSizer = newd wxBoxSizer(wxHORIZONTAL);
 	m_progressLabel = newd wxStaticText(this, wxID_ANY, "");
 	m_progressLabel->SetForegroundColour(wxColour(200, 200, 200));
-	progressSizer->Add(m_progressLabel, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 10);
+	progressSizer->Add(m_progressLabel, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT,
+					   10);
 
 	m_progressBar =
-			newd wxGauge(this, wxID_ANY, 100, wxDefaultPosition, wxSize(300, 20));
+		newd wxGauge(this, wxID_ANY, 100, wxDefaultPosition, wxSize(300, 20));
 	progressSizer->Add(m_progressBar, 1, wxALIGN_CENTER_VERTICAL);
 
 	mainSizer->Add(progressSizer, 0, wxEXPAND | wxLEFT | wxRIGHT, 20);
@@ -574,7 +586,7 @@ void HuntingCalculatorWindow::CreateControls() {
 	// Experience Results
 	// ========================================================================
 	wxStaticBoxSizer *resultBox =
-			newd wxStaticBoxSizer(wxHORIZONTAL, this, "Results");
+		newd wxStaticBoxSizer(wxHORIZONTAL, this, "Results");
 	resultBox->GetStaticBox()->SetForegroundColour(wxColour(200, 200, 200));
 
 	m_expPerHourLabel = newd wxStaticText(this, wxID_ANY, "Exp/Hour: 0");
@@ -594,7 +606,8 @@ void HuntingCalculatorWindow::CreateControls() {
 
 	m_goldPerHourLabel = newd wxStaticText(this, wxID_ANY, "Gold/Hour: 0");
 	m_goldPerHourLabel->SetFont(m_goldPerHourLabel->GetFont().Bold());
-	m_goldPerHourLabel->SetForegroundColour(wxColour(255, 215, 0)); // Gold color
+	m_goldPerHourLabel->SetForegroundColour(
+		wxColour(255, 215, 0)); // Gold color
 	resultBox->Add(m_goldPerHourLabel, 1, wxALL | wxALIGN_CENTER_VERTICAL, 8);
 
 	mainSizer->Add(resultBox, 0, wxEXPAND | wxALL, 5);
@@ -606,14 +619,15 @@ void HuntingCalculatorWindow::CreateControls() {
 
 	// Monster List with header
 	wxStaticBoxSizer *monsterBox =
-			newd wxStaticBoxSizer(wxVERTICAL, this, "Monsters in Selection");
+		newd wxStaticBoxSizer(wxVERTICAL, this, "Monsters in Selection");
 	monsterBox->GetStaticBox()->SetForegroundColour(wxColour(200, 200, 200));
 
 	// Column headers for monsters
 	wxBoxSizer *monsterHeaderSizer = newd wxBoxSizer(wxHORIZONTAL);
 	monsterHeaderSizer->AddSpacer(40); // Sprite space
 
-	auto addHeader = [this](wxBoxSizer *sizer, const wxString &text, int width) {
+	auto addHeader = [this](wxBoxSizer *sizer, const wxString &text,
+							int width) {
 		wxStaticText *header = newd wxStaticText(this, wxID_ANY, text);
 		header->SetForegroundColour(wxColour(150, 150, 150));
 		header->SetFont(header->GetFont().Bold());
@@ -636,7 +650,7 @@ void HuntingCalculatorWindow::CreateControls() {
 
 	// Loot List with header
 	wxStaticBoxSizer *lootBox =
-			newd wxStaticBoxSizer(wxVERTICAL, this, "Expected Loot");
+		newd wxStaticBoxSizer(wxVERTICAL, this, "Expected Loot");
 	lootBox->GetStaticBox()->SetForegroundColour(wxColour(200, 200, 200));
 
 	// Column headers for loot
@@ -658,21 +672,22 @@ void HuntingCalculatorWindow::CreateControls() {
 	// Save Analysis Section
 	// ========================================================================
 	wxStaticBoxSizer *saveBox =
-			newd wxStaticBoxSizer(wxHORIZONTAL, this, "Save Analysis");
+		newd wxStaticBoxSizer(wxHORIZONTAL, this, "Save Analysis");
 	saveBox->GetStaticBox()->SetForegroundColour(wxColour(200, 200, 200));
 
-	wxStaticText *nameLabel = newd wxStaticText(this, wxID_ANY, "Analysis Name:");
+	wxStaticText *nameLabel =
+		newd wxStaticText(this, wxID_ANY, "Analysis Name:");
 	nameLabel->SetForegroundColour(wxColour(255, 255, 255));
 	saveBox->Add(nameLabel, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
 
 	m_analysisName = newd wxTextCtrl(this, ID_HUNTING_CALC_ANALYSIS_NAME, "",
-																	 wxDefaultPosition, wxSize(200, -1));
+									 wxDefaultPosition, wxSize(200, -1));
 	m_analysisName->SetForegroundColour(wxColour(255, 255, 255));
 	m_analysisName->SetBackgroundColour(wxColour(45, 45, 48));
 	saveBox->Add(m_analysisName, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5);
 
 	m_saveAnalysisButton =
-			newd wxButton(this, ID_HUNTING_CALC_SAVE_ANALYSIS, "Save");
+		newd wxButton(this, ID_HUNTING_CALC_SAVE_ANALYSIS, "Save");
 	m_saveAnalysisButton->SetMinSize(wxSize(80, 28));
 	saveBox->Add(m_saveAnalysisButton, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
 
@@ -700,7 +715,7 @@ void HuntingCalculatorWindow::CreateControls() {
 }
 
 void HuntingCalculatorWindow::SetArea(int startX, int startY, int startZ,
-																			int endX, int endY, int endZ) {
+									  int endX, int endY, int endZ) {
 	// Ensure start <= end
 	m_areaStartX = std::min(startX, endX);
 	m_areaStartY = std::min(startY, endY);
@@ -750,8 +765,8 @@ void HuntingCalculatorWindow::SetUseSelection(bool useSelection) {
 		// Update selection info label
 		if (m_selectionInfoLabel) {
 			wxString info = wxString::Format(
-					"Floor %d  |  %zu tiles  |  %zu monsters", m_cachedCurrentFloor,
-					m_cachedTileCount, m_cachedMonsters.size());
+				"Floor %d  |  %zu tiles  |  %zu monsters", m_cachedCurrentFloor,
+				m_cachedTileCount, m_cachedMonsters.size());
 			m_selectionInfoLabel->SetLabel(info);
 		}
 	}
@@ -773,8 +788,8 @@ void HuntingCalculatorWindow::LoadMonstersFromArea() {
 			// Process cached monsters
 			for (const auto &cachedMonster : m_cachedMonsters) {
 				std::string lowerName = cachedMonster.creatureName;
-				std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(),
-											 ::tolower);
+				std::transform(lowerName.begin(), lowerName.end(),
+							   lowerName.begin(), ::tolower);
 
 				monsterCounts[lowerName]++;
 				monsterOriginalNames[lowerName] = cachedMonster.creatureName;
@@ -786,16 +801,17 @@ void HuntingCalculatorWindow::LoadMonstersFromArea() {
 		} else {
 			// No cache - try to get from current selection
 			if (!m_editor.hasSelection()) {
-				wxMessageBox("No selection found.\nPlease make a selection with the "
-										 "lasso tool first.",
-										 "No Selection", wxOK | wxICON_INFORMATION);
+				wxMessageBox(
+					"No selection found.\nPlease make a selection with the "
+					"lasso tool first.",
+					"No Selection", wxOK | wxICON_INFORMATION);
 				return;
 			}
 
 			const Selection &selection = m_editor.getSelection();
 			if (selection.empty()) {
 				wxMessageBox("Selection is empty.", "No Selection",
-										 wxOK | wxICON_INFORMATION);
+							 wxOK | wxICON_INFORMATION);
 				return;
 			}
 
@@ -816,7 +832,7 @@ void HuntingCalculatorWindow::LoadMonstersFromArea() {
 				}
 			} catch (...) {
 				wxMessageBox("Error accessing selection tiles.", "Error",
-										 wxOK | wxICON_ERROR);
+							 wxOK | wxICON_ERROR);
 				return;
 			}
 
@@ -866,7 +882,7 @@ void HuntingCalculatorWindow::LoadMonstersFromArea() {
 						std::string name = creature->getName();
 						std::string lowerName = name;
 						std::transform(lowerName.begin(), lowerName.end(),
-													 lowerName.begin(), ::tolower);
+									   lowerName.begin(), ::tolower);
 
 						monsterCounts[lowerName]++;
 						monsterOriginalNames[lowerName] = name;
@@ -884,8 +900,8 @@ void HuntingCalculatorWindow::LoadMonstersFromArea() {
 
 		if (monsterCounts.empty()) {
 			wxMessageBox("No monsters found on floor " +
-											 std::to_string(m_cachedCurrentFloor) + ".",
-									 "No Monsters", wxOK | wxICON_INFORMATION);
+							 std::to_string(m_cachedCurrentFloor) + ".",
+						 "No Monsters", wxOK | wxICON_INFORMATION);
 			return;
 		}
 	} else {
@@ -916,7 +932,7 @@ void HuntingCalculatorWindow::LoadMonstersFromArea() {
 						std::string name = tile->creature->getName();
 						std::string lowerName = name;
 						std::transform(lowerName.begin(), lowerName.end(),
-													 lowerName.begin(), ::tolower);
+									   lowerName.begin(), ::tolower);
 						monsterCounts[lowerName]++;
 						monsterOriginalNames[lowerName] = name;
 
@@ -946,9 +962,9 @@ void HuntingCalculatorWindow::LoadMonstersFromArea() {
 
 	// Sort by count descending
 	std::sort(m_monstersInArea.begin(), m_monstersInArea.end(),
-						[](const HuntingMonsterData &a, const HuntingMonsterData &b) {
-							return a.count > b.count;
-						});
+			  [](const HuntingMonsterData &a, const HuntingMonsterData &b) {
+				  return a.count > b.count;
+			  });
 }
 
 bool HuntingCalculatorWindow::LoadConfigLua(const std::string &filepath) {
@@ -958,7 +974,7 @@ bool HuntingCalculatorWindow::LoadConfigLua(const std::string &filepath) {
 	}
 
 	std::string content((std::istreambuf_iterator<char>(file)),
-											std::istreambuf_iterator<char>());
+						std::istreambuf_iterator<char>());
 	file.close();
 
 	// Parse rates from config.lua
@@ -996,11 +1012,12 @@ bool HuntingCalculatorWindow::LoadConfigLua(const std::string &filepath) {
 
 void HuntingCalculatorWindow::UpdateMultiplierLabels() {
 	if (m_serverConfig.loaded) {
-		m_expMultLabel->SetLabel(wxString::Format("%.1fx", m_serverConfig.rateExp));
+		m_expMultLabel->SetLabel(
+			wxString::Format("%.1fx", m_serverConfig.rateExp));
 		m_lootMultLabel->SetLabel(
-				wxString::Format("%.1fx", m_serverConfig.rateLoot));
+			wxString::Format("%.1fx", m_serverConfig.rateLoot));
 		m_spawnMultLabel->SetLabel(
-				wxString::Format("%.1fx", m_serverConfig.rateSpawn));
+			wxString::Format("%.1fx", m_serverConfig.rateSpawn));
 	} else {
 		m_expMultLabel->SetLabel("1.0x");
 		m_lootMultLabel->SetLabel("1.0x");
@@ -1019,14 +1036,15 @@ void HuntingCalculatorWindow::LoadMonsterDatabase() {
 	LoadMonstersFromDirectory(m_monsterDirectory);
 
 	// Also check for 'lua' subdirectory
-	wxString luaDir = m_monsterDirectory + wxFileName::GetPathSeparator() + "lua";
+	wxString luaDir =
+		m_monsterDirectory + wxFileName::GetPathSeparator() + "lua";
 	if (wxDir::Exists(luaDir)) {
 		LoadMonstersFromDirectory(luaDir.ToStdString());
 	}
 }
 
 void HuntingCalculatorWindow::LoadMonstersFromDirectory(
-		const std::string &dirPath) {
+	const std::string &dirPath) {
 	if (dirPath.empty()) {
 		return;
 	}
@@ -1043,13 +1061,15 @@ void HuntingCalculatorWindow::LoadMonstersFromDirectory(
 	while (cont) {
 		// Skip monsters.xml index file
 		if (filename.Lower() != "monsters.xml") {
-			wxString fullPath = dirPath + wxFileName::GetPathSeparator() + filename;
+			wxString fullPath =
+				dirPath + wxFileName::GetPathSeparator() + filename;
 			try {
 				HuntingMonsterData data;
 				if (LoadMonsterFromXML(fullPath.ToStdString(), data) &&
-						!data.name.empty()) {
+					!data.name.empty()) {
 					std::string key = data.name;
-					std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+					std::transform(key.begin(), key.end(), key.begin(),
+								   ::tolower);
 					m_monsterDatabase[key] = data;
 				}
 			} catch (...) {
@@ -1064,13 +1084,15 @@ void HuntingCalculatorWindow::LoadMonstersFromDirectory(
 	while (cont) {
 		// Skip files starting with # (examples/templates)
 		if (!filename.StartsWith("#")) {
-			wxString fullPath = dirPath + wxFileName::GetPathSeparator() + filename;
+			wxString fullPath =
+				dirPath + wxFileName::GetPathSeparator() + filename;
 			try {
 				HuntingMonsterData data;
 				if (LoadMonsterFromLua(fullPath.ToStdString(), data) &&
-						!data.name.empty()) {
+					!data.name.empty()) {
 					std::string key = data.name;
-					std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+					std::transform(key.begin(), key.end(), key.begin(),
+								   ::tolower);
 					m_monsterDatabase[key] = data;
 				}
 			} catch (...) {
@@ -1080,13 +1102,15 @@ void HuntingCalculatorWindow::LoadMonstersFromDirectory(
 		cont = dir.GetNext(&filename);
 	}
 
-	// Recursively load from subdirectories (limit depth to avoid infinite loops)
+	// Recursively load from subdirectories (limit depth to avoid infinite
+	// loops)
 	static int recursionDepth = 0;
 	if (recursionDepth < 5) { // Max 5 levels deep
 		cont = dir.GetFirst(&filename, wxEmptyString, wxDIR_DIRS);
 		while (cont) {
 			if (filename != "." && filename != "..") {
-				wxString subDir = dirPath + wxFileName::GetPathSeparator() + filename;
+				wxString subDir =
+					dirPath + wxFileName::GetPathSeparator() + filename;
 				recursionDepth++;
 				LoadMonstersFromDirectory(subDir.ToStdString());
 				recursionDepth--;
@@ -1097,7 +1121,7 @@ void HuntingCalculatorWindow::LoadMonstersFromDirectory(
 }
 
 bool HuntingCalculatorWindow::LoadMonsterFromXML(const std::string &filepath,
-																								 HuntingMonsterData &data) {
+												 HuntingMonsterData &data) {
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file(filepath.c_str());
 
@@ -1148,8 +1172,8 @@ bool HuntingCalculatorWindow::LoadMonsterFromXML(const std::string &filepath,
 }
 
 void HuntingCalculatorWindow::ParseLootXML(
-		pugi::xml_node lootNode,
-		std::vector<HuntingMonsterData::LootItem> &lootList) {
+	pugi::xml_node lootNode,
+	std::vector<HuntingMonsterData::LootItem> &lootList) {
 	for (pugi::xml_node itemNode : lootNode.children("item")) {
 		HuntingMonsterData::LootItem lootItem;
 
@@ -1186,7 +1210,7 @@ void HuntingCalculatorWindow::ParseLootXML(
 }
 
 bool HuntingCalculatorWindow::LoadMonsterFromLua(const std::string &filepath,
-																								 HuntingMonsterData &data) {
+												 HuntingMonsterData &data) {
 	wxTextFile file;
 	if (!file.Open(filepath)) {
 		return false;
@@ -1194,7 +1218,7 @@ bool HuntingCalculatorWindow::LoadMonsterFromLua(const std::string &filepath,
 
 	std::string content;
 	for (wxString line = file.GetFirstLine(); !file.Eof();
-			 line = file.GetNextLine()) {
+		 line = file.GetNextLine()) {
 		content += line.ToStdString() + "\n";
 	}
 	file.Close();
@@ -1265,8 +1289,8 @@ bool HuntingCalculatorWindow::LoadMonsterFromLua(const std::string &filepath,
 }
 
 void HuntingCalculatorWindow::ParseLootLua(
-		const std::string &content,
-		std::vector<HuntingMonsterData::LootItem> &lootList) {
+	const std::string &content,
+	std::vector<HuntingMonsterData::LootItem> &lootList) {
 	// Find the loot table
 	std::regex lootTableRegex(R"((?:monster\.)?loot\s*=\s*\{)");
 	std::smatch lootMatch;
@@ -1304,7 +1328,8 @@ void HuntingCalculatorWindow::ParseLootLua(
 		if (braceCount != 0)
 			break;
 
-		std::string block = lootSection.substr(braceStart, braceEnd - braceStart);
+		std::string block =
+			lootSection.substr(braceStart, braceEnd - braceStart);
 
 		std::smatch idMatch;
 		HuntingMonsterData::LootItem lootItem;
@@ -1352,7 +1377,7 @@ void HuntingCalculatorWindow::ParseLootLua(
 void HuntingCalculatorWindow::CalculateResults() {
 	double huntingDurationMinutes = m_huntingDuration->GetValue();
 	double huntingDurationHours =
-			huntingDurationMinutes / 60.0; // Convert to hours for calculations
+		huntingDurationMinutes / 60.0; // Convert to hours for calculations
 	double timePerKill = CalculateTimePerKill();
 
 	// Get multipliers
@@ -1377,9 +1402,9 @@ void HuntingCalculatorWindow::CalculateResults() {
 	m_aggregatedLoot.clear();
 
 	std::map<uint32_t, AggregatedLoot>
-			lootMapById; // Use ID as key to avoid duplicates
+		lootMapById; // Use ID as key to avoid duplicates
 	std::map<std::string, AggregatedLoot>
-			lootMapByName; // Fallback for items without ID
+		lootMapByName; // Fallback for items without ID
 
 	for (auto &monster : m_monstersInArea) {
 		// Calculate respawn time (protect against division by zero)
@@ -1392,7 +1417,8 @@ void HuntingCalculatorWindow::CalculateResults() {
 		if (m_useDPSMode->IsChecked() && monster.health > 0) {
 			double playerDPS = m_playerDPS->GetValue();
 			if (playerDPS > 0.0) {
-				effectiveTimePerKill = static_cast<double>(monster.health) / playerDPS;
+				effectiveTimePerKill =
+					static_cast<double>(monster.health) / playerDPS;
 			}
 		}
 		// Ensure minimum time per kill to avoid division by zero
@@ -1401,16 +1427,18 @@ void HuntingCalculatorWindow::CalculateResults() {
 
 		// Kills per hour (safe from division by zero now)
 		double maxKillsPerHour = 3600.0 / effectiveTimePerKill;
-		double respawnKillsPerHour = (3600.0 / monster.respawnTime) * monster.count;
+		double respawnKillsPerHour =
+			(3600.0 / monster.respawnTime) * monster.count;
 		monster.killsPerHour = std::min(maxKillsPerHour, respawnKillsPerHour);
 
 		// Experience per hour (with multiplier)
-		monster.expPerHour = monster.killsPerHour * monster.experience * expMult;
+		monster.expPerHour =
+			monster.killsPerHour * monster.experience * expMult;
 		m_totalExpPerHour += monster.expPerHour;
 
 		// Total kills and exp
 		int totalKillsForMonster =
-				static_cast<int>(monster.killsPerHour * huntingDurationHours);
+			static_cast<int>(monster.killsPerHour * huntingDurationHours);
 		m_totalKills += totalKillsForMonster;
 		m_totalExp += totalKillsForMonster * monster.experience * expMult;
 
@@ -1420,15 +1448,16 @@ void HuntingCalculatorWindow::CalculateResults() {
 			if (dropRate > 1.0)
 				dropRate = 1.0; // Cap at 100%
 			double expectedCount =
-					totalKillsForMonster * dropRate * lootItem.countmax;
+				totalKillsForMonster * dropRate * lootItem.countmax;
 
 			// Calculate gold value for coins
 			uint64_t coinValue = GetCoinValue(lootItem.id);
 			if (coinValue > 0) {
 				// This is a coin - calculate gold per hour
 				double coinsPerHour =
-						monster.killsPerHour * dropRate * lootItem.countmax;
-				m_totalGoldPerHour += static_cast<uint64_t>(coinsPerHour * coinValue);
+					monster.killsPerHour * dropRate * lootItem.countmax;
+				m_totalGoldPerHour +=
+					static_cast<uint64_t>(coinsPerHour * coinValue);
 			}
 
 			// Use ID as key if available, otherwise use name
@@ -1445,25 +1474,25 @@ void HuntingCalculatorWindow::CalculateResults() {
 				}
 			} else if (!lootItem.name.empty()) {
 				std::string lowerName = lootItem.name;
-				std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(),
-											 ::tolower);
+				std::transform(lowerName.begin(), lowerName.end(),
+							   lowerName.begin(), ::tolower);
 
 				// Check if this is a coin by name
 				if (lowerName == "gold coin") {
 					double coinsPerHour =
-							monster.killsPerHour * dropRate * lootItem.countmax;
+						monster.killsPerHour * dropRate * lootItem.countmax;
 					m_totalGoldPerHour +=
-							static_cast<uint64_t>(coinsPerHour * GOLD_COIN_VALUE);
+						static_cast<uint64_t>(coinsPerHour * GOLD_COIN_VALUE);
 				} else if (lowerName == "platinum coin") {
 					double coinsPerHour =
-							monster.killsPerHour * dropRate * lootItem.countmax;
-					m_totalGoldPerHour +=
-							static_cast<uint64_t>(coinsPerHour * PLATINUM_COIN_VALUE);
+						monster.killsPerHour * dropRate * lootItem.countmax;
+					m_totalGoldPerHour += static_cast<uint64_t>(
+						coinsPerHour * PLATINUM_COIN_VALUE);
 				} else if (lowerName == "crystal coin") {
 					double coinsPerHour =
-							monster.killsPerHour * dropRate * lootItem.countmax;
-					m_totalGoldPerHour +=
-							static_cast<uint64_t>(coinsPerHour * CRYSTAL_COIN_VALUE);
+						monster.killsPerHour * dropRate * lootItem.countmax;
+					m_totalGoldPerHour += static_cast<uint64_t>(
+						coinsPerHour * CRYSTAL_COIN_VALUE);
 				}
 
 				if (lootMapByName.find(lowerName) == lootMapByName.end()) {
@@ -1489,9 +1518,9 @@ void HuntingCalculatorWindow::CalculateResults() {
 	}
 
 	std::sort(m_aggregatedLoot.begin(), m_aggregatedLoot.end(),
-						[](const AggregatedLoot &a, const AggregatedLoot &b) {
-							return a.expectedCount > b.expectedCount;
-						});
+			  [](const AggregatedLoot &a, const AggregatedLoot &b) {
+				  return a.expectedCount > b.expectedCount;
+			  });
 }
 
 double HuntingCalculatorWindow::CalculateTimePerKill() {
@@ -1521,7 +1550,8 @@ std::string HuntingCalculatorWindow::FormatGold(uint64_t gold) {
 	std::ostringstream oss;
 
 	if (gold >= 1000000000) {
-		oss << std::fixed << std::setprecision(2) << (gold / 1000000000.0) << "kkk";
+		oss << std::fixed << std::setprecision(2) << (gold / 1000000000.0)
+			<< "kkk";
 	} else if (gold >= 1000000) {
 		oss << std::fixed << std::setprecision(2) << (gold / 1000000.0) << "kk";
 	} else if (gold >= 1000) {
@@ -1570,7 +1600,7 @@ double HuntingCalculatorWindow::GetTotalKillsPerHour() const {
 }
 
 double HuntingCalculatorWindow::CalculateExpectedTimeForItem(
-		const AggregatedLoot &item) const {
+	const AggregatedLoot &item) const {
 	// Expected time formula: E[T] = 1 / (p * r)
 	// where p = drop probability per kill, r = kills per hour
 	// Result is in hours, we convert to minutes
@@ -1593,7 +1623,7 @@ double HuntingCalculatorWindow::CalculateExpectedTimeForItem(
 
 double
 HuntingCalculatorWindow::CalculateTimeForProbability(const AggregatedLoot &item,
-																										 double probability) const {
+													 double probability) const {
 	// Time for X% probability of getting at least 1 item
 	// P(≥1 drop in time t) = 1 - (1-p)^(r*t)
 	// Solving for t: t = ln(1-P) / (r * ln(1-p))
@@ -1677,7 +1707,7 @@ std::string HuntingCalculatorWindow::FormatNumber(double value) {
 void HuntingCalculatorWindow::OnCalculate(wxCommandEvent &event) {
 	// Safety check for UI controls
 	if (!m_expPerHourLabel || !m_totalExpLabel || !m_totalKillsLabel ||
-			!m_goldPerHourLabel || !m_monsterList || !m_lootList) {
+		!m_goldPerHourLabel || !m_monsterList || !m_lootList) {
 		return;
 	}
 
@@ -1698,7 +1728,7 @@ void HuntingCalculatorWindow::OnCalculate(wxCommandEvent &event) {
 	for (auto &monster : m_monstersInArea) {
 		std::string lowerName = monster.name;
 		std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(),
-									 ::tolower);
+					   ::tolower);
 
 		auto it = m_monsterDatabase.find(lowerName);
 		if (it != m_monsterDatabase.end()) {
@@ -1718,7 +1748,8 @@ void HuntingCalculatorWindow::OnCalculate(wxCommandEvent &event) {
 	m_expPerHourLabel->SetLabel("Exp/Hour: " + FormatNumber(m_totalExpPerHour));
 	m_totalExpLabel->SetLabel("Total Exp: " + FormatNumber(m_totalExp));
 	m_totalKillsLabel->SetLabel("Kills: " + FormatNumber(m_totalKills));
-	m_goldPerHourLabel->SetLabel("Gold/Hour: " + FormatGold(m_totalGoldPerHour));
+	m_goldPerHourLabel->SetLabel("Gold/Hour: " +
+								 FormatGold(m_totalGoldPerHour));
 
 	UpdateMonsterList();
 	UpdateLootList();
@@ -1753,11 +1784,12 @@ void HuntingCalculatorWindow::OnApplyMultipliersChanged(wxCommandEvent &event) {
 	if (!m_monstersInArea.empty()) {
 		CalculateResults();
 
-		m_expPerHourLabel->SetLabel("Exp/Hour: " + FormatNumber(m_totalExpPerHour));
+		m_expPerHourLabel->SetLabel("Exp/Hour: " +
+									FormatNumber(m_totalExpPerHour));
 		m_totalExpLabel->SetLabel("Total Exp: " + FormatNumber(m_totalExp));
 		m_totalKillsLabel->SetLabel("Kills: " + FormatNumber(m_totalKills));
 		m_goldPerHourLabel->SetLabel("Gold/Hour: " +
-																 FormatGold(m_totalGoldPerHour));
+									 FormatGold(m_totalGoldPerHour));
 
 		UpdateMonsterList();
 		UpdateLootList();
@@ -1771,11 +1803,12 @@ void HuntingCalculatorWindow::OnKillModeChanged(wxCommandEvent &event) {
 	if (!m_monstersInArea.empty()) {
 		CalculateResults();
 
-		m_expPerHourLabel->SetLabel("Exp/Hour: " + FormatNumber(m_totalExpPerHour));
+		m_expPerHourLabel->SetLabel("Exp/Hour: " +
+									FormatNumber(m_totalExpPerHour));
 		m_totalExpLabel->SetLabel("Total Exp: " + FormatNumber(m_totalExp));
 		m_totalKillsLabel->SetLabel("Kills: " + FormatNumber(m_totalKills));
 		m_goldPerHourLabel->SetLabel("Gold/Hour: " +
-																 FormatGold(m_totalGoldPerHour));
+									 FormatGold(m_totalGoldPerHour));
 
 		UpdateMonsterList();
 		UpdateLootList();
@@ -1910,7 +1943,7 @@ std::string HuntingCalculatorWindow::GetAnalysisFolder() {
 
 	wxFileName fn(mapPath);
 	wxString analyzerDir =
-			fn.GetPath() + wxFileName::GetPathSeparator() + "hunting_analyzer";
+		fn.GetPath() + wxFileName::GetPathSeparator() + "hunting_analyzer";
 
 	// Create directory if it doesn't exist
 	if (!wxDir::Exists(analyzerDir)) {
@@ -1966,27 +1999,27 @@ void HuntingCalculatorWindow::RefreshSavedAnalysesList() {
 void HuntingCalculatorWindow::SaveAnalysis(const std::string &name) {
 	std::string folder = GetAnalysisFolder();
 	if (folder.empty()) {
-		wxMessageBox("Please save the map first before saving analysis.", "Error",
-								 wxOK | wxICON_ERROR);
+		wxMessageBox("Please save the map first before saving analysis.",
+					 "Error", wxOK | wxICON_ERROR);
 		return;
 	}
 
 	if (name.empty()) {
 		wxMessageBox("Please enter a name for the analysis.", "Error",
-								 wxOK | wxICON_ERROR);
+					 wxOK | wxICON_ERROR);
 		return;
 	}
 
 	if (m_monstersInArea.empty()) {
-		wxMessageBox("No analysis data to save. Please calculate first.", "Error",
-								 wxOK | wxICON_ERROR);
+		wxMessageBox("No analysis data to save. Please calculate first.",
+					 "Error", wxOK | wxICON_ERROR);
 		return;
 	}
 
 	std::string filepath =
-			folder +
-			std::string(1, static_cast<char>(wxFileName::GetPathSeparator())) + name +
-			".toml";
+		folder +
+		std::string(1, static_cast<char>(wxFileName::GetPathSeparator())) +
+		name + ".toml";
 
 	// Build TOML content
 	std::ostringstream toml;
@@ -2000,13 +2033,13 @@ void HuntingCalculatorWindow::SaveAnalysis(const std::string &name) {
 	toml << "[summary]\n";
 	toml << "name = \"" << name << "\"\n";
 	toml << "total_exp_per_hour = " << std::fixed << std::setprecision(0)
-			 << m_totalExpPerHour << "\n";
+		 << m_totalExpPerHour << "\n";
 	toml << "total_exp = " << std::fixed << std::setprecision(0) << m_totalExp
-			 << "\n";
+		 << "\n";
 	toml << "total_kills = " << m_totalKills << "\n";
 	toml << "gold_per_hour = " << m_totalGoldPerHour << "\n";
 	toml << "hunting_duration_minutes = " << m_huntingDuration->GetValue()
-			 << "\n";
+		 << "\n";
 
 	if (m_useDPSMode->IsChecked()) {
 		toml << "calculation_mode = \"dps\"\n";
@@ -2034,11 +2067,11 @@ void HuntingCalculatorWindow::SaveAnalysis(const std::string &name) {
 		toml << "count = " << monster.count << "\n";
 		toml << "experience = " << monster.experience << "\n";
 		toml << "respawn_time = " << std::fixed << std::setprecision(1)
-				 << monster.respawnTime << "\n";
+			 << monster.respawnTime << "\n";
 		toml << "kills_per_hour = " << std::fixed << std::setprecision(1)
-				 << monster.killsPerHour << "\n";
+			 << monster.killsPerHour << "\n";
 		toml << "exp_per_hour = " << std::fixed << std::setprecision(0)
-				 << monster.expPerHour << "\n\n";
+			 << monster.expPerHour << "\n\n";
 	}
 
 	// Loot section
@@ -2051,9 +2084,9 @@ void HuntingCalculatorWindow::SaveAnalysis(const std::string &name) {
 		toml << "name = \"" << loot.name << "\"\n";
 		toml << "id = " << loot.id << "\n";
 		toml << "expected_count = " << std::fixed << std::setprecision(1)
-				 << loot.expectedCount << "\n";
+			 << loot.expectedCount << "\n";
 		toml << "drop_rate = " << std::fixed << std::setprecision(2)
-				 << loot.dropRate << "\n\n";
+			 << loot.dropRate << "\n\n";
 	}
 
 	// Write to file
@@ -2062,10 +2095,11 @@ void HuntingCalculatorWindow::SaveAnalysis(const std::string &name) {
 		file << toml.str();
 		file.close();
 		wxMessageBox("Analysis saved to:\n" + filepath, "Success",
-								 wxOK | wxICON_INFORMATION);
+					 wxOK | wxICON_INFORMATION);
 		RefreshSavedAnalysesList();
 	} else {
-		wxMessageBox("Failed to save analysis file.", "Error", wxOK | wxICON_ERROR);
+		wxMessageBox("Failed to save analysis file.", "Error",
+					 wxOK | wxICON_ERROR);
 	}
 }
 
@@ -2080,9 +2114,9 @@ void HuntingCalculatorWindow::LoadAnalysis(const std::string &name) {
 	}
 
 	std::string filepath =
-			folder +
-			std::string(1, static_cast<char>(wxFileName::GetPathSeparator())) + name +
-			".toml";
+		folder +
+		std::string(1, static_cast<char>(wxFileName::GetPathSeparator())) +
+		name + ".toml";
 
 	// For now, just show the file content in a message box
 	// A full implementation would parse the TOML and populate the UI
@@ -2094,15 +2128,15 @@ void HuntingCalculatorWindow::LoadAnalysis(const std::string &name) {
 
 		// Show in a scrollable dialog
 		wxDialog *dlg = new wxDialog(this, wxID_ANY, "Analysis: " + name,
-																 wxDefaultPosition, wxSize(600, 500),
-																 wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
+									 wxDefaultPosition, wxSize(600, 500),
+									 wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
 		wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 
 		wxTextCtrl *text = new wxTextCtrl(
-				dlg, wxID_ANY, buffer.str(), wxDefaultPosition, wxDefaultSize,
-				wxTE_MULTILINE | wxTE_READONLY | wxHSCROLL);
+			dlg, wxID_ANY, buffer.str(), wxDefaultPosition, wxDefaultSize,
+			wxTE_MULTILINE | wxTE_READONLY | wxHSCROLL);
 		text->SetFont(wxFont(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL,
-												 wxFONTWEIGHT_NORMAL));
+							 wxFONTWEIGHT_NORMAL));
 		sizer->Add(text, 1, wxEXPAND | wxALL, 10);
 
 		wxButton *closeBtn = new wxButton(dlg, wxID_OK, "Close");
@@ -2112,7 +2146,8 @@ void HuntingCalculatorWindow::LoadAnalysis(const std::string &name) {
 		dlg->ShowModal();
 		dlg->Destroy();
 	} else {
-		wxMessageBox("Failed to load analysis file.", "Error", wxOK | wxICON_ERROR);
+		wxMessageBox("Failed to load analysis file.", "Error",
+					 wxOK | wxICON_ERROR);
 	}
 }
 
@@ -2120,7 +2155,7 @@ void HuntingCalculatorWindow::OnSaveAnalysis(wxCommandEvent &event) {
 	wxString name = m_analysisName->GetValue().Trim();
 	if (name.IsEmpty()) {
 		wxMessageBox("Please enter a name for the analysis.", "Error",
-								 wxOK | wxICON_ERROR);
+					 wxOK | wxICON_ERROR);
 		return;
 	}
 
@@ -2199,7 +2234,8 @@ void HuntingCalculatorWindow::CacheSelectionTiles() {
 		}
 	}
 
-	// Find the floor with the most tiles (this is the floor the user selected on)
+	// Find the floor with the most tiles (this is the floor the user selected
+	// on)
 	int detectedFloor = m_cachedCurrentFloor; // Default to cached floor
 	int maxCount = 0;
 	for (const auto &pair : floorCounts) {

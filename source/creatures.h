@@ -18,28 +18,27 @@
 #ifndef RME_CREATURES_H_
 #define RME_CREATURES_H_
 
-#include "outfit.h"
 #include "ext/pugixml.hpp"
+#include "outfit.h"
 
-#include <string>
 #include <map>
-#include <wx/string.h>
+#include <string>
 #include <wx/arrstr.h>
 #include <wx/filename.h>
+#include <wx/string.h>
 
 typedef wxFileName FileName;
 
 class CreatureType;
 class CreatureBrush;
 
-typedef std::map<std::string, CreatureType*> CreatureMap;
+typedef std::map<std::string, CreatureType *> CreatureMap;
 
-class CreatureDatabase
-{
-protected:
+class CreatureDatabase {
+  protected:
 	CreatureMap creature_map;
 
-public:
+  public:
 	typedef CreatureMap::iterator iterator;
 	typedef CreatureMap::const_iterator const_iterator;
 
@@ -48,26 +47,28 @@ public:
 
 	void clear();
 
-	CreatureType* operator[](const std::string& name);
-	CreatureType* addMissingCreatureType(const std::string& name, bool isNpc);
-	CreatureType* addCreatureType(const std::string& name, bool isNpc, const Outfit& outfit);
+	CreatureType *operator[](const std::string &name);
+	CreatureType *addMissingCreatureType(const std::string &name, bool isNpc);
+	CreatureType *addCreatureType(const std::string &name, bool isNpc,
+								  const Outfit &outfit);
 
 	bool hasMissing() const;
 	iterator begin() noexcept { return creature_map.begin(); }
 	iterator end() noexcept { return creature_map.end(); }
 
-	bool loadFromXML(const FileName& filename, bool standard, wxString& error, wxArrayString& warnings);
-	bool importXMLFromOT(const FileName& filename, wxString& error, wxArrayString& warnings);
+	bool loadFromXML(const FileName &filename, bool standard, wxString &error,
+					 wxArrayString &warnings);
+	bool importXMLFromOT(const FileName &filename, wxString &error,
+						 wxArrayString &warnings);
 
-	bool saveToXML(const FileName& filename);
+	bool saveToXML(const FileName &filename);
 };
 
-class CreatureType
-{
-public:
+class CreatureType {
+  public:
 	CreatureType();
-	CreatureType(const CreatureType& ct);
-	CreatureType& operator=(const CreatureType& ct);
+	CreatureType(const CreatureType &ct);
+	CreatureType &operator=(const CreatureType &ct);
 	~CreatureType();
 
 	bool isNpc;
@@ -76,10 +77,13 @@ public:
 	bool standard;
 	std::string name;
 	Outfit outfit;
-	CreatureBrush* brush;
+	CreatureBrush *brush;
 
-	static CreatureType* loadFromXML(pugi::xml_node node, wxArrayString& warnings);
-	static CreatureType* loadFromOTXML(const FileName& filename, pugi::xml_document& node, wxArrayString& warnings);
+	static CreatureType *loadFromXML(pugi::xml_node node,
+									 wxArrayString &warnings);
+	static CreatureType *loadFromOTXML(const FileName &filename,
+									   pugi::xml_document &node,
+									   wxArrayString &warnings);
 };
 
 extern CreatureDatabase g_creatures;

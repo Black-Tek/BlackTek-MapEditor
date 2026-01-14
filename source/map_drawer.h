@@ -19,27 +19,26 @@
 #define RME_MAP_DRAWER_H_
 
 #include <iostream>
-#include <unordered_set>
-#include <unordered_map>
 #include <memory>
+#include <unordered_map>
+#include <unordered_set>
 
 class GameSprite;
 class LassoSelection;
 
-struct MapTooltip
-{
+struct MapTooltip {
 	enum TextLength {
 		MAX_CHARS_PER_LINE = 40,
 		MAX_CHARS = 255,
 	};
 
-	MapTooltip(int x, int y, std::string text, uint8_t r, uint8_t g, uint8_t b) :
-		x(x), y(y), text(text), r(r), g(g), b(b) {
+	MapTooltip(int x, int y, std::string text, uint8_t r, uint8_t g, uint8_t b)
+		: x(x), y(y), text(text), r(r), g(g), b(b) {
 		ellipsis = (text.length() - 3) > MAX_CHARS;
 	}
 
 	void checkLineEnding() {
-		if(text.at(text.size() - 1) == '\n')
+		if (text.at(text.size() - 1) == '\n')
 			text.resize(text.size() - 1);
 	}
 
@@ -50,9 +49,8 @@ struct MapTooltip
 };
 
 // Storage during drawing, for option caching
-class DrawingOptions
-{
-public:
+class DrawingOptions {
+  public:
 	DrawingOptions();
 
 	void SetIngame();
@@ -96,78 +94,64 @@ public:
 class MapCanvas;
 class LightDrawer;
 
-struct FinderPosition
-{
+struct FinderPosition {
 	FinderPosition() {}
 	FinderPosition(int _x, int _y, int _z) : x(_x), y(_y), z(_z) {}
 	int x, y, z;
 
-	bool operator==(const FinderPosition& other) const
-	{
+	bool operator==(const FinderPosition &other) const {
 		return x == other.x && y == other.y && z == other.z;
 	}
 
-	double distance(const FinderPosition& b) const
-	{
+	double distance(const FinderPosition &b) const {
 		return std::sqrt(std::pow(x - b.x, 2) + std::pow(y - b.y, 2));
 	}
 
-	struct Hash
-	{
-		size_t operator()(const FinderPosition& p) const
-		{
+	struct Hash {
+		size_t operator()(const FinderPosition &p) const {
 			return p.x ^ p.y ^ p.z;
 		}
 	};
 };
 
-class ZoneFinder
-{
-	private:
+class ZoneFinder {
+  private:
 	std::unordered_set<FinderPosition, FinderPosition::Hash> positions;
 	std::vector<std::vector<FinderPosition>> zones;
 	std::unordered_set<FinderPosition, FinderPosition::Hash> visited;
 
-	bool isValid(const FinderPosition& pos)
-	{
-		return positions.find(pos) != positions.end() && visited.find(pos) == visited.end();
+	bool isValid(const FinderPosition &pos) {
+		return positions.find(pos) != positions.end() &&
+			   visited.find(pos) == visited.end();
 	}
 
-	void dfs(const FinderPosition& pos, std::vector<FinderPosition>& zone)
-	{
-		if (visited.find(pos) != visited.end())
-		{
+	void dfs(const FinderPosition &pos, std::vector<FinderPosition> &zone) {
+		if (visited.find(pos) != visited.end()) {
 			return;
 		}
 
 		visited.insert(pos);
 		zone.push_back(pos);
 
-		std::vector<FinderPosition> neighbors = {
-			{pos.x + 1, pos.y, pos.z},
-			{pos.x - 1, pos.y, pos.z},
-			{pos.x, pos.y + 1, pos.z},
-			{pos.x, pos.y - 1, pos.z}
-		};
+		std::vector<FinderPosition> neighbors = {{pos.x + 1, pos.y, pos.z},
+												 {pos.x - 1, pos.y, pos.z},
+												 {pos.x, pos.y + 1, pos.z},
+												 {pos.x, pos.y - 1, pos.z}};
 
-		for (const auto& next : neighbors)
-		{
-			if (isValid(next))
-			{
+		for (const auto &next : neighbors) {
+			if (isValid(next)) {
 				dfs(next, zone);
 			}
 		}
 	}
 
-	public:
-	ZoneFinder(const std::vector<FinderPosition>& inputPositions) : positions(inputPositions.begin(), inputPositions.end()) {}
+  public:
+	ZoneFinder(const std::vector<FinderPosition> &inputPositions)
+		: positions(inputPositions.begin(), inputPositions.end()) {}
 
-	std::vector<std::vector<FinderPosition>> findZones()
-	{
-		for (const auto& pos : positions)
-		{
-			if (visited.find(pos) == visited.end())
-			{
+	std::vector<std::vector<FinderPosition>> findZones() {
+		for (const auto &pos : positions) {
+			if (visited.find(pos) == visited.end()) {
 				std::vector<FinderPosition> zone;
 				dfs(pos, zone);
 				zones.push_back(zone);
@@ -177,11 +161,10 @@ class ZoneFinder
 		return zones;
 	}
 
-	FinderPosition findClosestToCenter(const std::vector<FinderPosition>& zone)
-	{
-		FinderPosition centroid = { 0, 0, 0 };
-		for (const auto& pos : zone)
-		{
+	FinderPosition
+	findClosestToCenter(const std::vector<FinderPosition> &zone) {
+		FinderPosition centroid = {0, 0, 0};
+		for (const auto &pos : zone) {
 			centroid.x += pos.x;
 			centroid.y += pos.y;
 			centroid.z += pos.z;
@@ -193,11 +176,9 @@ class ZoneFinder
 
 		double minDistance = std::numeric_limits<double>::max();
 		FinderPosition closestPosition;
-		for (const auto& pos : zone)
-		{
+		for (const auto &pos : zone) {
 			const double dist = pos.distance(centroid);
-			if (dist < minDistance)
-			{
+			if (dist < minDistance) {
 				minDistance = dist;
 				closestPosition = pos;
 			}
@@ -207,10 +188,9 @@ class ZoneFinder
 	}
 };
 
-class MapDrawer
-{
-	MapCanvas* canvas;
-	Editor& editor;
+class MapDrawer {
+	MapCanvas *canvas;
+	Editor &editor;
 	DrawingOptions options;
 	std::shared_ptr<LightDrawer> light_drawer;
 
@@ -226,16 +206,16 @@ class MapDrawer
 	int tile_size;
 	int floor;
 
-protected:
+  protected:
 	std::unordered_map<uint16_t, std::vector<FinderPosition>> zoneTiles;
-	std::vector<MapTooltip*> tooltips;
+	std::vector<MapTooltip *> tooltips;
 	std::ostringstream tooltip;
 
 	wxStopWatch pos_indicator_timer;
 	Position pos_indicator;
 
-public:
-	MapDrawer(MapCanvas* canvas);
+  public:
+	MapDrawer(MapCanvas *canvas);
 	~MapDrawer();
 
 	bool dragging;
@@ -260,36 +240,51 @@ public:
 	void DrawGrid();
 	void DrawTooltips();
 
-	void TakeScreenshot(uint8_t* screenshot_buffer);
+	void TakeScreenshot(uint8_t *screenshot_buffer);
 
-	void ShowPositionIndicator(const Position& position);
+	void ShowPositionIndicator(const Position &position);
 	long GetPositionIndicatorTime() const {
 		const long time = pos_indicator_timer.Time();
-		if(time < rme::PositionIndicatorDuration) {
+		if (time < rme::PositionIndicatorDuration) {
 			return time;
 		}
 		return 0;
 	}
 
-	DrawingOptions& getOptions() noexcept { return options; }
+	DrawingOptions &getOptions() noexcept { return options; }
 
-protected:
-	void BlitItem(int& screenx, int& screeny, const Tile* tile, const Item* item, bool ephemeral = false, int red = 255, int green = 255, int blue = 255, int alpha = 255);
-	void BlitItem(int& screenx, int& screeny, const Position& pos, const Item* item, bool ephemeral = false, int red = 255, int green = 255, int blue = 255, int alpha = 255);
-	void BlitSpriteType(int screenx, int screeny, uint32_t spriteid, int red = 255, int green = 255, int blue = 255, int alpha = 255);
-	void BlitSpriteType(int screenx, int screeny, GameSprite* spr, int red = 255, int green = 255, int blue = 255, int alpha = 255);
-	void BlitCreature(int screenx, int screeny, const Creature* c, int red = 255, int green = 255, int blue = 255, int alpha = 255);
-	void BlitCreature(int screenx, int screeny, const Outfit& outfit, Direction dir, int red = 255, int green = 255, int blue = 255, int alpha = 255);
-	void DrawTile(TileLocation* tile);
-	void DrawBrushIndicator(int x, int y, Brush* brush, uint8_t r, uint8_t g, uint8_t b);
-	void DrawHookIndicator(int x, int y, const ItemType& type);
-	void DrawTileIndicators(TileLocation* location);
-	void DrawIndicator(int x, int y, int indicator, uint8_t r = 255, uint8_t g = 255, uint8_t b = 255, uint8_t a = 255);
+  protected:
+	void BlitItem(int &screenx, int &screeny, const Tile *tile,
+				  const Item *item, bool ephemeral = false, int red = 255,
+				  int green = 255, int blue = 255, int alpha = 255);
+	void BlitItem(int &screenx, int &screeny, const Position &pos,
+				  const Item *item, bool ephemeral = false, int red = 255,
+				  int green = 255, int blue = 255, int alpha = 255);
+	void BlitSpriteType(int screenx, int screeny, uint32_t spriteid,
+						int red = 255, int green = 255, int blue = 255,
+						int alpha = 255);
+	void BlitSpriteType(int screenx, int screeny, GameSprite *spr,
+						int red = 255, int green = 255, int blue = 255,
+						int alpha = 255);
+	void BlitCreature(int screenx, int screeny, const Creature *c,
+					  int red = 255, int green = 255, int blue = 255,
+					  int alpha = 255);
+	void BlitCreature(int screenx, int screeny, const Outfit &outfit,
+					  Direction dir, int red = 255, int green = 255,
+					  int blue = 255, int alpha = 255);
+	void DrawTile(TileLocation *tile);
+	void DrawBrushIndicator(int x, int y, Brush *brush, uint8_t r, uint8_t g,
+							uint8_t b);
+	void DrawHookIndicator(int x, int y, const ItemType &type);
+	void DrawTileIndicators(TileLocation *location);
+	void DrawIndicator(int x, int y, int indicator, uint8_t r = 255,
+					   uint8_t g = 255, uint8_t b = 255, uint8_t a = 255);
 	void DrawPositionIndicator(int z);
-	void WriteTooltip(Tile* tile, const Item* item, std::ostringstream& stream);
-	void WriteTooltip(const Waypoint* item, std::ostringstream& stream);
-	void MakeTooltip(int screenx, int screeny, const std::string& text, uint8_t r = 255, uint8_t g = 255, uint8_t b = 255);
-	void AddLight(TileLocation* location);
+	void WriteTooltip(Tile *tile, const Item *item, std::ostringstream &stream);
+	void WriteTooltip(const Waypoint *item, std::ostringstream &stream);
+	void MakeTooltip(int screenx, int screeny, const std::string &text,
+					 uint8_t r = 255, uint8_t g = 255, uint8_t b = 255);
+	void AddLight(TileLocation *location);
 
 	enum BrushColor {
 		COLOR_BRUSH,
@@ -302,18 +297,21 @@ protected:
 		COLOR_BLANK,
 	};
 
-	void getColor(Brush* brush, const Position& position, uint8_t &r, uint8_t &g, uint8_t &b);
-	void glBlitTexture(int x, int y, int textureId, int red, int green, int blue, int alpha, bool adjustZoom = false);
+	void getColor(Brush *brush, const Position &position, uint8_t &r,
+				  uint8_t &g, uint8_t &b);
+	void glBlitTexture(int x, int y, int textureId, int red, int green,
+					   int blue, int alpha, bool adjustZoom = false);
 	void glBlitSquare(int x, int y, int red, int green, int blue, int alpha);
-	void glBlitSquare(int x, int y, const wxColor& color);
-	void glColor(const wxColor& color);
+	void glBlitSquare(int x, int y, const wxColor &color);
+	void glColor(const wxColor &color);
 	void glColor(BrushColor color);
-	void glColorCheck(Brush* brush, const Position& pos);
-	void drawRect(int x, int y, int w, int h, const wxColor& color, int width = 1);
-	void drawFilledRect(int x, int y, int w, int h, const wxColor& color);
+	void glColorCheck(Brush *brush, const Position &pos);
+	void drawRect(int x, int y, int w, int h, const wxColor &color,
+				  int width = 1);
+	void drawFilledRect(int x, int y, int w, int h, const wxColor &color);
 
-private:
-	void getDrawPosition(const Position& position, int &x, int &y);
+  private:
+	void getDrawPosition(const Position &position, int &x, int &y);
 };
 
 #endif

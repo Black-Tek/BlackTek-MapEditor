@@ -18,14 +18,14 @@
 #ifndef RME_ITEMS_H_
 #define RME_ITEMS_H_
 
-#include "filehandle.h"
 #include "brush_enums.h"
 #include "con_vector.h"
 #include "ext/pugixml.hpp"
+#include "filehandle.h"
 #include <toml++/toml.hpp>
-#include <wx/string.h>
 #include <wx/arrstr.h>
 #include <wx/filename.h>
+#include <wx/string.h>
 
 typedef wxFileName FileName;
 
@@ -86,9 +86,7 @@ enum ItemTypes_t {
 
 /////////OTB specific//////////////
 
-enum rootattrib_t{
-	ROOT_ATTR_VERSION = 0x01
-};
+enum rootattrib_t { ROOT_ATTR_VERSION = 0x01 };
 
 enum itemattrib_t {
 	ITEM_ATTR_FIRST = 0x10,
@@ -114,7 +112,7 @@ enum itemattrib_t {
 	ITEM_ATTR_08,
 	ITEM_ATTR_LIGHT,
 
-	//1-byte aligned
+	// 1-byte aligned
 	ITEM_ATTR_DECAY2,
 	ITEM_ATTR_WEAPON2,
 	ITEM_ATTR_AMU2,
@@ -156,7 +154,7 @@ enum itemflags_t {
 	FLAG_IGNORE_LOOK = 1 << 23
 };
 
-enum slotsOTB_t{
+enum slotsOTB_t {
 	OTB_SLOT_DEFAULT,
 	OTB_SLOT_HEAD,
 	OTB_SLOT_BODY,
@@ -171,26 +169,26 @@ enum slotsOTB_t{
 };
 
 enum ShootTypeOtb_t {
-	OTB_SHOOT_NONE          = 0,
-	OTB_SHOOT_BOLT          = 1,
-	OTB_SHOOT_ARROW         = 2,
-	OTB_SHOOT_FIRE          = 3,
-	OTB_SHOOT_ENERGY        = 4,
-	OTB_SHOOT_POISONARROW   = 5,
-	OTB_SHOOT_BURSTARROW    = 6,
-	OTB_SHOOT_THROWINGSTAR  = 7,
+	OTB_SHOOT_NONE = 0,
+	OTB_SHOOT_BOLT = 1,
+	OTB_SHOOT_ARROW = 2,
+	OTB_SHOOT_FIRE = 3,
+	OTB_SHOOT_ENERGY = 4,
+	OTB_SHOOT_POISONARROW = 5,
+	OTB_SHOOT_BURSTARROW = 6,
+	OTB_SHOOT_THROWINGSTAR = 7,
 	OTB_SHOOT_THROWINGKNIFE = 8,
-	OTB_SHOOT_SMALLSTONE    = 9,
-	OTB_SHOOT_SUDDENDEATH   = 10,
-	OTB_SHOOT_LARGEROCK     = 11,
-	OTB_SHOOT_SNOWBALL      = 12,
-	OTB_SHOOT_POWERBOLT     = 13,
-	OTB_SHOOT_SPEAR         = 14,
-	OTB_SHOOT_POISONFIELD   = 15,
-	OTB_SHOOT_INFERNALBOLT  = 16
+	OTB_SHOOT_SMALLSTONE = 9,
+	OTB_SHOOT_SUDDENDEATH = 10,
+	OTB_SHOOT_LARGEROCK = 11,
+	OTB_SHOOT_SNOWBALL = 12,
+	OTB_SHOOT_POWERBOLT = 13,
+	OTB_SHOOT_SPEAR = 14,
+	OTB_SHOOT_POISONFIELD = 15,
+	OTB_SHOOT_INFERNALBOLT = 16
 };
 
-//1-byte aligned structs
+// 1-byte aligned structs
 #pragma pack(1)
 
 struct VERSIONINFO {
@@ -241,12 +239,11 @@ struct writeableBlock3 {
 
 #pragma pack()
 
-class ItemType
-{
-private:
-	ItemType(const ItemType&) {}
+class ItemType {
+  private:
+	ItemType(const ItemType &) {}
 
-public:
+  public:
 	ItemType();
 
 	bool isGroundTile() const noexcept { return group == ITEM_GROUP_GROUND; }
@@ -254,11 +251,15 @@ public:
 	bool isFluidContainer() const noexcept { return group == ITEM_GROUP_FLUID; }
 
 	bool isClientCharged() const { return client_chargeable; }
-	bool isExtraCharged() const { return !client_chargeable && extra_chargeable; }
+	bool isExtraCharged() const {
+		return !client_chargeable && extra_chargeable;
+	}
 
 	bool isDepot() const noexcept { return type == ITEM_TYPE_DEPOT; }
 	bool isMailbox() const noexcept { return type == ITEM_TYPE_MAILBOX; }
-	bool isTrashHolder() const noexcept { return type == ITEM_TYPE_TRASHHOLDER; }
+	bool isTrashHolder() const noexcept {
+		return type == ITEM_TYPE_TRASHHOLDER;
+	}
 	bool isContainer() const noexcept { return type == ITEM_TYPE_CONTAINER; }
 	bool isDoor() const noexcept { return type == ITEM_TYPE_DOOR; }
 	bool isMagicField() const noexcept { return type == ITEM_TYPE_MAGICFIELD; }
@@ -274,11 +275,11 @@ public:
 	float getWeight() const noexcept { return weight; }
 	uint16_t getVolume() const noexcept { return volume; }
 
-// editor related
-public:
-	Brush* brush;
-	Brush* doodad_brush;
-	RAWBrush* raw_brush;
+	// editor related
+  public:
+	Brush *brush;
+	Brush *doodad_brush;
+	RAWBrush *raw_brush;
 	bool is_metaitem;
 	// This is needed as a consequence of the item palette & the raw palette
 	// using the same brushes ("others" category consists of items with this
@@ -299,8 +300,8 @@ public:
 	bool isTable;
 	bool isCarpet;
 
-public:
-	GameSprite* sprite;
+  public:
+	GameSprite *sprite;
 
 	uint16_t id;
 	uint16_t clientID;
@@ -310,7 +311,7 @@ public:
 
 	uint16_t volume;
 	uint16_t maxTextLen;
-	//uint16_t writeOnceItemId;
+	// uint16_t writeOnceItemId;
 
 	std::string name;
 	std::string editorsuffix;
@@ -318,7 +319,8 @@ public:
 	std::string article;
 
 	float weight;
-	// It might be useful to be able to extrapolate this information in the future
+	// It might be useful to be able to extrapolate this information in the
+	// future
 	int attack;
 	int defense;
 	int armor;
@@ -360,9 +362,8 @@ public:
 	BorderType border_alignment;
 };
 
-class ItemDatabase
-{
-public:
+class ItemDatabase {
+  public:
 	ItemDatabase();
 	~ItemDatabase();
 
@@ -372,38 +373,47 @@ public:
 
 	uint16_t getMinID() const noexcept { return 100; }
 	uint16_t getMaxID() const noexcept { return maxItemId; }
-	const ItemType& getItemType(uint16_t id) const;
-	ItemType* getRawItemType(uint16_t id);
+	const ItemType &getItemType(uint16_t id) const;
+	ItemType *getRawItemType(uint16_t id);
 
 	bool isValidID(uint16_t id) const;
 
-	bool loadFromOtb(const FileName& datafile, wxString& error, wxArrayString& warnings);
-	bool loadFromGameXml(const FileName& datafile, wxString& error, wxArrayString& warnings);
+	bool loadFromOtb(const FileName &datafile, wxString &error,
+					 wxArrayString &warnings);
+	bool loadFromGameXml(const FileName &datafile, wxString &error,
+						 wxArrayString &warnings);
 	bool loadItemFromGameXml(pugi::xml_node itemNode, uint16_t id);
 	bool loadMetaItem(pugi::xml_node node);
-	
-	bool loadFromGameToml(const wxString& filename, wxString& error, wxArrayString& warnings);
-	bool loadFromGameTomlDir(const wxString& dirPath, wxString& error, wxArrayString& warnings);
-	bool loadItems(const wxString& dataDir, wxString& error, wxArrayString& warnings);
 
-	//typedef std::map<int32_t, ItemType*> ItemMap;
-	typedef contigous_vector<ItemType*> ItemMap;
-	typedef std::map<std::string, ItemType*> ItemNameMap;
+	bool loadFromGameToml(const wxString &filename, wxString &error,
+						  wxArrayString &warnings);
+	bool loadFromGameTomlDir(const wxString &dirPath, wxString &error,
+							 wxArrayString &warnings);
+	bool loadItems(const wxString &dataDir, wxString &error,
+				   wxArrayString &warnings);
+
+	// typedef std::map<int32_t, ItemType*> ItemMap;
+	typedef contigous_vector<ItemType *> ItemMap;
+	typedef std::map<std::string, ItemType *> ItemNameMap;
 
 	// Version information
 	uint32_t MajorVersion;
 	uint32_t MinorVersion;
 	uint32_t BuildNumber;
 
-	ItemMap& getItemMap() { return items; }
-protected:
-	bool loadFromOtbVer1(BinaryNode* itemNode, wxString& error, wxArrayString& warnings);
-	bool loadFromOtbVer2(BinaryNode* itemNode, wxString& error, wxArrayString& warnings);
-	bool loadFromOtbVer3(BinaryNode* itemNode, wxString& error, wxArrayString& warnings);
-	
-	void setItemAttributes(ItemType* item, const toml::table* attrs);
+	ItemMap &getItemMap() { return items; }
 
-protected:
+  protected:
+	bool loadFromOtbVer1(BinaryNode *itemNode, wxString &error,
+						 wxArrayString &warnings);
+	bool loadFromOtbVer2(BinaryNode *itemNode, wxString &error,
+						 wxArrayString &warnings);
+	bool loadFromOtbVer3(BinaryNode *itemNode, wxString &error,
+						 wxArrayString &warnings);
+
+	void setItemAttributes(ItemType *item, const toml::table *attrs);
+
+  protected:
 	ItemMap items;
 
 	// Count of GameSprite types

@@ -18,11 +18,10 @@
 #ifndef RME_CREATURE_H_
 #define RME_CREATURE_H_
 
-#include "definitions.h"
 #include "creatures.h"
+#include "definitions.h"
 
-enum Direction
-{
+enum Direction {
 	NORTH = 0,
 	EAST = 1,
 	SOUTH = 2,
@@ -34,15 +33,14 @@ enum Direction
 
 IMPLEMENT_INCREMENT_OP(Direction)
 
-class Creature
-{
-public:
-	Creature(CreatureType* type);
-	Creature(const std::string& type_name);
+class Creature {
+  public:
+	Creature(CreatureType *type);
+	Creature(const std::string &type_name);
 
-	Creature* deepCopy() const;
+	Creature *deepCopy() const;
 
-	const Outfit& getLookType() const;
+	const Outfit &getLookType() const;
 
 	bool isSaved() const noexcept { return saved; }
 	void save() noexcept { saved = true; }
@@ -55,7 +53,7 @@ public:
 	bool isNpc() const;
 
 	std::string getName() const;
-	CreatureBrush* getBrush() const;
+	CreatureBrush *getBrush() const;
 
 	int getSpawnTime() const noexcept { return spawntime; }
 	void setSpawnTime(int time) noexcept { spawntime = time; }
@@ -67,7 +65,7 @@ public:
 	static std::string DirID2Name(uint16_t id);
 	static uint16_t DirName2ID(std::string id);
 
-protected:
+  protected:
 	std::string type_name;
 	Direction direction;
 	int spawntime;
@@ -75,7 +73,7 @@ protected:
 	bool selected;
 };
 
-typedef std::vector<Creature*> CreatureVector;
-typedef std::list<Creature*> CreatureList;
+typedef std::vector<Creature *> CreatureVector;
+typedef std::list<Creature *> CreatureList;
 
 #endif
