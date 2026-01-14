@@ -43,6 +43,7 @@
 #include "table_brush.h"
 #include "waypoint_brush.h"
 #include "light_drawer.h"
+#include "lasso_selection.h"
 
 using Color = std::tuple<int, int, int>;
 
@@ -280,6 +281,7 @@ void MapDrawer::Draw()
 	DrawHigherFloors();
 	if(options.dragging)
 		DrawSelectionBox();
+	DrawLassoSelection();
 	DrawLiveCursors();
 	DrawBrush();
 	if(options.show_grid && zoom <= 10.f)
@@ -812,6 +814,75 @@ void MapDrawer::DrawSelectionBox()
 	}
 	glEnd();
 	glDisable(GL_LINE_STIPPLE);
+	glEnable(GL_TEXTURE_2D);
+}
+
+void MapDrawer::DrawLassoSelection()
+{
+	if (options.ingame) {
+		return;
+	}
+
+	// Safety check - ensure lasso exists and is active
+	if (!canvas || !canvas->m_lasso) {
+		return;
+	}
+	
+	// Check if lasso selection is active
+	if (!canvas->lasso_selection || !canvas->m_lasso->isActive()) {
+		return;
+	}
+
+	const std::vector<LassoPoint>& path = canvas->m_lasso->getPath();
+	if (path.size() < 2) {
+		return;
+	}
+
+	// Calculate floor adjustment for proper rendering
+	int adjustment = getFloorAdjustment(floor);
+
+	glDisable(GL_TEXTURE_2D);
+	
+	// Draw filled polygon with semi-transparent green color (matching selection style)
+	if (path.size() >= 3) {
+		glColor4f(0.0f, 0.8f, 0.0f, 0.3f); // Green, semi-transparent
+		glBegin(GL_POLYGON);
+		for (const auto& point : path) {
+			// Convert tile coordinates to screen coordinates with floor adjustment
+			int screen_x = (point.x * rme::TileSize) - view_scroll_x - adjustment;
+			int screen_y = (point.y * rme::TileSize) - view_scroll_y - adjustment;
+			glVertex2f(static_cast<float>(screen_x), static_cast<float>(screen_y));
+		}
+		glEnd();
+	}
+	
+	// Draw the lasso path outline
+	glEnable(GL_LINE_STIPPLE);
+	glLineStipple(2, 0xAAAA);
+	glLineWidth(2.0f);
+	glColor4f(0.0f, 1.0f, 0.0f, 1.0f); // Green color for the outline
+	
+	glBegin(GL_LINE_STRIP);
+	for (const auto& point : path) {
+		// Convert tile coordinates to screen coordinates with floor adjustment
+		int screen_x = (point.x * rme::TileSize) - view_scroll_x - adjustment;
+		int screen_y = (point.y * rme::TileSize) - view_scroll_y - adjustment;
+		glVertex2f(static_cast<float>(screen_x), static_cast<float>(screen_y));
+	}
+	glEnd();
+	
+	// Draw points at each vertex for visual feedback
+	glDisable(GL_LINE_STIPPLE);
+	glPointSize(4.0f);
+	glColor4f(1.0f, 1.0f, 0.0f, 1.0f); // Yellow points
+	glBegin(GL_POINTS);
+	for (const auto& point : path) {
+		int screen_x = (point.x * rme::TileSize) - view_scroll_x - adjustment;
+		int screen_y = (point.y * rme::TileSize) - view_scroll_y - adjustment;
+		glVertex2f(static_cast<float>(screen_x), static_cast<float>(screen_y));
+	}
+	glEnd();
+	
 	glEnable(GL_TEXTURE_2D);
 }
 

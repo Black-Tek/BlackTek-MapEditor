@@ -333,19 +333,24 @@ void HousePalettePanel::OnListBoxChange(wxCommandEvent& event)
 
 void HousePalettePanel::OnListBoxDoubleClick(wxCommandEvent& event)
 {
-	if (House* house = reinterpret_cast<House*>(event.GetClientData())) {
-		const Position& position = house->getExit();
-		if (!position.isValid()) {
-			// find a valid tile position
-			for (const Position& tilePosition : house->getTiles()) {
-				if (tilePosition.isValid()) {
-					g_gui.SetScreenCenterPosition(tilePosition);
-					break;
-				}
+	House* house = reinterpret_cast<House*>(event.GetClientData());
+	if (!house) {
+		return;
+	}
+	
+	const Position& position = house->getExit();
+	if (position.isValid()) {
+		g_gui.SetScreenCenterPosition(position);
+	} else {
+		// find a valid tile position
+		for (const Position& tilePosition : house->getTiles()) {
+			if (tilePosition.isValid()) {
+				g_gui.SetScreenCenterPosition(tilePosition);
+				return;
 			}
-		} else {
-			g_gui.SetScreenCenterPosition(position);
 		}
+		// No valid position found
+		g_gui.SetStatusText("House has no valid position to go to");
 	}
 }
 

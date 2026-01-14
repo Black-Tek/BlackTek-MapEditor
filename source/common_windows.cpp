@@ -1298,7 +1298,11 @@ void EditTownsDialog::OnListBoxChange(wxCommandEvent& event)
 void EditTownsDialog::OnClickSelectTemplePosition(wxCommandEvent& WXUNUSED(event))
 {
 	Position templepos = temple_position->GetPosition();
-	g_gui.SetScreenCenterPosition(templepos);
+	if (templepos.isValid() && templepos.x > 0 && templepos.y > 0) {
+		g_gui.SetScreenCenterPosition(templepos);
+	} else {
+		g_gui.SetStatusText("Invalid temple position - please set a valid position first");
+	}
 }
 
 void EditTownsDialog::OnClickAdd(wxCommandEvent& WXUNUSED(event))

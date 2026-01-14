@@ -47,6 +47,8 @@
 #include "raw_brush.h"
 #include "carpet_brush.h"
 #include "table_brush.h"
+#include "hunting_calculator_window.h"
+#include "lasso_selection.h"
 
 
 BEGIN_EVENT_TABLE(MapCanvas, wxGLCanvas)
@@ -100,6 +102,7 @@ BEGIN_EVENT_TABLE(MapCanvas, wxGLCanvas)
 	EVT_MENU(MAP_POPUP_MENU_PROPERTIES, MapCanvas::OnProperties)
 	// ----
 	EVT_MENU(MAP_POPUP_MENU_BROWSE_TILE, MapCanvas::OnBrowseTile)
+	EVT_MENU(MAP_POPUP_MENU_HUNTING_CALCULATOR, MapCanvas::OnHuntingCalculator)
 END_EVENT_TABLE()
 
 bool MapCanvas::processed[] = {0};
@@ -113,12 +116,14 @@ MapCanvas::MapCanvas(MapWindow* parent, Editor& editor, int* attriblist) :
 	cursor_y(-1),
 	dragging(false),
 	boundbox_selection(false),
+	lasso_selection(false),
 	screendragging(false),
 	drawing(false),
 	dragging_draw(false),
 	replace_dragging(false),
 
 	screenshot_buffer(nullptr),
+	m_lasso(nullptr),
 
 	drag_start_x(-1),
 	drag_start_y(-1),
@@ -141,6 +146,7 @@ MapCanvas::MapCanvas(MapWindow* parent, Editor& editor, int* attriblist) :
 {
 	popup_menu = newd MapPopupMenu(editor);
 	animation_timer = newd AnimationTimer(this);
+	m_lasso = new LassoSelection();
 	drawer = new MapDrawer(this);
 	keyCode = WXK_NONE;
 }
@@ -150,6 +156,7 @@ MapCanvas::~MapCanvas()
 	delete popup_menu;
 	delete animation_timer;
 	delete drawer;
+	delete m_lasso;
 	free(screenshot_buffer);
 }
 
@@ -460,7 +467,8 @@ void MapCanvas::OnMouseMove(wxMouseEvent& event)
 	last_cursor_map_y = mouse_map_y;
 	last_cursor_map_z = floor;
 
-	if(map_update) {
+	// Don't update position status during lasso selection
+	if(map_update && !(lasso_selection && m_lasso && m_lasso->isActive())) {
 		UpdatePositionStatus(cursor_x, cursor_y);
 		UpdateZoomStatus();
 	}
@@ -477,6 +485,16 @@ void MapCanvas::OnMouseMove(wxMouseEvent& event)
 			ss << "Dragging " << -move_x << "," << -move_y << "," << -move_z;
 			g_gui.SetStatusText(ss);
 
+			Refresh();
+		} else if(lasso_selection && m_lasso && m_lasso->isActive()) {
+			// Add point to lasso path
+			m_lasso->addPoint(mouse_map_x, mouse_map_y);
+			
+			if(map_update) {
+				wxString ss;
+				ss << "Lasso selection - " << m_lasso->getPath().size() << " points (ESC to cancel)";
+				g_gui.SetStatusText(ss);
+			}
 			Refresh();
 		} else if(boundbox_selection) {
 			if(map_update) {
@@ -670,7 +688,31 @@ void MapCanvas::OnMouseActionClick(wxMouseEvent& event)
 	int mouse_map_x, mouse_map_y;
 	ScreenToMap(event.GetX(), event.GetY(), &mouse_map_x, &mouse_map_y);
 
-	if(event.ControlDown() && event.AltDown()) {
+	// Shift+Alt triggers lasso selection regardless of current mode
+	if(event.ShiftDown() && event.AltDown() && !event.ControlDown()) {
+		// Lasso selection mode: Shift+Alt
+		// Switch to selection mode if not already
+		if(!g_gui.IsSelectionMode()) {
+			g_gui.SetSelectionMode();
+		}
+		
+		// Safety check for m_lasso
+		if(!m_lasso) {
+			m_lasso = new LassoSelection();
+		}
+		
+		Selection& selection = editor.getSelection();
+		boundbox_selection = false;
+		lasso_selection = true;
+		m_lasso->clear();
+		m_lasso->setActive(true);
+		m_lasso->addPoint(mouse_map_x, mouse_map_y);
+
+		selection.start(Selection::NONE, ACTION_UNSELECT);
+		selection.clear();
+		selection.finish();
+		selection.updateSelectionCount();
+	} else if(event.ControlDown() && event.AltDown()) {
 		Tile* tile = editor.getMap().getTile(mouse_map_x, mouse_map_y, floor);
 		if(tile && tile->size() > 0) {
 			Item* item = tile->getTopItem();
@@ -693,6 +735,7 @@ void MapCanvas::OnMouseActionClick(wxMouseEvent& event)
 			drag_start_z = floor;
 		} else do {
 			boundbox_selection = false;
+			lasso_selection = false;
 			if(event.ShiftDown()) {
 				boundbox_selection = true;
 
@@ -950,7 +993,32 @@ void MapCanvas::OnMouseActionRelease(wxMouseEvent& event)
 			editor.moveSelection(Position(move_x, move_y, move_z));
 		} else {
 			Selection& selection = editor.getSelection();
-			if(boundbox_selection) {
+			if(lasso_selection && m_lasso && m_lasso->isActive()) {
+				// Complete lasso selection
+				m_lasso->closePath();
+				
+				if(m_lasso->isClosed()) {
+					// Get all tiles inside the lasso polygon
+					std::vector<Position> tilesInLasso = m_lasso->getTilesInPolygon(floor);
+					
+					if(!tilesInLasso.empty()) {
+						selection.start(); // Start a selection session
+						
+						for(const Position& pos : tilesInLasso) {
+							Tile* tile = editor.getMap().getTile(pos);
+							if(tile) {
+								selection.add(tile);
+							}
+						}
+						
+						selection.finish(); // Finish the selection session
+						selection.updateSelectionCount();
+					}
+				}
+				
+				m_lasso->clear();
+				lasso_selection = false;
+			} else if(boundbox_selection) {
 				if(mouse_map_x == last_click_map_x && mouse_map_y == last_click_map_y && event.ControlDown()) {
 					// Mouse hasn't moved, do control+shift thingy!
 					Tile* tile = editor.getMap().getTile(mouse_map_x, mouse_map_y, floor);
@@ -1111,6 +1179,7 @@ void MapCanvas::OnMouseActionRelease(wxMouseEvent& event)
 		editor.updateActions();
 		dragging = false;
 		boundbox_selection = false;
+		lasso_selection = false;
 	} else if(g_gui.GetCurrentBrush()){ // Drawing mode
 		Brush* brush = g_gui.GetCurrentBrush();
 		if(dragging_draw) {
@@ -1559,6 +1628,25 @@ void MapCanvas::OnKeyDown(wxKeyEvent& event)
 	//char keycode = event.GetKeyCode();
 	// std::cout << "Keycode " << keycode << std::endl;
 	switch(event.GetKeyCode()) {
+		case WXK_ESCAPE: {
+			// Cancel lasso selection with ESC key
+			if(lasso_selection && m_lasso && m_lasso->isActive()) {
+				m_lasso->clear();
+				lasso_selection = false;
+				g_gui.SetStatusText("Lasso selection cancelled");
+				Refresh();
+			} else if(g_gui.IsSelectionMode() && editor.hasSelection()) {
+				// Clear current selection with ESC
+				Selection& selection = editor.getSelection();
+				selection.start(Selection::NONE, ACTION_UNSELECT);
+				selection.clear();
+				selection.finish();
+				selection.updateSelectionCount();
+				g_gui.SetStatusText("Selection cleared");
+				g_gui.RefreshView();
+			}
+			break;
+		}
 		case WXK_NUMPAD_ADD:
 		case WXK_PAGEUP: {
 			g_gui.ChangeFloor(floor - 1);
@@ -2189,6 +2277,67 @@ void MapCanvas::OnProperties(wxCommandEvent& WXUNUSED(event))
 	w->Destroy();
 }
 
+void MapCanvas::OnHuntingCalculator(wxCommandEvent& WXUNUSED(event))
+{
+	// Safety check for g_gui.root
+	if (!g_gui.root) {
+		wxMessageBox("Error: Main window not available.", "Error", wxOK | wxICON_ERROR);
+		return;
+	}
+	
+	// Check selection size before creating dialog to avoid performance issues
+	if (editor.hasSelection()) {
+		try {
+			size_t selectionSize = editor.getSelection().size();
+			if (selectionSize > 100000) {
+				wxMessageBox(wxString::Format("Selection too large (%zu tiles).\nPlease select a smaller area (max 100,000 tiles).", selectionSize),
+				             "Selection Too Large", wxOK | wxICON_WARNING);
+				return;
+			}
+		} catch (...) {
+			// If we can't get selection size, continue anyway
+		}
+	}
+	
+	HuntingCalculatorWindow* dialog = nullptr;
+	try {
+		dialog = new HuntingCalculatorWindow(g_gui.root, editor);
+	} catch (...) {
+		wxMessageBox("Error creating Hunting Calculator window.", "Error", wxOK | wxICON_ERROR);
+		return;
+	}
+	
+	if (!dialog) {
+		return;
+	}
+	
+	// If there's a selection, use its bounds
+	if (editor.hasSelection()) {
+		try {
+			const Selection& selection = editor.getSelection();
+			size_t selectionSize = selection.size();
+			
+			// For lasso selections, use selection tiles directly (don't calculate bounds for large selections)
+			if (selectionSize > 0) {
+				// Always use selection mode for lasso - it's more efficient
+				dialog->SetUseSelection(true);
+			}
+		} catch (...) {
+			// If selection access fails, don't use selection mode
+		}
+	} else {
+		// Use current view area
+		int mouse_map_x, mouse_map_y;
+		MouseToMap(&mouse_map_x, &mouse_map_y);
+		// Default to a 50x50 area around cursor
+		dialog->SetArea(mouse_map_x - 25, mouse_map_y - 25, floor,
+		                mouse_map_x + 25, mouse_map_y + 25, floor);
+	}
+	
+	dialog->ShowModal();
+	dialog->Destroy();
+}
+
 void MapCanvas::ChangeFloor(int new_floor)
 {
 	ASSERT(new_floor >= 0 || new_floor <= rme::MapMaxLayer);
@@ -2435,6 +2584,10 @@ void MapPopupMenu::Update()
 			browseTile->Enable(anything_selected);
 		}
 	}
+	
+	// Always show Hunting Calculator option
+	AppendSeparator();
+	Append(MAP_POPUP_MENU_HUNTING_CALCULATOR, "Hunting Calculator", "Analyze hunting potential for selected area");
 }
 
 void MapCanvas::getTilesToDraw(int mouse_map_x, int mouse_map_y, int floor, PositionVector* tilestodraw, PositionVector* tilestoborder, bool fill /*= false*/)

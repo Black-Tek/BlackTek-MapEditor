@@ -24,6 +24,7 @@
 #include <memory>
 
 class GameSprite;
+class LassoSelection;
 
 struct MapTooltip
 {
@@ -252,6 +253,7 @@ public:
 	void DrawDraggingShadow();
 	void DrawHigherFloors();
 	void DrawSelectionBox();
+	void DrawLassoSelection();
 	void DrawLiveCursors();
 	void DrawBrush();
 	void DrawIngameBox();
