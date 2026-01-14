@@ -20,7 +20,14 @@
 
 #include "filehandle.h"
 #include "brush_enums.h"
+#include "con_vector.h"
+#include "ext/pugixml.hpp"
 #include <toml++/toml.hpp>
+#include <wx/string.h>
+#include <wx/arrstr.h>
+#include <wx/filename.h>
+
+typedef wxFileName FileName;
 
 class Brush;
 class GroundBrush;

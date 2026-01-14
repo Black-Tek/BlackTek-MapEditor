@@ -19,9 +19,11 @@
 #define __POSITION_HPP__
 
 #include <ostream>
+#include <istream>
 #include <cstdint>
 #include <vector>
 #include <list>
+#include "const.h"
 
 class Position
 {

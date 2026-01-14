@@ -19,9 +19,15 @@
 #define RME_CREATURES_H_
 
 #include "outfit.h"
+#include "ext/pugixml.hpp"
 
 #include <string>
 #include <map>
+#include <wx/string.h>
+#include <wx/arrstr.h>
+#include <wx/filename.h>
+
+typedef wxFileName FileName;
 
 class CreatureType;
 class CreatureBrush;

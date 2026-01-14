@@ -18,6 +18,7 @@
 #ifndef RME_CREATURE_H_
 #define RME_CREATURE_H_
 
+#include "definitions.h"
 #include "creatures.h"
 
 enum Direction

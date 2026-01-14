@@ -50,11 +50,12 @@ void LassoSelection::addPoint(int x, int y) {
   m_path.push_back(newPoint);
   m_boundingBox.expand(x, y);
 
-  // Optimization: Only simplify every 15 points instead of every point
-  // RDP is O(n^2) worst case, calling it less frequently improves performance
-  if (m_path.size() > 2 && m_path.size() % 15 == 0) {
-    simplifyPath();
-  } else if (m_path.size() <= 2) {
+  // OPTIMIZATION: Don't simplify during drag - only update simplified path
+  // for rendering with minimal overhead. Full simplification happens on close.
+  if (m_path.size() <= 2) {
+    m_simplifiedPath = m_path;
+  } else if (m_path.size() % 20 == 0) {
+    // Light simplification every 20 points for rendering only
     m_simplifiedPath = m_path;
   }
 }
@@ -71,6 +72,8 @@ void LassoSelection::closePath() {
   }
 
   m_closed = true;
+
+  // OPTIMIZATION: Simplify only once when path is closed
   simplifyPath();
 }
 
@@ -88,6 +91,7 @@ void LassoSelection::simplifyPath() {
               m_simplifyTolerance, keep);
 
   m_simplifiedPath.clear();
+  m_simplifiedPath.reserve(m_path.size() / 2); // Estimate ~50% reduction
   for (size_t i = 0; i < m_path.size(); ++i) {
     if (keep[i]) {
       m_simplifiedPath.push_back(m_path[i]);
@@ -143,12 +147,64 @@ std::vector<Position> LassoSelection::getTilesInPolygon(int floor) const {
     return tiles;
   }
 
-  scanlineFill(floor, tiles);
+  // OPTIMIZATION: Pre-reserve memory based on bounding box area estimate
+  if (m_boundingBox.isValid()) {
+    int estimatedTiles =
+        (m_boundingBox.width() + 1) * (m_boundingBox.height() + 1);
+    // Estimate ~50% fill ratio for most polygon shapes
+    tiles.reserve(estimatedTiles / 2);
+  }
+
+  scanlineFillAET(floor, tiles);
   return tiles;
 }
 
-void LassoSelection::scanlineFill(int floor,
-                                  std::vector<Position> &tiles) const {
+void LassoSelection::buildEdgeTable(
+    std::vector<std::vector<LassoEdge>> &edgeTable, int minY) const {
+  // Use simplified path for the polygon
+  const std::vector<LassoPoint> &poly =
+      m_simplifiedPath.empty() ? m_path : m_simplifiedPath;
+
+  if (poly.size() < 3)
+    return;
+
+  // Build edge table - each bucket contains edges starting at that y
+  for (size_t i = 0; i < poly.size() - 1; ++i) {
+    const LassoPoint &p1 = poly[i];
+    const LassoPoint &p2 = poly[i + 1];
+
+    // Skip horizontal edges
+    if (p1.y == p2.y)
+      continue;
+
+    // Determine which point is at the top (smaller y)
+    int yMin, yMax;
+    double xAtYMin;
+
+    if (p1.y < p2.y) {
+      yMin = p1.y;
+      yMax = p2.y;
+      xAtYMin = static_cast<double>(p1.x);
+    } else {
+      yMin = p2.y;
+      yMax = p1.y;
+      xAtYMin = static_cast<double>(p2.x);
+    }
+
+    // Calculate inverse slope (dx/dy)
+    double invSlope =
+        static_cast<double>(p2.x - p1.x) / static_cast<double>(p2.y - p1.y);
+
+    // Add edge to the appropriate bucket
+    int bucketIndex = yMin - minY;
+    if (bucketIndex >= 0 && bucketIndex < static_cast<int>(edgeTable.size())) {
+      edgeTable[bucketIndex].emplace_back(yMax, xAtYMin, invSlope);
+    }
+  }
+}
+
+void LassoSelection::scanlineFillAET(int floor,
+                                     std::vector<Position> &tiles) const {
   // Use simplified path for the polygon
   const std::vector<LassoPoint> &poly =
       m_simplifiedPath.empty() ? m_path : m_simplifiedPath;
@@ -160,32 +216,56 @@ void LassoSelection::scanlineFill(int floor,
   if (!m_boundingBox.isValid())
     return;
 
-  // Iterate through each row in the bounding box
-  for (int y = m_boundingBox.minY; y <= m_boundingBox.maxY; ++y) {
-    std::vector<int> intersections;
+  int minY = m_boundingBox.minY;
+  int maxY = m_boundingBox.maxY;
+  int height = maxY - minY + 1;
 
-    // Find all intersections with polygon edges
-    for (size_t i = 0; i < poly.size() - 1; ++i) {
-      const LassoPoint &p1 = poly[i];
-      const LassoPoint &p2 = poly[i + 1];
+  // Build edge table (edges indexed by their starting y coordinate)
+  std::vector<std::vector<LassoEdge>> edgeTable(height);
+  buildEdgeTable(edgeTable, minY);
 
-      // Check if edge crosses this scanline
-      if ((p1.y <= y && p2.y > y) || (p2.y <= y && p1.y > y)) {
-        // Calculate x intersection (use floor for consistent rounding)
-        double t = static_cast<double>(y - p1.y) / (p2.y - p1.y);
-        int x = static_cast<int>(std::floor(p1.x + t * (p2.x - p1.x)));
-        intersections.push_back(x);
+  // Active Edge Table - edges currently being processed
+  std::vector<LassoEdge> activeEdges;
+  activeEdges.reserve(poly.size());
+
+  // Process each scanline
+  for (int y = minY; y <= maxY; ++y) {
+    int bucketIndex = y - minY;
+
+    // Add new edges from edge table to active edges
+    if (bucketIndex < static_cast<int>(edgeTable.size())) {
+      for (const LassoEdge &edge : edgeTable[bucketIndex]) {
+        activeEdges.push_back(edge);
       }
     }
 
-    // Sort intersections
-    std::sort(intersections.begin(), intersections.end());
+    // Remove edges that have ended (yMax == y)
+    activeEdges.erase(
+        std::remove_if(activeEdges.begin(), activeEdges.end(),
+                       [y](const LassoEdge &e) { return e.yMax == y; }),
+        activeEdges.end());
+
+    // Skip if no active edges
+    if (activeEdges.empty())
+      continue;
+
+    // Sort active edges by current x intersection
+    std::sort(activeEdges.begin(), activeEdges.end(),
+              [](const LassoEdge &a, const LassoEdge &b) { return a.x < b.x; });
 
     // Fill between pairs of intersections
-    for (size_t i = 0; i + 1 < intersections.size(); i += 2) {
-      for (int x = intersections[i]; x <= intersections[i + 1]; ++x) {
-        tiles.push_back(Position(x, y, floor));
+    for (size_t i = 0; i + 1 < activeEdges.size(); i += 2) {
+      int xStart = static_cast<int>(std::ceil(activeEdges[i].x));
+      int xEnd = static_cast<int>(std::floor(activeEdges[i + 1].x));
+
+      for (int x = xStart; x <= xEnd; ++x) {
+        tiles.emplace_back(x, y, floor);
       }
+    }
+
+    // Update x values for next scanline
+    for (LassoEdge &edge : activeEdges) {
+      edge.x += edge.invSlope;
     }
   }
 }
