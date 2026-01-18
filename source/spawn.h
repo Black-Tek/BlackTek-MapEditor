@@ -23,27 +23,28 @@ class Tile;
 class Spawn
 {
 public:
-	Spawn(int size = 3);
+    Spawn(int size = 3);
 
-	Spawn* deepCopy() const;
+    Spawn* deepCopy() const;
 
-	bool isSelected() const noexcept { return selected; }
-	void select() noexcept { selected = true; }
-	void deselect() noexcept { selected = false; }
+    bool isSelected() const noexcept { return selected; }
+    void select() noexcept { selected = true; }
+    void deselect() noexcept { selected = false; }
 
-	int getSize() const noexcept { return size; }
-	void setSize(int newsize) {
-		ASSERT(size < 100);
-		size = newsize;
-	}
+    int getSize() const noexcept { return size; }
+    void setSize(int newsize)
+    {
+        ASSERT(size < 100);
+        size = newsize;
+    }
 
-	// Does not compare selection!
-	bool operator==(const Spawn& other) { return size == other.size; }
-	bool operator!=(const Spawn& other) { return size != other.size; }
+    // Does not compare selection!
+    bool operator==(const Spawn& other) { return size == other.size; }
+    bool operator!=(const Spawn& other) { return size != other.size; }
 
 protected:
-	int size;
-	bool selected;
+    int size;
+    bool selected;
 };
 
 typedef std::set<Position> SpawnPositionList;
@@ -52,18 +53,18 @@ typedef std::list<Spawn*> SpawnList;
 class Spawns
 {
 public:
-	void addSpawn(Tile* tile);
-	void removeSpawn(Tile* tile);
+    void addSpawn(Tile* tile);
+    void removeSpawn(Tile* tile);
 
-	SpawnPositionList::iterator begin() noexcept { return spawns.begin(); }
-	SpawnPositionList::const_iterator begin() const noexcept { return spawns.begin(); }
-	SpawnPositionList::iterator end() noexcept { return spawns.end(); }
-	SpawnPositionList::const_iterator end() const noexcept { return spawns.end(); }
-	void erase(SpawnPositionList::iterator iter) noexcept { spawns.erase(iter); }
-	SpawnPositionList::iterator find(Position& pos) { return spawns.find(pos); }
+    SpawnPositionList::iterator begin() noexcept { return spawns.begin(); }
+    SpawnPositionList::const_iterator begin() const noexcept { return spawns.begin(); }
+    SpawnPositionList::iterator end() noexcept { return spawns.end(); }
+    SpawnPositionList::const_iterator end() const noexcept { return spawns.end(); }
+    void erase(SpawnPositionList::iterator iter) noexcept { spawns.erase(iter); }
+    SpawnPositionList::iterator find(Position& pos) { return spawns.find(pos); }
 
 private:
-	SpawnPositionList spawns;
+    SpawnPositionList spawns;
 };
 
 #endif

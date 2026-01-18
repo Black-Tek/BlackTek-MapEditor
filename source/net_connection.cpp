@@ -15,124 +15,138 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////
 
-#include "main.h"
 #include "net_connection.h"
+#include "main.h"
 
 NetworkMessage::NetworkMessage()
 {
-	clear();
+    clear();
 }
 
 void NetworkMessage::clear()
 {
-	buffer.resize(4);
-	position = 4;
-	size = 0;
+    buffer.resize(4);
+    position = 4;
+    size = 0;
 }
 
 void NetworkMessage::expand(const size_t length)
 {
-	if(position + length >= buffer.size()) {
-		buffer.resize(position + length + 1);
-	}
-	size += length;
+    if (position + length >= buffer.size())
+    {
+        buffer.resize(position + length + 1);
+    }
+    size += length;
 }
 
-template<> std::string NetworkMessage::read<std::string>()
+template <>
+std::string NetworkMessage::read<std::string>()
 {
-	const uint16_t length = read<uint16_t>();
-	char* strBuffer = reinterpret_cast<char*>(&buffer[position]);
-	position += length;
-	return std::string(strBuffer, length);
+    const uint16_t length = read<uint16_t>();
+    char* strBuffer = reinterpret_cast<char*>(&buffer[position]);
+    position += length;
+    return std::string(strBuffer, length);
 }
 
-template<> Position NetworkMessage::read<Position>()
+template <>
+Position NetworkMessage::read<Position>()
 {
-	Position position;
-	position.x = read<uint16_t>();
-	position.y = read<uint16_t>();
-	position.z = read<uint8_t>();
-	return position;
+    Position position;
+    position.x = read<uint16_t>();
+    position.y = read<uint16_t>();
+    position.z = read<uint8_t>();
+    return position;
 }
 
-template<> void NetworkMessage::write<std::string>(const std::string& value)
+template <>
+void NetworkMessage::write<std::string>(const std::string& value)
 {
-	const size_t length = value.length();
-	write<uint16_t>(length);
+    const size_t length = value.length();
+    write<uint16_t>(length);
 
-	expand(length);
-	memcpy(&buffer[position], &value[0], length);
-	position += length;
+    expand(length);
+    memcpy(&buffer[position], &value[0], length);
+    position += length;
 }
 
-template<> void NetworkMessage::write<Position>(const Position& value)
+template <>
+void NetworkMessage::write<Position>(const Position& value)
 {
-	write<uint16_t>(value.x);
-	write<uint16_t>(value.y);
-	write<uint8_t>(value.z);
+    write<uint16_t>(value.x);
+    write<uint16_t>(value.y);
+    write<uint8_t>(value.z);
 }
 
 // NetworkConnection
 NetworkConnection::NetworkConnection() :
-	service(nullptr), thread(), stopped(false)
+    service(nullptr), thread(), stopped(false)
 {
-	//
+    //
 }
 
 NetworkConnection::~NetworkConnection()
 {
-	stop();
+    stop();
 }
 
 NetworkConnection& NetworkConnection::getInstance()
 {
-	static NetworkConnection connection;
-	return connection;
+    static NetworkConnection connection;
+    return connection;
 }
 
 bool NetworkConnection::start()
 {
-	if(thread.joinable()) {
-		if(stopped) {
-			return false;
-		}
-		return true;
-	}
+    if (thread.joinable())
+    {
+        if (stopped)
+        {
+            return false;
+        }
+        return true;
+    }
 
-	stopped = false;
-	if(!service) {
-		service = new asio::io_service;
-	}
+    stopped = false;
+    if (!service)
+    {
+        service = new asio::io_service;
+    }
 
-	thread = std::thread([this]() -> void {
-		asio::io_service& serviceRef = *service;
-		try {
-			while(!stopped) {
-				serviceRef.run_one();
-				serviceRef.reset();
-			}
-		} catch (std::exception& e) {
-			std::cout << e.what() << std::endl;
-		}
-	});
-	return true;
+    thread = std::thread([this]() -> void
+        {
+            asio::io_service& serviceRef = *service;
+            try
+            {
+                while (!stopped)
+                {
+                    serviceRef.run_one();
+                    serviceRef.reset();
+                }
+            }
+            catch (std::exception& e)
+            {
+                std::cout << e.what() << std::endl;
+            }
+        });
+    return true;
 }
 
 void NetworkConnection::stop()
 {
-	if(!service) {
-		return;
-	}
+    if (!service)
+    {
+        return;
+    }
 
-	service->stop();
-	stopped = true;
-	thread.join();
+    service->stop();
+    stopped = true;
+    thread.join();
 
-	delete service;
-	service = nullptr;
+    delete service;
+    service = nullptr;
 }
 
 asio::io_service& NetworkConnection::get_service()
 {
-	return *service;
+    return *service;
 }

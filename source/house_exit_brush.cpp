@@ -17,56 +17,57 @@
 
 #include "main.h"
 
-#include "house_exit_brush.h"
-#include "house.h"
 #include "basemap.h"
+#include "house.h"
+#include "house_exit_brush.h"
 
 //=============================================================================
 // House Exit Brush
 
 HouseExitBrush::HouseExitBrush() :
-	Brush(),
-	draw_house(0)
+    Brush(),
+    draw_house(0)
 {
-	////
+    ////
 }
 
 HouseExitBrush::~HouseExitBrush()
 {
-	////
+    ////
 }
 
 void HouseExitBrush::setHouse(House* house)
 {
-	draw_house = house->id;
+    draw_house = house->id;
 }
 
 uint32_t HouseExitBrush::getHouseID() const
 {
-	return draw_house;
+    return draw_house;
 }
-
 
 bool HouseExitBrush::canDraw(BaseMap* map, const Position& position) const
 {
-	Tile* tile = map->getTile(position);
-	if(!tile || !tile->hasGround()) {
-		return false;
-	}
-	if(tile->isHouseTile() || tile->isBlocking()) {
-		return false;
-	}
-	return true;
+    Tile* tile = map->getTile(position);
+    if (!tile || !tile->hasGround())
+    {
+        return false;
+    }
+    if (tile->isHouseTile() || tile->isBlocking())
+    {
+        return false;
+    }
+    return true;
 }
 
 void HouseExitBrush::undraw(BaseMap* map, Tile* tile)
 {
-	// Never called
-	ASSERT(false);
+    // Never called
+    ASSERT(false);
 }
 
 void HouseExitBrush::draw(BaseMap* map, Tile* tile, void* parameter)
 {
-	// Never called
-	ASSERT(false);
+    // Never called
+    ASSERT(false);
 }

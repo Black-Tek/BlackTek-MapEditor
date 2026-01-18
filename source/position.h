@@ -18,107 +18,124 @@
 #ifndef __POSITION_HPP__
 #define __POSITION_HPP__
 
-#include <ostream>
 #include <cstdint>
-#include <vector>
 #include <list>
+#include <ostream>
+#include <vector>
 
 class Position
 {
 public:
-	// We use int since it's the native machine type and can be several times faster than
-	// the other integer types in most cases, also, the position may be negative in some
-	// cases
-	int x, y, z;
+    // We use int since it's the native machine type and can be several times faster than
+    // the other integer types in most cases, also, the position may be negative in some
+    // cases
+    int x, y, z;
 
-	Position() : x(0), y(0), z(0) {}
-	Position(int x, int y, int z) : x(x), y(y), z(z) {}
+    Position() :
+        x(0), y(0), z(0) { }
+    Position(int x, int y, int z) :
+        x(x), y(y), z(z) { }
 
-	bool operator<(const Position& other) const noexcept {
-		if(z < other.z)
-			return true;
-		if(z > other.z)
-			return false;
+    bool operator<(const Position& other) const noexcept
+    {
+        if (z < other.z)
+            return true;
+        if (z > other.z)
+            return false;
 
-		if(y < other.y)
-			return true;
-		if(y > other.y)
-			return false;
+        if (y < other.y)
+            return true;
+        if (y > other.y)
+            return false;
 
-		if(x < other.x)
-			return true;
-		//if(x > p.x)
-		//	return false;
+        if (x < other.x)
+            return true;
+        // if(x > p.x)
+        //	return false;
 
-		return false;
-	}
+        return false;
+    }
 
-	bool operator>(const Position& other) const noexcept {
-		return !(*this < other);
-	}
+    bool operator>(const Position& other) const noexcept
+    {
+        return !(*this < other);
+    }
 
-	Position operator-(const Position& other) const noexcept {
-		return Position(x - other.x, y - other.y, z - other.z);
-	}
+    Position operator-(const Position& other) const noexcept
+    {
+        return Position(x - other.x, y - other.y, z - other.z);
+    }
 
-	Position operator+(const Position& other) const noexcept {
-		return Position(x + other.x, y + other.y, z + other.z);
-	}
+    Position operator+(const Position& other) const noexcept
+    {
+        return Position(x + other.x, y + other.y, z + other.z);
+    }
 
-	Position& operator+=(const Position& other) {
-		*this = *this + other;
-		return *this;
-	}
+    Position& operator+=(const Position& other)
+    {
+        *this = *this + other;
+        return *this;
+    }
 
-	bool operator==(const Position& other) const noexcept {
-		return other.z == z && other.x == x && other.y == y;
-	}
+    bool operator==(const Position& other) const noexcept
+    {
+        return other.z == z && other.x == x && other.y == y;
+    }
 
-	bool operator!=(const Position& other) const noexcept {
-		return !(*this == other);
-	}
+    bool operator!=(const Position& other) const noexcept
+    {
+        return !(*this == other);
+    }
 
-	bool isValid() const noexcept {
-		if(x == 0 && y == 0 && z == 0)
-			return false;
-		return (z >= rme::MapMinLayer && z <= rme::MapMaxLayer)
-			&& (x >= 0 && x <= rme::MapMaxWidth)
-			&& (y >= 0 && y <= rme::MapMaxHeight);
-	}
+    bool isValid() const noexcept
+    {
+        if (x == 0 && y == 0 && z == 0)
+            return false;
+        return (z >= rme::MapMinLayer && z <= rme::MapMaxLayer)
+            && (x >= 0 && x <= rme::MapMaxWidth)
+            && (y >= 0 && y <= rme::MapMaxHeight);
+    }
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Position& pos) {
-	os << pos.x << ':' << pos.y << ':' << pos.z;
-	return os;
+inline std::ostream& operator<<(std::ostream& os, const Position& pos)
+{
+    os << pos.x << ':' << pos.y << ':' << pos.z;
+    return os;
 }
 
-inline std::istream& operator>>(std::istream& is, Position& pos) {
-	char a, b;
-	int x, y, z;
-	is >> x;
-	if(!is) return is;
-	is >> a;
-	if(!is || a != ':') return is;
-	is >> y;
-	if(!is) return is;
-	is >> b;
-	if(!is || b != ':') return is;
-	is >> z;
-	if(!is) return is;
+inline std::istream& operator>>(std::istream& is, Position& pos)
+{
+    char a, b;
+    int x, y, z;
+    is >> x;
+    if (!is)
+        return is;
+    is >> a;
+    if (!is || a != ':')
+        return is;
+    is >> y;
+    if (!is)
+        return is;
+    is >> b;
+    if (!is || b != ':')
+        return is;
+    is >> z;
+    if (!is)
+        return is;
 
-	pos.x = x;
-	pos.y = y;
-	pos.z = z;
+    pos.x = x;
+    pos.y = y;
+    pos.z = z;
 
-	return is;
+    return is;
 }
 
-inline Position abs(const Position& position) {
-	return Position(
-		std::abs(position.x),
-		std::abs(position.y),
-		std::abs(position.z)
-	);
+inline Position abs(const Position& position)
+{
+    return Position(
+        std::abs(position.x),
+        std::abs(position.y),
+        std::abs(position.z));
 }
 
 typedef std::vector<Position> PositionVector;

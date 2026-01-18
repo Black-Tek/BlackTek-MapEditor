@@ -18,30 +18,30 @@
 #ifndef RME_EXTENSION_H_
 #define RME_EXTENSION_H_
 
-#include "tileset.h"
 #include "client_version.h"
+#include "tileset.h"
 
 class MaterialsExtension
 {
 public:
-	MaterialsExtension(std::string name, std::string author, std::string description);
-	~MaterialsExtension();
+    MaterialsExtension(std::string name, std::string author, std::string description);
+    ~MaterialsExtension();
 
-	void addVersion(const std::string& versionString);
-	bool isForVersion(uint16_t versionId);
-	std::string getVersionString();
+    void addVersion(const std::string& versionString);
+    bool isForVersion(uint16_t versionId);
+    std::string getVersionString();
 
-	std::string name;
-	std::string url;
-	std::string author;
-	std::string author_url;
-	std::string description;
-	bool for_all_versions;
-	ClientVersionList version_list;
+    std::string name;
+    std::string url;
+    std::string author;
+    std::string author_url;
+    std::string description;
+    bool for_all_versions;
+    ClientVersionList version_list;
 
 private:
-	MaterialsExtension(const MaterialsExtension&);
-	MaterialsExtension& operator=(const MaterialsExtension&);
+    MaterialsExtension(const MaterialsExtension&);
+    MaterialsExtension& operator=(const MaterialsExtension&);
 };
 
 typedef std::vector<MaterialsExtension*> MaterialsExtensionList;

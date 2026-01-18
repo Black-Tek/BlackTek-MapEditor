@@ -22,13 +22,13 @@
 
 enum Direction
 {
-	NORTH = 0,
-	EAST = 1,
-	SOUTH = 2,
-	WEST = 3,
+    NORTH = 0,
+    EAST = 1,
+    SOUTH = 2,
+    WEST = 3,
 
-	DIRECTION_FIRST = NORTH,
-	DIRECTION_LAST = WEST
+    DIRECTION_FIRST = NORTH,
+    DIRECTION_LAST = WEST
 };
 
 IMPLEMENT_INCREMENT_OP(Direction)
@@ -36,42 +36,42 @@ IMPLEMENT_INCREMENT_OP(Direction)
 class Creature
 {
 public:
-	Creature(CreatureType* type);
-	Creature(const std::string& type_name);
+    Creature(CreatureType* type);
+    Creature(const std::string& type_name);
 
-	Creature* deepCopy() const;
+    Creature* deepCopy() const;
 
-	const Outfit& getLookType() const;
+    const Outfit& getLookType() const;
 
-	bool isSaved() const noexcept { return saved; }
-	void save() noexcept { saved = true; }
-	void reset() noexcept { saved = false; }
+    bool isSaved() const noexcept { return saved; }
+    void save() noexcept { saved = true; }
+    void reset() noexcept { saved = false; }
 
-	bool isSelected() const noexcept { return selected; }
-	void deselect() noexcept { selected = false; }
-	void select() noexcept { selected = true; }
+    bool isSelected() const noexcept { return selected; }
+    void deselect() noexcept { selected = false; }
+    void select() noexcept { selected = true; }
 
-	bool isNpc() const;
+    bool isNpc() const;
 
-	std::string getName() const;
-	CreatureBrush* getBrush() const;
+    std::string getName() const;
+    CreatureBrush* getBrush() const;
 
-	int getSpawnTime() const noexcept { return spawntime; }
-	void setSpawnTime(int time) noexcept { spawntime = time; }
+    int getSpawnTime() const noexcept { return spawntime; }
+    void setSpawnTime(int time) noexcept { spawntime = time; }
 
-	Direction getDirection() const noexcept { return direction; }
-	void setDirection(Direction _direction) noexcept { direction = _direction; }
+    Direction getDirection() const noexcept { return direction; }
+    void setDirection(Direction _direction) noexcept { direction = _direction; }
 
-	// Static conversions
-	static std::string DirID2Name(uint16_t id);
-	static uint16_t DirName2ID(std::string id);
+    // Static conversions
+    static std::string DirID2Name(uint16_t id);
+    static uint16_t DirName2ID(std::string id);
 
 protected:
-	std::string type_name;
-	Direction direction;
-	int spawntime;
-	bool saved;
-	bool selected;
+    std::string type_name;
+    Direction direction;
+    int spawntime;
+    bool saved;
+    bool selected;
 };
 
 typedef std::vector<Creature*> CreatureVector;

@@ -18,8 +18,8 @@
 #ifndef RME_SELECTION_H
 #define RME_SELECTION_H
 
-#include "position.h"
 #include "action.h"
+#include "position.h"
 
 class Action;
 class Editor;
@@ -30,86 +30,91 @@ class SelectionThread;
 class Selection
 {
 public:
-	Selection(Editor& editor);
-	~Selection();
+    Selection(Editor& editor);
+    ~Selection();
 
-	// Selects the items on the tile/tiles
-	// Won't work outside a selection session
-	void add(const Tile* tile, Item* item);
-	void add(const Tile* tile, Spawn* spawn);
-	void add(const Tile* tile, Creature* creature);
-	void add(const Tile* tile);
-	void remove(Tile* tile, Item* item);
-	void remove(Tile* tile, Spawn* spawn);
-	void remove(Tile* tile, Creature* creature);
-	void remove(Tile* tile);
+    // Selects the items on the tile/tiles
+    // Won't work outside a selection session
+    void add(const Tile* tile, Item* item);
+    void add(const Tile* tile, Spawn* spawn);
+    void add(const Tile* tile, Creature* creature);
+    void add(const Tile* tile);
+    void remove(Tile* tile, Item* item);
+    void remove(Tile* tile, Spawn* spawn);
+    void remove(Tile* tile, Creature* creature);
+    void remove(Tile* tile);
 
-	// The tile will be added to the list of selected tiles, however, the items on the tile won't be selected
-	void addInternal(Tile* tile);
-	void removeInternal(Tile* tile);
+    // The tile will be added to the list of selected tiles, however, the items on the tile won't be selected
+    void addInternal(Tile* tile);
+    void removeInternal(Tile* tile);
 
-	// Clears the selection completely
-	void clear();
+    // Clears the selection completely
+    void clear();
 
-	// Returns true when inside a session
-	bool isBusy() const noexcept { return busy; }
+    // Returns true when inside a session
+    bool isBusy() const noexcept { return busy; }
 
-	//
-	Position minPosition() const;
-	Position maxPosition() const;
+    //
+    Position minPosition() const;
+    Position maxPosition() const;
 
-	// This manages a "selection session"
-	// Internal session doesn't store the result (eg. no undo)
-	// Subthread means the session doesn't create a complete
-	// action, just part of one to be merged with the main thread
-	// later.
-	enum SessionFlags {
-		NONE,
-		INTERNAL = 1,
-		SUBTHREAD = 2,
-	};
+    // This manages a "selection session"
+    // Internal session doesn't store the result (eg. no undo)
+    // Subthread means the session doesn't create a complete
+    // action, just part of one to be merged with the main thread
+    // later.
+    enum SessionFlags
+    {
+        NONE,
+        INTERNAL = 1,
+        SUBTHREAD = 2,
+    };
 
-	void start(SessionFlags flags = NONE, ActionIdentifier identifier = ACTION_SELECT);
-	void commit();
-	void finish(SessionFlags flags = NONE);
+    void start(SessionFlags flags = NONE, ActionIdentifier identifier = ACTION_SELECT);
+    void commit();
+    void finish(SessionFlags flags = NONE);
 
-	// Joins the selection instance in this thread with this instance
-	// This deletes the thread
-	void join(SelectionThread* thread);
+    // Joins the selection instance in this thread with this instance
+    // This deletes the thread
+    void join(SelectionThread* thread);
 
-	size_t size() const noexcept { return tiles.size(); }
-	bool empty() const noexcept { return tiles.empty(); }
-	void updateSelectionCount();
-	TileSet::iterator begin() noexcept { return tiles.begin(); }
-	TileSet::iterator end() noexcept { return tiles.end(); }
-	const TileSet& getTiles() const noexcept { return tiles; }
-	Tile* getSelectedTile() { ASSERT(size() == 1); return *tiles.begin(); }
+    size_t size() const noexcept { return tiles.size(); }
+    bool empty() const noexcept { return tiles.empty(); }
+    void updateSelectionCount();
+    TileSet::iterator begin() noexcept { return tiles.begin(); }
+    TileSet::iterator end() noexcept { return tiles.end(); }
+    const TileSet& getTiles() const noexcept { return tiles; }
+    Tile* getSelectedTile()
+    {
+        ASSERT(size() == 1);
+        return *tiles.begin();
+    }
 
 private:
-	Editor& editor;
-	BatchAction* session;
-	Action* subsession;
-	TileSet tiles;
-	bool busy;
+    Editor& editor;
+    BatchAction* session;
+    Action* subsession;
+    TileSet tiles;
+    bool busy;
 
-	friend class SelectionThread;
+    friend class SelectionThread;
 };
 
 class SelectionThread : public wxThread
 {
 public:
-	SelectionThread(Editor& editor, Position start, Position end);
+    SelectionThread(Editor& editor, Position start, Position end);
 
-	void Execute(); // Calls "Create" and then "Run"
+    void Execute(); // Calls "Create" and then "Run"
 
 protected:
-	virtual ExitCode Entry();
-	Editor& editor;
-	Position start, end;
-	Selection selection;
-	Action* result;
+    virtual ExitCode Entry();
+    Editor& editor;
+    Position start, end;
+    Selection selection;
+    Action* result;
 
-	friend class Selection;
+    friend class Selection;
 };
 
 #endif

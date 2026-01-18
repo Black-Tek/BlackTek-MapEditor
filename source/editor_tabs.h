@@ -25,50 +25,50 @@ class EditorTab;
 class MapTabbook : public wxPanel
 {
 public:
-	MapTabbook(wxWindow* parent, wxWindowID id);
+    MapTabbook(wxWindow* parent, wxWindowID id);
 
-	// Wrapper functions
-	void AddTab(EditorTab* tab, bool select);
-	void SetTabLabel(int idx, wxString label);
-	void SetFocusedTab(int idx);
-	void DeleteTab(int idx);
-	int GetTabCount();
-	int GetTabIndex(wxWindow* tab);
-	int GetSelection();
-	void CycleTab(bool forward = true);
-	wxWindow* GetCurrentPage();
-	EditorTab* GetCurrentTab();
-	EditorTab* GetTab(int idx);
+    // Wrapper functions
+    void AddTab(EditorTab* tab, bool select);
+    void SetTabLabel(int idx, wxString label);
+    void SetFocusedTab(int idx);
+    void DeleteTab(int idx);
+    int GetTabCount();
+    int GetTabIndex(wxWindow* tab);
+    int GetSelection();
+    void CycleTab(bool forward = true);
+    wxWindow* GetCurrentPage();
+    EditorTab* GetCurrentTab();
+    EditorTab* GetTab(int idx);
 
-	// Events
-	void OnAllowNotebookDND(wxAuiNotebookEvent& evt);
-	void OnNotebookPageClose(wxAuiNotebookEvent& evt);
-	void OnNotebookPageChanged(wxAuiNotebookEvent& evt);
-	void OnSwitchEditorMode(EditorMode mode);
+    // Events
+    void OnAllowNotebookDND(wxAuiNotebookEvent& evt);
+    void OnNotebookPageClose(wxAuiNotebookEvent& evt);
+    void OnNotebookPageChanged(wxAuiNotebookEvent& evt);
+    void OnSwitchEditorMode(EditorMode mode);
 
 protected:
-	EditorTab* GetInternalTab(int idx);
-	wxAuiNotebook* notebook;
-	std::map<wxWindow*, EditorTab*> conv;
+    EditorTab* GetInternalTab(int idx);
+    wxAuiNotebook* notebook;
+    std::map<wxWindow*, EditorTab*> conv;
 
-	friend class MapTab;
+    friend class MapTab;
 
-	DECLARE_EVENT_TABLE();
+    DECLARE_EVENT_TABLE();
 };
 
 class EditorTab
 {
 public:
-	EditorTab();
-	virtual ~EditorTab();
+    EditorTab();
+    virtual ~EditorTab();
 
-	// Properties
-	virtual wxWindow* GetWindow() const = 0;
-	virtual wxString GetTitle() const = 0;
-	virtual bool IsCurrent() const = 0;
+    // Properties
+    virtual wxWindow* GetWindow() const = 0;
+    virtual wxString GetTitle() const = 0;
+    virtual bool IsCurrent() const = 0;
 
-	//
-	virtual void OnSwitchEditorMode(EditorMode mode) {}
+    //
+    virtual void OnSwitchEditorMode(EditorMode mode) { }
 };
 
 #endif

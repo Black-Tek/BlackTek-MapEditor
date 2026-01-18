@@ -28,31 +28,31 @@
 class WaypointBrush : public Brush
 {
 public:
-	WaypointBrush();
-	virtual ~WaypointBrush();
+    WaypointBrush();
+    virtual ~WaypointBrush();
 
-	bool isWaypoint() const { return true; }
-	WaypointBrush* asWaypoint() { return static_cast<WaypointBrush*>(this); }
+    bool isWaypoint() const { return true; }
+    WaypointBrush* asWaypoint() { return static_cast<WaypointBrush*>(this); }
 
-	// Not used
-	virtual bool load(pugi::xml_node node, wxArrayString& warnings) { return true; }
+    // Not used
+    virtual bool load(pugi::xml_node node, wxArrayString& warnings) { return true; }
 
-	virtual bool canDraw(BaseMap* map, const Position& position) const;
-	// Will ASSERT
-	virtual void draw(BaseMap* map, Tile* tile, void* parameter);
-	virtual void undraw(BaseMap* map, Tile* tile);
+    virtual bool canDraw(BaseMap* map, const Position& position) const;
+    // Will ASSERT
+    virtual void draw(BaseMap* map, Tile* tile, void* parameter);
+    virtual void undraw(BaseMap* map, Tile* tile);
 
-	virtual bool canDrag() const { return false; }
-	virtual bool canSmear() const { return false; }
-	virtual bool oneSizeFitsAll() const { return true; }
+    virtual bool canDrag() const { return false; }
+    virtual bool canSmear() const { return false; }
+    virtual bool oneSizeFitsAll() const { return true; }
 
-	std::string getWaypoint() const;
-	void setWaypoint(Waypoint* wp);
-	virtual int getLookID() const { return 0; } // We don't have a graphic
-	virtual std::string getName() const { return "Waypoint Brush"; }
+    std::string getWaypoint() const;
+    void setWaypoint(Waypoint* wp);
+    virtual int getLookID() const { return 0; } // We don't have a graphic
+    virtual std::string getName() const { return "Waypoint Brush"; }
 
 protected:
-	std::string waypoint_name;
+    std::string waypoint_name;
 };
 
 #endif

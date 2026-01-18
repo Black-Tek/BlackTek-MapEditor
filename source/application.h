@@ -18,13 +18,13 @@
 #ifndef RME_APPLICATION_H_
 #define RME_APPLICATION_H_
 
+#include "action.h"
 #include "gui.h"
 #include "main_toolbar.h"
-#include "action.h"
 #include "settings.h"
 
-#include "process_com.h"
 #include "map_display.h"
+#include "process_com.h"
 #include "welcome_dialog.h"
 
 class Item;
@@ -38,26 +38,25 @@ class wxSingleInstanceChecker;
 class Application : public wxApp
 {
 public:
-	~Application();
-	virtual bool OnInit();
+    ~Application();
+    virtual bool OnInit();
     virtual void OnEventLoopEnter(wxEventLoopBase* loop);
-	virtual void MacOpenFiles(const wxArrayString& fileNames);
-	virtual int OnExit();
-	void Unload();
+    virtual void MacOpenFiles(const wxArrayString& fileNames);
+    virtual int OnExit();
+    void Unload();
 
 private:
     bool m_startup;
     wxString m_file_to_open;
-	void FixVersionDiscrapencies();
-	bool ParseCommandLineMap(wxString& fileName);
+    void FixVersionDiscrapencies();
+    bool ParseCommandLineMap(wxString& fileName);
 
-	virtual void OnFatalException();
+    virtual void OnFatalException();
 
 #ifdef _USE_PROCESS_COM
-	RMEProcessServer* m_proc_server;
-	wxSingleInstanceChecker* m_single_instance_checker;
+    RMEProcessServer* m_proc_server;
+    wxSingleInstanceChecker* m_single_instance_checker;
 #endif
-
 };
 
 class MainMenuBar;
@@ -65,47 +64,48 @@ class MainMenuBar;
 class MainFrame : public wxFrame
 {
 public:
-	MainFrame(const wxString& title,
-		const wxPoint& pos, const wxSize& size);
-	~MainFrame();
+    MainFrame(const wxString& title,
+        const wxPoint& pos, const wxSize& size);
+    ~MainFrame();
 
-	void UpdateMenubar();
-	bool DoQueryClose();
-	bool DoQuerySave(bool doclose = true);
-	bool DoQueryImportCreatures();
-	bool LoadMap(FileName name);
+    void UpdateMenubar();
+    bool DoQueryClose();
+    bool DoQuerySave(bool doclose = true);
+    bool DoQueryImportCreatures();
+    bool LoadMap(FileName name);
 
-	void AddRecentFile(const FileName& file);
-	void LoadRecentFiles();
-	void SaveRecentFiles();
-	std::vector<wxString> GetRecentFiles();
+    void AddRecentFile(const FileName& file);
+    void LoadRecentFiles();
+    void SaveRecentFiles();
+    std::vector<wxString> GetRecentFiles();
 
-	MainToolBar* GetAuiToolBar() const { return tool_bar; }
+    MainToolBar* GetAuiToolBar() const { return tool_bar; }
 
-	void OnUpdateMenus(wxCommandEvent& event);
-	void OnUpdateActions(wxCommandEvent& event);
-	void UpdateFloorMenu();
-	void UpdateIndicatorsMenu();
-	void OnIdle(wxIdleEvent& event);
-	void OnExit(wxCloseEvent& event);
+    void OnUpdateMenus(wxCommandEvent& event);
+    void OnUpdateActions(wxCommandEvent& event);
+    void UpdateFloorMenu();
+    void UpdateIndicatorsMenu();
+    void OnIdle(wxIdleEvent& event);
+    void OnExit(wxCloseEvent& event);
 
 #ifdef _USE_UPDATER_
-	void OnUpdateReceived(wxCommandEvent& event);
+    void OnUpdateReceived(wxCommandEvent& event);
 #endif
 
 #ifdef __WINDOWS__
-	virtual bool MSWTranslateMessage(WXMSG *msg);
+    virtual bool MSWTranslateMessage(WXMSG* msg);
 #endif
 
-	void PrepareDC(wxDC& dc);
+    void PrepareDC(wxDC& dc);
+
 protected:
-	MainMenuBar* menu_bar;
-	MainToolBar* tool_bar;
+    MainMenuBar* menu_bar;
+    MainToolBar* tool_bar;
 
-	friend class Application;
-	friend class GUI;
+    friend class Application;
+    friend class GUI;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 #endif

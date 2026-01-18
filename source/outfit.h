@@ -18,21 +18,24 @@
 #ifndef RME_OUTFIT_H_
 #define RME_OUTFIT_H_
 
-struct Outfit {
-	Outfit() : lookType(0), lookItem(0), lookMount(0), lookAddon(0), lookHead(0), lookBody(0), lookLegs(0), lookFeet(0) {}
-	~Outfit() {}
-	int lookType;
-	int lookItem;
-	int lookMount;
-	int lookAddon;
-	int lookHead;
-	int lookBody;
-	int lookLegs;
-	int lookFeet;
+struct Outfit
+{
+    Outfit() :
+        lookType(0), lookItem(0), lookMount(0), lookAddon(0), lookHead(0), lookBody(0), lookLegs(0), lookFeet(0) { }
+    ~Outfit() { }
+    int lookType;
+    int lookItem;
+    int lookMount;
+    int lookAddon;
+    int lookHead;
+    int lookBody;
+    int lookLegs;
+    int lookFeet;
 
-	uint32_t getColorHash() const {
-		return lookHead << 24 | lookBody << 16 | lookLegs << 8 | lookFeet;
-	}
+    uint32_t getColorHash() const
+    {
+        return lookHead << 24 | lookBody << 16 | lookLegs << 8 | lookFeet;
+    }
 };
 
 #endif

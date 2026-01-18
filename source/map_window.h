@@ -31,73 +31,73 @@ class DCButton;
 class MapWindow : public wxPanel
 {
 public:
-	MapWindow(wxWindow* parent, Editor& editor);
-	virtual ~MapWindow();
+    MapWindow(wxWindow* parent, Editor& editor);
+    virtual ~MapWindow();
 
-	// Event handlers
-	void OnSize(wxSizeEvent& event);
-	void OnScroll(wxScrollEvent& event);
-	void OnScrollLineDown(wxScrollEvent& event);
-	void OnScrollLineUp(wxScrollEvent& event);
-	void OnScrollPageDown(wxScrollEvent& event);
-	void OnScrollPageUp(wxScrollEvent& event);
-	void OnGem(wxCommandEvent& event);
+    // Event handlers
+    void OnSize(wxSizeEvent& event);
+    void OnScroll(wxScrollEvent& event);
+    void OnScrollLineDown(wxScrollEvent& event);
+    void OnScrollLineUp(wxScrollEvent& event);
+    void OnScrollPageDown(wxScrollEvent& event);
+    void OnScrollPageUp(wxScrollEvent& event);
+    void OnGem(wxCommandEvent& event);
 
-	// Custom interface for MapWindow
+    // Custom interface for MapWindow
 
-	// GetViewSize returns the size of the containing canvas, in pixels
-	void GetViewSize(int* x, int* y);
-	// Returns the start of the camera on the map, in pixels
-	// Actually is scroll thumb positions
-	void GetViewStart(int* x, int* y);
+    // GetViewSize returns the size of the containing canvas, in pixels
+    void GetViewSize(int* x, int* y);
+    // Returns the start of the camera on the map, in pixels
+    // Actually is scroll thumb positions
+    void GetViewStart(int* x, int* y);
 
-	// Set size of this window (in pixels)
-	// if center is true, the camera will be moved to the center of the map.
-	void SetSize(int x, int y, bool center = false);
+    // Set size of this window (in pixels)
+    // if center is true, the camera will be moved to the center of the map.
+    void SetSize(int x, int y, bool center = false);
 
-	// Scroll to the specified, absolute position (in pixels)
-	void Scroll(int x, int y, bool center = false);
+    // Scroll to the specified, absolute position (in pixels)
+    void Scroll(int x, int y, bool center = false);
 
-	// Scroll this many pixels in X/Y, relative to current position
-	void ScrollRelative(int x, int y);
+    // Scroll this many pixels in X/Y, relative to current position
+    void ScrollRelative(int x, int y);
 
-	// Resize scrollbars to fit to the map dimensions
-	// This needs to be called after updating map height/width
-	void FitToMap();
+    // Resize scrollbars to fit to the map dimensions
+    // This needs to be called after updating map height/width
+    void FitToMap();
 
-	// Screen position.
-	Position GetScreenCenterPosition();
-	void SetScreenCenterPosition(const Position& position, bool showIndicator = false);
-	void GoToPreviousCenterPosition();
+    // Screen position.
+    Position GetScreenCenterPosition();
+    void SetScreenCenterPosition(const Position& position, bool showIndicator = false);
+    void GoToPreviousCenterPosition();
 
-	// Return the containing canvas
-	MapCanvas* GetCanvas() const noexcept { return canvas; }
+    // Return the containing canvas
+    MapCanvas* GetCanvas() const noexcept { return canvas; }
 
-	void ShowReplaceItemsDialog(bool selectionOnly);
-	void CloseReplaceItemsDialog();
-	void OnReplaceItemsDialogClose(wxCloseEvent& event);
-
-protected:
-	// For internal use, call to resize the scrollbars with
-	// the newd dimensions of *this* window
-	void UpdateScrollbars(int nx, int ny);
-	void UpdateDialogs(bool show);
+    void ShowReplaceItemsDialog(bool selectionOnly);
+    void CloseReplaceItemsDialog();
+    void OnReplaceItemsDialogClose(wxCloseEvent& event);
 
 protected:
-	Editor& editor;
-	DCButton* gem;
-	MapCanvas* canvas;
-	wxScrollBar* hScroll;
-	wxScrollBar* vScroll;
+    // For internal use, call to resize the scrollbars with
+    // the newd dimensions of *this* window
+    void UpdateScrollbars(int nx, int ny);
+    void UpdateDialogs(bool show);
+
+protected:
+    Editor& editor;
+    DCButton* gem;
+    MapCanvas* canvas;
+    wxScrollBar* hScroll;
+    wxScrollBar* vScroll;
 
 private:
-	ReplaceItemsDialog* replaceItemsDialog;
-	Position previous_position;
+    ReplaceItemsDialog* replaceItemsDialog;
+    Position previous_position;
 
-	friend class MainFrame;
-	friend class MapCanvas;
+    friend class MainFrame;
+    friend class MapCanvas;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 // MapScrollbar, a special scrollbar that relays alot of events
@@ -106,16 +106,16 @@ private:
 class MapScrollBar : public wxScrollBar
 {
 public:
-	MapScrollBar(MapWindow* parent, wxWindowID id, long style, wxWindow* canvas) :
-	  wxScrollBar(parent, id, wxDefaultPosition, wxDefaultSize, style), canvas(canvas) {}
-	virtual ~MapScrollBar() {}
+    MapScrollBar(MapWindow* parent, wxWindowID id, long style, wxWindow* canvas) :
+        wxScrollBar(parent, id, wxDefaultPosition, wxDefaultSize, style), canvas(canvas) { }
+    virtual ~MapScrollBar() { }
 
-	void OnKey(wxKeyEvent& event) { canvas->GetEventHandler()->AddPendingEvent(event); }
-	void OnWheel(wxMouseEvent& event) { canvas->GetEventHandler()->AddPendingEvent(event); }
-	void OnFocus(wxFocusEvent& event) { canvas->SetFocus(); }
+    void OnKey(wxKeyEvent& event) { canvas->GetEventHandler()->AddPendingEvent(event); }
+    void OnWheel(wxMouseEvent& event) { canvas->GetEventHandler()->AddPendingEvent(event); }
+    void OnFocus(wxFocusEvent& event) { canvas->SetFocus(); }
 
-	wxWindow* canvas;
-	DECLARE_EVENT_TABLE()
+    wxWindow* canvas;
+    DECLARE_EVENT_TABLE()
 };
 
 #endif

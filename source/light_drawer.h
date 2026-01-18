@@ -23,45 +23,49 @@
 
 class LightDrawer
 {
-	struct Light {
-		uint16_t map_x = 0;
-		uint16_t map_y = 0;
-		uint8_t color = 0;
-		uint8_t intensity = 0;
-	};
+    struct Light
+    {
+        uint16_t map_x = 0;
+        uint16_t map_y = 0;
+        uint8_t color = 0;
+        uint8_t intensity = 0;
+    };
 
 public:
-	LightDrawer();
-	virtual ~LightDrawer();
+    LightDrawer();
+    virtual ~LightDrawer();
 
-	void draw(int map_x, int map_y, int scroll_x, int scroll_y);
+    void draw(int map_x, int map_y, int scroll_x, int scroll_y);
 
-	void setGlobalLightColor(uint8_t color);
-	void addLight(int map_x, int map_y, const SpriteLight& light);
-	void clear() noexcept;
+    void setGlobalLightColor(uint8_t color);
+    void addLight(int map_x, int map_y, const SpriteLight& light);
+    void clear() noexcept;
 
 private:
-	void createGLTexture();
-	void unloadGLTexture();
+    void createGLTexture();
+    void unloadGLTexture();
 
-	inline float calculateIntensity(int map_x, int map_y, const Light& light) {
-		int dx = map_x - light.map_x;
-		int dy = map_y - light.map_y;
-		float distance = std::sqrt(dx * dx + dy * dy);
-		if (distance > rme::MaxLightIntensity) {
-			return 0.f;
-		}
-		float intensity = (-distance + light.intensity) * 0.2f;
-		if (intensity < 0.01f) {
-			return 0.f;
-		}
-		return std::min(intensity, 1.f);
-	}
+    inline float calculateIntensity(int map_x, int map_y, const Light& light)
+    {
+        int dx = map_x - light.map_x;
+        int dy = map_y - light.map_y;
+        float distance = std::sqrt(dx * dx + dy * dy);
+        if (distance > rme::MaxLightIntensity)
+        {
+            return 0.f;
+        }
+        float intensity = (-distance + light.intensity) * 0.2f;
+        if (intensity < 0.01f)
+        {
+            return 0.f;
+        }
+        return std::min(intensity, 1.f);
+    }
 
-	GLuint texture;
-	std::vector<Light> lights;
-	std::vector<uint8_t> buffer;
-	wxColor global_color;
+    GLuint texture;
+    std::vector<Light> lights;
+    std::vector<uint8_t> buffer;
+    wxColor global_color;
 };
 
 #endif

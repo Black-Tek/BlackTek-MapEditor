@@ -22,42 +22,45 @@ class Sprite;
 class GameSprite;
 class EditorSprite;
 
-enum {
-	DC_BTN_NORMAL,
-	DC_BTN_TOGGLE,
+enum
+{
+    DC_BTN_NORMAL,
+    DC_BTN_TOGGLE,
 };
 
-enum RenderSize {
-	RENDER_SIZE_16x16,
-	RENDER_SIZE_32x32,
-	RENDER_SIZE_64x64,
+enum RenderSize
+{
+    RENDER_SIZE_16x16,
+    RENDER_SIZE_32x32,
+    RENDER_SIZE_64x64,
 };
 
 class DCButton : public wxPanel
 {
 public:
-	DCButton();
-	DCButton(wxWindow* parent, wxWindowID id, wxPoint pos, int type, RenderSize sz, int sprite_id);
-	virtual ~DCButton();
+    DCButton();
+    DCButton(wxWindow* parent, wxWindowID id, wxPoint pos, int type, RenderSize sz, int sprite_id);
+    virtual ~DCButton();
 
-	void SetValue(bool val);
-	bool GetValue() const;
+    void SetValue(bool val);
+    bool GetValue() const;
 
-	void SetSprite(int id);
+    void SetSprite(int id);
 
-	void OnPaint(wxPaintEvent&);
-	void OnClick(wxMouseEvent&);
+    void OnPaint(wxPaintEvent&);
+    void OnClick(wxMouseEvent&);
+
 protected:
-	void SetOverlay(Sprite* espr);
+    void SetOverlay(Sprite* espr);
 
-	int type;
-	bool state; // pressed/unpressed
-	RenderSize size;
-	Sprite* sprite;
-	Sprite* overlay;
+    int type;
+    bool state; // pressed/unpressed
+    RenderSize size;
+    Sprite* sprite;
+    Sprite* overlay;
 
-	DECLARE_DYNAMIC_CLASS(DCButton)
-	DECLARE_EVENT_TABLE()
+    DECLARE_DYNAMIC_CLASS(DCButton)
+    DECLARE_EVENT_TABLE()
 };
 
 #endif

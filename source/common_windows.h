@@ -32,9 +32,9 @@ class MapTab;
 class ItemToggleButton : public DCButton
 {
 public:
-	ItemToggleButton(wxWindow* parent, RenderSize size, int lookid, wxWindowID id = wxID_ANY) :
-		DCButton(parent, id, wxDefaultPosition, DC_BTN_TOGGLE, size, lookid) {}
-	virtual ~ItemToggleButton() {}
+    ItemToggleButton(wxWindow* parent, RenderSize size, int lookid, wxWindowID id = wxID_ANY) :
+        DCButton(parent, id, wxDefaultPosition, DC_BTN_TOGGLE, size, lookid) { }
+    virtual ~ItemToggleButton() { }
 };
 
 /**
@@ -43,9 +43,9 @@ public:
 class ItemButton : public DCButton
 {
 public:
-	ItemButton(wxWindow* parent, RenderSize size, uint16_t lookid, wxWindowID id = wxID_ANY) :
-		DCButton(parent, id, wxDefaultPosition, DC_BTN_NORMAL, size, lookid) {}
-	virtual ~ItemButton() {}
+    ItemButton(wxWindow* parent, RenderSize size, uint16_t lookid, wxWindowID id = wxID_ANY) :
+        DCButton(parent, id, wxDefaultPosition, DC_BTN_NORMAL, size, lookid) { }
+    virtual ~ItemButton() { }
 };
 
 /**
@@ -55,28 +55,28 @@ public:
 class MapPropertiesWindow : public wxDialog
 {
 public:
-	MapPropertiesWindow(wxWindow* parent, MapTab* tab, Editor& editor);
-	virtual ~MapPropertiesWindow();
+    MapPropertiesWindow(wxWindow* parent, MapTab* tab, Editor& editor);
+    virtual ~MapPropertiesWindow();
 
-	void OnChangeVersion(wxCommandEvent&);
+    void OnChangeVersion(wxCommandEvent&);
 
-	void OnClickOK(wxCommandEvent&);
-	void OnClickCancel(wxCommandEvent&);
+    void OnClickOK(wxCommandEvent&);
+    void OnClickCancel(wxCommandEvent&);
 
 protected:
-	void UpdateProtocolList();
+    void UpdateProtocolList();
 
-	MapTab* view;
-	Editor& editor;
-	wxSpinCtrl* height_spin;
-	wxSpinCtrl* width_spin;
-	wxChoice* version_choice;
-	wxChoice* protocol_choice;
-	wxTextCtrl* description_ctrl;
-	wxTextCtrl* house_filename_ctrl;
-	wxTextCtrl* spawn_filename_ctrl;
+    MapTab* view;
+    Editor& editor;
+    wxSpinCtrl* height_spin;
+    wxSpinCtrl* width_spin;
+    wxChoice* version_choice;
+    wxChoice* protocol_choice;
+    wxTextCtrl* description_ctrl;
+    wxTextCtrl* house_filename_ctrl;
+    wxTextCtrl* spawn_filename_ctrl;
 
-	DECLARE_EVENT_TABLE();
+    DECLARE_EVENT_TABLE();
 };
 
 /**
@@ -86,24 +86,25 @@ protected:
 class ImportMapWindow : public wxDialog
 {
 public:
-	ImportMapWindow(wxWindow* parent, Editor& editor);
-	virtual ~ImportMapWindow();
+    ImportMapWindow(wxWindow* parent, Editor& editor);
+    virtual ~ImportMapWindow();
 
-	void OnClickBrowse(wxCommandEvent&);
-	void OnClickOK(wxCommandEvent&);
-	void OnClickCancel(wxCommandEvent&);
+    void OnClickBrowse(wxCommandEvent&);
+    void OnClickOK(wxCommandEvent&);
+    void OnClickCancel(wxCommandEvent&);
+
 protected:
-	Editor& editor;
+    Editor& editor;
 
-	wxTextCtrl* file_text_field;
-	wxSpinCtrl* x_offset_ctrl;
-	wxSpinCtrl* y_offset_ctrl;
-	wxSpinCtrl* z_offset_ctrl;
+    wxTextCtrl* file_text_field;
+    wxSpinCtrl* x_offset_ctrl;
+    wxSpinCtrl* y_offset_ctrl;
+    wxSpinCtrl* z_offset_ctrl;
 
-	wxChoice* house_options;
-	wxChoice* spawn_options;
+    wxChoice* house_options;
+    wxChoice* spawn_options;
 
-	DECLARE_EVENT_TABLE();
+    DECLARE_EVENT_TABLE();
 };
 
 /**
@@ -112,30 +113,30 @@ protected:
 class ExportMiniMapWindow : public wxDialog
 {
 public:
-	ExportMiniMapWindow(wxWindow* parent, Editor& editor);
-	virtual ~ExportMiniMapWindow();
+    ExportMiniMapWindow(wxWindow* parent, Editor& editor);
+    virtual ~ExportMiniMapWindow();
 
-	void OnClickBrowse(wxCommandEvent&);
-	void OnDirectoryChanged(wxKeyEvent&);
-	void OnFileNameChanged(wxKeyEvent&);
-	void OnClickOK(wxCommandEvent&);
-	void OnClickCancel(wxCommandEvent&);
-	void OnExportTypeChange(wxCommandEvent&);
+    void OnClickBrowse(wxCommandEvent&);
+    void OnDirectoryChanged(wxKeyEvent&);
+    void OnFileNameChanged(wxKeyEvent&);
+    void OnClickOK(wxCommandEvent&);
+    void OnClickCancel(wxCommandEvent&);
+    void OnExportTypeChange(wxCommandEvent&);
 
 protected:
-	void CheckValues();
+    void CheckValues();
 
-	Editor& editor;
+    Editor& editor;
 
-	wxChoice* format_options;
-	wxStaticText* error_field;
-	wxTextCtrl* directory_text_field;
-	wxTextCtrl* file_name_text_field;
-	wxChoice* floor_options;
-	wxSpinCtrl* floor_number;
-	wxButton* ok_button;
+    wxChoice* format_options;
+    wxStaticText* error_field;
+    wxTextCtrl* directory_text_field;
+    wxTextCtrl* file_name_text_field;
+    wxChoice* floor_options;
+    wxSpinCtrl* floor_number;
+    wxButton* ok_button;
 
-	DECLARE_EVENT_TABLE();
+    DECLARE_EVENT_TABLE();
 };
 
 /**
@@ -144,13 +145,13 @@ protected:
 class KeyForwardingTextCtrl : public wxTextCtrl
 {
 public:
-	KeyForwardingTextCtrl(wxWindow* parent, wxWindowID id, const wxString& value = "", const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0, const wxValidator& validator = wxDefaultValidator, const wxString& name = wxTextCtrlNameStr)
-		: wxTextCtrl(parent, id, value, pos, size, style, validator, name) {}
-	~KeyForwardingTextCtrl() {}
+    KeyForwardingTextCtrl(wxWindow* parent, wxWindowID id, const wxString& value = "", const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0, const wxValidator& validator = wxDefaultValidator, const wxString& name = wxTextCtrlNameStr) :
+        wxTextCtrl(parent, id, value, pos, size, style, validator, name) { }
+    ~KeyForwardingTextCtrl() { }
 
-	void OnKeyDown(wxKeyEvent&);
+    void OnKeyDown(wxKeyEvent&);
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 /**
@@ -160,34 +161,36 @@ public:
 class FindDialogListBox : public wxVListBox
 {
 public:
-	FindDialogListBox(wxWindow* parent, wxWindowID id);
-	~FindDialogListBox();
+    FindDialogListBox(wxWindow* parent, wxWindowID id);
+    ~FindDialogListBox();
 
-	void Clear();
-	void SetNoMatches();
-	void AddBrush(Brush*);
-	Brush* GetSelectedBrush();
+    void Clear();
+    void SetNoMatches();
+    void AddBrush(Brush*);
+    Brush* GetSelectedBrush();
 
-	void OnDrawItem(wxDC& dc, const wxRect& rect, size_t index) const;
-	wxCoord OnMeasureItem(size_t index) const;
+    void OnDrawItem(wxDC& dc, const wxRect& rect, size_t index) const;
+    wxCoord OnMeasureItem(size_t index) const;
+
 protected:
-	bool cleared;
-	bool no_matches;
-	std::vector<Brush*> brushlist;
+    bool cleared;
+    bool no_matches;
+    std::vector<Brush*> brushlist;
 };
 
 /**
-* A wxListBox that can be sorted without using style wxLB_SORT.
-* wxLB_SORT does not work properly on Windows and causes errors on macOS.
-*/
+ * A wxListBox that can be sorted without using style wxLB_SORT.
+ * wxLB_SORT does not work properly on Windows and causes errors on macOS.
+ */
 class SortableListBox : public wxListBox
 {
 public:
-	SortableListBox(wxWindow* parent, wxWindowID id, const wxPoint &pos = wxDefaultPosition, const wxSize &size = wxDefaultSize);
-	~SortableListBox();
-	void Sort();
+    SortableListBox(wxWindow* parent, wxWindowID id, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
+    ~SortableListBox();
+    void Sort();
+
 private:
-	void DoSort();
+    void DoSort();
 };
 
 /**
@@ -198,31 +201,32 @@ private:
 class FindDialog : public wxDialog
 {
 public:
-	FindDialog(wxWindow* parent, wxString title);
-	virtual ~FindDialog();
+    FindDialog(wxWindow* parent, wxString title);
+    virtual ~FindDialog();
 
-	void OnKeyDown(wxKeyEvent&);
-	void OnTextChange(wxCommandEvent&);
-	void OnTextIdle(wxTimerEvent&);
-	void OnClickList(wxCommandEvent&);
-	void OnClickOK(wxCommandEvent&);
-	void OnClickCancel(wxCommandEvent&);
+    void OnKeyDown(wxKeyEvent&);
+    void OnTextChange(wxCommandEvent&);
+    void OnTextIdle(wxTimerEvent&);
+    void OnClickList(wxCommandEvent&);
+    void OnClickOK(wxCommandEvent&);
+    void OnClickCancel(wxCommandEvent&);
 
-	void RefreshContents();
-	virtual const Brush* getResult() const { return result_brush; }
-	virtual int getResultID() const { return result_id; }
+    void RefreshContents();
+    virtual const Brush* getResult() const { return result_brush; }
+    virtual int getResultID() const { return result_id; }
+
 protected:
-	virtual void RefreshContentsInternal() = 0;
-	virtual void OnClickListInternal(wxCommandEvent&) = 0;
-	virtual void OnClickOKInternal() = 0;
+    virtual void RefreshContentsInternal() = 0;
+    virtual void OnClickListInternal(wxCommandEvent&) = 0;
+    virtual void OnClickOKInternal() = 0;
 
-	FindDialogListBox* item_list;
-	KeyForwardingTextCtrl* search_field;
-	wxTimer idle_input_timer;
-	const Brush* result_brush;
-	int result_id;
+    FindDialogListBox* item_list;
+    KeyForwardingTextCtrl* search_field;
+    wxTimer idle_input_timer;
+    const Brush* result_brush;
+    int result_id;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 /**
@@ -232,12 +236,12 @@ protected:
 class FindBrushDialog : public FindDialog
 {
 public:
-	FindBrushDialog(wxWindow* parent, wxString title = "Jump to Brush");
-	virtual ~FindBrushDialog();
+    FindBrushDialog(wxWindow* parent, wxString title = "Jump to Brush");
+    virtual ~FindBrushDialog();
 
-	virtual void RefreshContentsInternal();
-	virtual void OnClickListInternal(wxCommandEvent&);
-	virtual void OnClickOKInternal();
+    virtual void RefreshContentsInternal();
+    virtual void OnClickListInternal(wxCommandEvent&);
+    virtual void OnClickOKInternal();
 };
 
 /**
@@ -247,17 +251,17 @@ public:
 class GotoPositionDialog : public wxDialog
 {
 public:
-	GotoPositionDialog(wxWindow* parent, Editor& editor);
-	~GotoPositionDialog() {}
+    GotoPositionDialog(wxWindow* parent, Editor& editor);
+    ~GotoPositionDialog() { }
 
-	void OnClickOK(wxCommandEvent&);
-	void OnClickCancel(wxCommandEvent&);
+    void OnClickOK(wxCommandEvent&);
+    void OnClickCancel(wxCommandEvent&);
 
 protected:
-	Editor& editor;
-	PositionCtrl* posctrl;
+    Editor& editor;
+    PositionCtrl* posctrl;
 
-	DECLARE_EVENT_TABLE();
+    DECLARE_EVENT_TABLE();
 };
 
 /**
@@ -268,29 +272,29 @@ protected:
 class ObjectPropertiesWindowBase : public wxDialog
 {
 public:
-	ObjectPropertiesWindowBase(
-		wxWindow* parent, wxString title,
-		const Map* map, const Tile* tile, Item* item,
-		wxPoint position = wxDefaultPosition);
-	ObjectPropertiesWindowBase(
-		wxWindow* parent, wxString title,
-		const Map* map, const Tile* tile, Spawn* spawn,
-		wxPoint position = wxDefaultPosition);
-	ObjectPropertiesWindowBase(
-		wxWindow* parent, wxString title,
-		const Map* map, const Tile* tile, Creature* creature,
-		wxPoint position = wxDefaultPosition);
+    ObjectPropertiesWindowBase(
+        wxWindow* parent, wxString title,
+        const Map* map, const Tile* tile, Item* item,
+        wxPoint position = wxDefaultPosition);
+    ObjectPropertiesWindowBase(
+        wxWindow* parent, wxString title,
+        const Map* map, const Tile* tile, Spawn* spawn,
+        wxPoint position = wxDefaultPosition);
+    ObjectPropertiesWindowBase(
+        wxWindow* parent, wxString title,
+        const Map* map, const Tile* tile, Creature* creature,
+        wxPoint position = wxDefaultPosition);
 
-	Item* getItemBeingEdited();
-	Creature* getCreatureBeingEdited();
-	Spawn* getSpawnBeingEdited();
+    Item* getItemBeingEdited();
+    Creature* getCreatureBeingEdited();
+    Spawn* getSpawnBeingEdited();
 
 protected:
-	const Map* edit_map;
-	const Tile* edit_tile;
-	Item* edit_item;
-	Creature* edit_creature;
-	Spawn* edit_spawn;
+    const Map* edit_map;
+    const Tile* edit_tile;
+    Item* edit_item;
+    Creature* edit_creature;
+    Spawn* edit_spawn;
 };
 
 /**
@@ -299,36 +303,36 @@ protected:
 class EditTownsDialog : public wxDialog
 {
 public:
-	EditTownsDialog(wxWindow* parent, Editor& editor);
-	virtual ~EditTownsDialog();
+    EditTownsDialog(wxWindow* parent, Editor& editor);
+    virtual ~EditTownsDialog();
 
-	void OnListBoxChange(wxCommandEvent&);
-	void OnClickSelectTemplePosition(wxCommandEvent&);
-	void OnClickAdd(wxCommandEvent&);
-	void OnClickRemove(wxCommandEvent&);
-	void OnClickOK(wxCommandEvent&);
-	void OnClickCancel(wxCommandEvent&);
+    void OnListBoxChange(wxCommandEvent&);
+    void OnClickSelectTemplePosition(wxCommandEvent&);
+    void OnClickAdd(wxCommandEvent&);
+    void OnClickRemove(wxCommandEvent&);
+    void OnClickOK(wxCommandEvent&);
+    void OnClickCancel(wxCommandEvent&);
+
 protected:
+    void BuildListBox(bool doselect);
+    void UpdateSelection(int new_selection);
 
-	void BuildListBox(bool doselect);
-	void UpdateSelection(int new_selection);
+    Editor& editor;
 
-	Editor& editor;
+    std::vector<Town*> town_list;
+    uint32_t max_town_id;
 
-	std::vector<Town*> town_list;
-	uint32_t max_town_id;
+    wxListBox* town_listbox;
+    wxString town_name, town_id;
 
-	wxListBox* town_listbox;
-	wxString town_name, town_id;
+    wxTextCtrl* name_field;
+    wxTextCtrl* id_field;
 
-	wxTextCtrl* name_field;
-	wxTextCtrl* id_field;
+    PositionCtrl* temple_position;
+    wxButton* remove_button;
+    wxButton* select_position_button;
 
-	PositionCtrl* temple_position;
-	wxButton* remove_button;
-	wxButton* select_position_button;
-
-	DECLARE_EVENT_TABLE();
+    DECLARE_EVENT_TABLE();
 };
 
 #endif

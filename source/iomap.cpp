@@ -15,28 +15,28 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////
 
-#include "main.h"
 #include "gui.h"
+#include "main.h"
 
 void IOMap::error(const wxString format, ...)
 {
-	va_list argp;
-	va_start(argp, format);
-	errorstr.PrintfV(format, argp);
-	va_end(argp);
+    va_list argp;
+    va_start(argp, format);
+    errorstr.PrintfV(format, argp);
+    va_end(argp);
 };
 
 void IOMap::warning(const wxString format, ...)
 {
-	wxString s;
-	va_list argp;
-	va_start(argp, format);
-	s.PrintfV(format, argp);
-	va_end(argp);
-	warnings.push_back(s);
+    wxString s;
+    va_list argp;
+    va_start(argp, format);
+    s.PrintfV(format, argp);
+    va_end(argp);
+    warnings.push_back(s);
 };
 
 bool IOMap::queryUser(const wxString& title, const wxString& text)
 {
-	return g_gui.PopupDialog(title, text, wxYES | wxNO) == wxID_YES;
+    return g_gui.PopupDialog(title, text, wxYES | wxNO) == wxID_YES;
 }

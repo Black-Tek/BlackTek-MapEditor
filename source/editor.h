@@ -18,10 +18,10 @@
 #ifndef RME_EDITOR_H
 #define RME_EDITOR_H
 
-#include "item.h"
-#include "tile.h"
 #include "iomap.h"
+#include "item.h"
 #include "map.h"
+#include "tile.h"
 
 #include "action.h"
 #include "selection.h"
@@ -35,113 +35,113 @@ class LiveSocket;
 class Editor
 {
 public:
-	Editor(CopyBuffer& copybuffer, LiveClient* client);
-	Editor(CopyBuffer& copybuffer, const FileName& fn);
-	Editor(CopyBuffer& copybuffer);
-	~Editor();
+    Editor(CopyBuffer& copybuffer, LiveClient* client);
+    Editor(CopyBuffer& copybuffer, const FileName& fn);
+    Editor(CopyBuffer& copybuffer);
+    ~Editor();
 
 protected:
-	// Live Server
-	LiveServer* live_server;
-	LiveClient* live_client;
+    // Live Server
+    LiveServer* live_server;
+    LiveClient* live_client;
 
 public:
-	// Public members
-	CopyBuffer& copybuffer;
-	GroundBrush* replace_brush;
+    // Public members
+    CopyBuffer& copybuffer;
+    GroundBrush* replace_brush;
 
 public: // Functions
-	// Live Server handling
-	LiveClient* GetLiveClient() const;
-	LiveServer* GetLiveServer() const;
-	LiveSocket& GetLive() const;
-	bool CanEdit() const noexcept { return true; }
-	bool IsLocal() const;
-	bool IsLive() const;
-	bool IsLiveServer() const;
-	bool IsLiveClient() const;
+    // Live Server handling
+    LiveClient* GetLiveClient() const;
+    LiveServer* GetLiveServer() const;
+    LiveSocket& GetLive() const;
+    bool CanEdit() const noexcept { return true; }
+    bool IsLocal() const;
+    bool IsLive() const;
+    bool IsLiveServer() const;
+    bool IsLiveClient() const;
 
-	// Server side
-	LiveServer* StartLiveServer();
-	void CloseLiveServer();
-	void BroadcastNodes(DirtyList& dirty_list);
+    // Server side
+    LiveServer* StartLiveServer();
+    void CloseLiveServer();
+    void BroadcastNodes(DirtyList& dirty_list);
 
-	// Client side
-	void QueryNode(int ndx, int ndy, bool underground);
-	void SendNodeRequests();
+    // Client side
+    void QueryNode(int ndx, int ndy, bool underground);
+    void SendNodeRequests();
 
-	bool hasChanges() const;
-	void clearChanges();
+    bool hasChanges() const;
+    void clearChanges();
 
-	// Map handling
-	void saveMap(FileName filename, bool showdialog); // "" means default filename
+    // Map handling
+    void saveMap(FileName filename, bool showdialog); // "" means default filename
 
-	Map& getMap() noexcept { return map; }
-	const Map& getMap() const noexcept { return map; }
-	uint16_t getMapWidth() const noexcept { return map.width; }
-	uint16_t getMapHeight() const noexcept { return map.height; }
+    Map& getMap() noexcept { return map; }
+    const Map& getMap() const noexcept { return map; }
+    uint16_t getMapWidth() const noexcept { return map.width; }
+    uint16_t getMapHeight() const noexcept { return map.height; }
 
-	wxString getLoaderError() const { return map.getError(); }
-	bool importMap(FileName filename, int import_x_offset, int import_y_offset, int import_z_offset, ImportType house_import_type, ImportType spawn_import_type);
-	bool importMiniMap(FileName filename, int import, int import_x_offset, int import_y_offset, int import_z_offset);
+    wxString getLoaderError() const { return map.getError(); }
+    bool importMap(FileName filename, int import_x_offset, int import_y_offset, int import_z_offset, ImportType house_import_type, ImportType spawn_import_type);
+    bool importMiniMap(FileName filename, int import, int import_x_offset, int import_y_offset, int import_z_offset);
 
-	ActionQueue* getHistoryActions() const noexcept { return actionQueue; }
-	Action* createAction(ActionIdentifier type);
-	Action* createAction(BatchAction* parent);
-	BatchAction* createBatch(ActionIdentifier type);
-	void addBatch(BatchAction* action, int stacking_delay = 0);
-	void addAction(Action* action, int stacking_delay = 0);
-	bool canUndo() const;
-	bool canRedo() const;
-	void undo(int indexes = 1);
-	void redo(int indexes = 1);
-	void updateActions();
-	void resetActionsTimer();
-	void clearActions();
+    ActionQueue* getHistoryActions() const noexcept { return actionQueue; }
+    Action* createAction(ActionIdentifier type);
+    Action* createAction(BatchAction* parent);
+    BatchAction* createBatch(ActionIdentifier type);
+    void addBatch(BatchAction* action, int stacking_delay = 0);
+    void addAction(Action* action, int stacking_delay = 0);
+    bool canUndo() const;
+    bool canRedo() const;
+    void undo(int indexes = 1);
+    void redo(int indexes = 1);
+    void updateActions();
+    void resetActionsTimer();
+    void clearActions();
 
-	// Selection
-	Selection& getSelection() noexcept { return selection; }
-	const Selection& getSelection() const noexcept { return selection; }
-	bool hasSelection() const noexcept { return selection.size() != 0; }
-	// Some simple actions that work on the map (these will work through the undo queue)
-	// Moves the selected area by the offset
-	void moveSelection(const Position& offset);
-	// Deletes all selected items
-	void destroySelection();
-	// Borderizes the selected region
-	void borderizeSelection();
-	// Randomizes the ground in the selected region
-	void randomizeSelection();
+    // Selection
+    Selection& getSelection() noexcept { return selection; }
+    const Selection& getSelection() const noexcept { return selection; }
+    bool hasSelection() const noexcept { return selection.size() != 0; }
+    // Some simple actions that work on the map (these will work through the undo queue)
+    // Moves the selected area by the offset
+    void moveSelection(const Position& offset);
+    // Deletes all selected items
+    void destroySelection();
+    // Borderizes the selected region
+    void borderizeSelection();
+    // Randomizes the ground in the selected region
+    void randomizeSelection();
 
-	// Same as above although it applies to the entire map
-	// action queue is flushed when these functions are called
-	// showdialog is whether a progress bar should be shown
-	void borderizeMap(bool showdialog);
-	void randomizeMap(bool showdialog);
-	void clearInvalidHouseTiles(bool showdialog);
-	void clearModifiedTileState(bool showdialog);
+    // Same as above although it applies to the entire map
+    // action queue is flushed when these functions are called
+    // showdialog is whether a progress bar should be shown
+    void borderizeMap(bool showdialog);
+    void randomizeMap(bool showdialog);
+    void clearInvalidHouseTiles(bool showdialog);
+    void clearModifiedTileState(bool showdialog);
 
-	// Draw using the current brush to the target position
-	// alt is whether the ALT key is pressed
-	void draw(const Position& offset, bool alt);
-	void undraw(const Position& offset, bool alt);
-	void draw(const PositionVector& posvec, bool alt);
-	void draw(const PositionVector& todraw, PositionVector& toborder, bool alt);
-	void undraw(const PositionVector& posvec, bool alt);
-	void undraw(const PositionVector& todraw, PositionVector& toborder, bool alt);
+    // Draw using the current brush to the target position
+    // alt is whether the ALT key is pressed
+    void draw(const Position& offset, bool alt);
+    void undraw(const Position& offset, bool alt);
+    void draw(const PositionVector& posvec, bool alt);
+    void draw(const PositionVector& todraw, PositionVector& toborder, bool alt);
+    void undraw(const PositionVector& posvec, bool alt);
+    void undraw(const PositionVector& todraw, PositionVector& toborder, bool alt);
 
 protected:
-	void drawInternal(const Position offset, bool alt, bool dodraw);
-	void drawInternal(const PositionVector& posvec, bool alt, bool dodraw);
-	void drawInternal(const PositionVector& todraw, PositionVector& toborder, bool alt, bool dodraw);
+    void drawInternal(const Position offset, bool alt, bool dodraw);
+    void drawInternal(const PositionVector& posvec, bool alt, bool dodraw);
+    void drawInternal(const PositionVector& todraw, PositionVector& toborder, bool alt, bool dodraw);
 
-	Editor(const Editor&);
-	Editor& operator=(const Editor&);
+    Editor(const Editor&);
+    Editor& operator=(const Editor&);
 
 private:
-	Map map;
-	Selection selection;
-	ActionQueue* actionQueue;
+    Map map;
+    Selection selection;
+    ActionQueue* actionQueue;
 };
 
 inline void Editor::draw(const Position& offset, bool alt) { drawInternal(offset, alt, true); }

@@ -22,10 +22,10 @@
 
 enum ImportType
 {
-	IMPORT_DONT,
-	IMPORT_MERGE,
-	IMPORT_SMART_MERGE,
-	IMPORT_INSERT,
+    IMPORT_DONT,
+    IMPORT_MERGE,
+    IMPORT_SMART_MERGE,
+    IMPORT_INSERT,
 };
 
 class Map;
@@ -33,37 +33,40 @@ class Map;
 class IOMap
 {
 protected:
-	wxArrayString warnings;
-	wxString errorstr;
+    wxArrayString warnings;
+    wxString errorstr;
 
-	bool queryUser(const wxString& title, const wxString& format);
-	void warning(const wxString format, ...);
-	void error(const wxString format, ...);
+    bool queryUser(const wxString& title, const wxString& format);
+    void warning(const wxString format, ...);
+    void error(const wxString format, ...);
+
 public:
-	IOMap() {
-		version.otbm = MAP_OTBM_1;
-		version.client = CLIENT_VERSION_NONE;
-	}
-	virtual ~IOMap() {}
+    IOMap()
+    {
+        version.otbm = MAP_OTBM_1;
+        version.client = CLIENT_VERSION_NONE;
+    }
+    virtual ~IOMap() { }
 
-	MapVersion version;
+    MapVersion version;
 
-	wxArrayString& getWarnings() { return warnings; }
-	wxString& getError() { return errorstr; }
+    wxArrayString& getWarnings() { return warnings; }
+    wxString& getError() { return errorstr; }
 
-	virtual bool loadMap(Map& map, const FileName& identifier) = 0;
-	virtual bool saveMap(Map& map, const FileName& identifier) = 0;
+    virtual bool loadMap(Map& map, const FileName& identifier) = 0;
+    virtual bool saveMap(Map& map, const FileName& identifier) = 0;
 };
 
-
-class VirtualIOMap : public IOMap {
+class VirtualIOMap : public IOMap
+{
 public:
-	VirtualIOMap(MapVersion v) {
-		version = v;
-	}
+    VirtualIOMap(MapVersion v)
+    {
+        version = v;
+    }
 
-	virtual bool loadMap(Map& map, const FileName& identifier) { return false; }
-	virtual bool saveMap(Map& map, const FileName& identifier) { return false; }
+    virtual bool loadMap(Map& map, const FileName& identifier) { return false; }
+    virtual bool saveMap(Map& map, const FileName& identifier) { return false; }
 };
 
 #endif

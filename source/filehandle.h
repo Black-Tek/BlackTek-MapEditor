@@ -20,88 +20,92 @@
 
 #include "definitions.h"
 
-#include <stdexcept>
-#include <string>
 #include <stack>
+#include <stdexcept>
 #include <stdio.h>
+#include <string>
 
 #ifndef FORCEINLINE
-#   ifdef _MSV_VER
-#       define FORCEINLINE __forceinline
-#   else
-#       define FORCEINLINE inline
-#   endif
+#ifdef _MSV_VER
+#define FORCEINLINE __forceinline
+#else
+#define FORCEINLINE inline
+#endif
 #endif
 
-enum FileHandleError {
-	FILE_NO_ERROR,
-	FILE_COULD_NOT_OPEN,
-	FILE_INVALID_IDENTIFIER,
-	FILE_STRING_TOO_LONG,
-	FILE_READ_ERROR,
-	FILE_WRITE_ERROR,
-	FILE_SYNTAX_ERROR,
-	FILE_PREMATURE_END,
+enum FileHandleError
+{
+    FILE_NO_ERROR,
+    FILE_COULD_NOT_OPEN,
+    FILE_INVALID_IDENTIFIER,
+    FILE_STRING_TOO_LONG,
+    FILE_READ_ERROR,
+    FILE_WRITE_ERROR,
+    FILE_SYNTAX_ERROR,
+    FILE_PREMATURE_END,
 };
 
-enum NodeType {
-	NODE_START = 0xfe,
-	NODE_END = 0xff,
-	ESCAPE_CHAR = 0xfd,
+enum NodeType
+{
+    NODE_START = 0xfe,
+    NODE_END = 0xff,
+    ESCAPE_CHAR = 0xfd,
 };
 
 class FileHandle
 {
 public:
-	FileHandle() : error_code(FILE_NO_ERROR), file(nullptr) {}
-	virtual ~FileHandle() { close(); }
+    FileHandle() :
+        error_code(FILE_NO_ERROR), file(nullptr) { }
+    virtual ~FileHandle() { close(); }
 
-	bool seek(size_t offset, int origin = SEEK_SET);
-	size_t tell();
-	FORCEINLINE void skip(size_t offset) { seek(offset, SEEK_CUR); }
+    bool seek(size_t offset, int origin = SEEK_SET);
+    size_t tell();
+    FORCEINLINE void skip(size_t offset) { seek(offset, SEEK_CUR); }
 
-	// Ensures we don't accidentally copy it.
-	FileHandle(const FileHandle &) = delete;
-	FileHandle &operator=(const FileHandle &) = delete;
+    // Ensures we don't accidentally copy it.
+    FileHandle(const FileHandle&) = delete;
+    FileHandle& operator=(const FileHandle&) = delete;
 
-	virtual void close();
-	virtual bool isOpen() { return file != nullptr; }
-	virtual bool isOk() { return isOpen() && error_code == FILE_NO_ERROR && ferror(file) == 0; }
-	std::string getErrorMessage();
+    virtual void close();
+    virtual bool isOpen() { return file != nullptr; }
+    virtual bool isOk() { return isOpen() && error_code == FILE_NO_ERROR && ferror(file) == 0; }
+    std::string getErrorMessage();
 
 public:
-	FileHandleError error_code;
-	FILE* file;
+    FileHandleError error_code;
+    FILE* file;
 };
 
 class FileReadHandle : public FileHandle
 {
 public:
-	explicit FileReadHandle(const std::string& name);
-	virtual ~FileReadHandle();
+    explicit FileReadHandle(const std::string& name);
+    virtual ~FileReadHandle();
 
-	FORCEINLINE bool getU8(uint8_t& u8) { return getType(u8); }
-	FORCEINLINE bool getByte(uint8_t& u8) { return getType(u8); }
-	FORCEINLINE bool getSByte(int8_t& i8) { return getType(i8); }
-	FORCEINLINE bool getU16(uint16_t& u16) { return getType(u16); }
-	FORCEINLINE bool getU32(uint32_t& u32) { return getType(u32); }
-	FORCEINLINE bool get32(int32_t& i32) { return getType(i32); }
-	bool getRAW(uint8_t* ptr, size_t sz);
-	bool getRAW(std::string& str, size_t sz);
-	bool getString(std::string& str);
-	bool getLongString(std::string& str);
+    FORCEINLINE bool getU8(uint8_t& u8) { return getType(u8); }
+    FORCEINLINE bool getByte(uint8_t& u8) { return getType(u8); }
+    FORCEINLINE bool getSByte(int8_t& i8) { return getType(i8); }
+    FORCEINLINE bool getU16(uint16_t& u16) { return getType(u16); }
+    FORCEINLINE bool getU32(uint32_t& u32) { return getType(u32); }
+    FORCEINLINE bool get32(int32_t& i32) { return getType(i32); }
+    bool getRAW(uint8_t* ptr, size_t sz);
+    bool getRAW(std::string& str, size_t sz);
+    bool getString(std::string& str);
+    bool getLongString(std::string& str);
 
-	virtual void close();
-	size_t size() { return file_size; }
-	
+    virtual void close();
+    size_t size() { return file_size; }
+
 protected:
-	size_t file_size;
+    size_t file_size;
 
-	template<class T>
-	bool getType(T& ref) {
-		fread(&ref, sizeof(ref), 1, file);
-		return ferror(file) == 0;
-	}
+    template <class T>
+    bool getType(T& ref)
+    {
+        fread(&ref, sizeof(ref), 1, file);
+        return ferror(file) == 0;
+    }
 };
 
 class NodeFileReadHandle;
@@ -111,225 +115,245 @@ class MemoryNodeFileReadHandle;
 class BinaryNode
 {
 public:
-	BinaryNode(NodeFileReadHandle* file, BinaryNode* parent);
-	~BinaryNode();
+    BinaryNode(NodeFileReadHandle* file, BinaryNode* parent);
+    ~BinaryNode();
 
-	FORCEINLINE bool getU8(uint8_t& u8) { return getType(u8); }
-	FORCEINLINE bool getByte(uint8_t& u8) { return getType(u8); }
-	FORCEINLINE bool getU16(uint16_t& u16) { return getType(u16); }
-	FORCEINLINE bool getU32(uint32_t& u32) { return getType(u32); }
-	FORCEINLINE bool getU64(uint64_t& u64) { return getType(u64); }
-	FORCEINLINE bool skip(size_t sz) {
-		if(read_offset + sz > data.size()) {
-			read_offset = data.size();
-			return false;
-		}
-		read_offset += sz;
-		return true;
-	}
-	bool getRAW(uint8_t* ptr, size_t sz);
-	bool getRAW(std::string& str, size_t sz);
-	bool getString(std::string& str);
-	bool getLongString(std::string& str);
+    FORCEINLINE bool getU8(uint8_t& u8) { return getType(u8); }
+    FORCEINLINE bool getByte(uint8_t& u8) { return getType(u8); }
+    FORCEINLINE bool getU16(uint16_t& u16) { return getType(u16); }
+    FORCEINLINE bool getU32(uint32_t& u32) { return getType(u32); }
+    FORCEINLINE bool getU64(uint64_t& u64) { return getType(u64); }
+    FORCEINLINE bool skip(size_t sz)
+    {
+        if (read_offset + sz > data.size())
+        {
+            read_offset = data.size();
+            return false;
+        }
+        read_offset += sz;
+        return true;
+    }
+    bool getRAW(uint8_t* ptr, size_t sz);
+    bool getRAW(std::string& str, size_t sz);
+    bool getString(std::string& str);
+    bool getLongString(std::string& str);
 
-	BinaryNode* getChild();
-	// Returns this on success, nullptr on failure
-	BinaryNode* advance();
+    BinaryNode* getChild();
+    // Returns this on success, nullptr on failure
+    BinaryNode* advance();
+
 protected:
-	template<class T>
-	bool getType(T& ref) {
-		if(read_offset + sizeof(ref) > data.size()) {
-			read_offset = data.size();
-			return false;
-		}
-		ref = *(T*)(data.data()+read_offset);
+    template <class T>
+    bool getType(T& ref)
+    {
+        if (read_offset + sizeof(ref) > data.size())
+        {
+            read_offset = data.size();
+            return false;
+        }
+        ref = *(T*)(data.data() + read_offset);
 
-		read_offset += sizeof(ref);
-		return true;
-	}
+        read_offset += sizeof(ref);
+        return true;
+    }
 
-	void load();
-	std::string data;
-	size_t read_offset;
-	NodeFileReadHandle* file;
-	BinaryNode* parent;
-	BinaryNode* child;
+    void load();
+    std::string data;
+    size_t read_offset;
+    NodeFileReadHandle* file;
+    BinaryNode* parent;
+    BinaryNode* child;
 
-	friend class DiskNodeFileReadHandle;
-	friend class MemoryNodeFileReadHandle;
+    friend class DiskNodeFileReadHandle;
+    friend class MemoryNodeFileReadHandle;
 };
 
 class NodeFileReadHandle : public FileHandle
 {
 public:
-	NodeFileReadHandle();
-	virtual ~NodeFileReadHandle();
+    NodeFileReadHandle();
+    virtual ~NodeFileReadHandle();
 
-	virtual BinaryNode* getRootNode() = 0;
+    virtual BinaryNode* getRootNode() = 0;
 
-	virtual size_t size() = 0;
-	virtual size_t tell() = 0;
+    virtual size_t size() = 0;
+    virtual size_t tell() = 0;
+
 protected:
-	BinaryNode* getNode(BinaryNode* parent);
-	void freeNode(BinaryNode* node);
-	// Returns false when end-of-file is reached
-	virtual bool renewCache() = 0;
+    BinaryNode* getNode(BinaryNode* parent);
+    void freeNode(BinaryNode* node);
+    // Returns false when end-of-file is reached
+    virtual bool renewCache() = 0;
 
-	bool last_was_start;
-	uint8_t* cache;
-	size_t cache_size;
-	size_t cache_length;
-	size_t local_read_index;
+    bool last_was_start;
+    uint8_t* cache;
+    size_t cache_size;
+    size_t cache_length;
+    size_t local_read_index;
 
-	BinaryNode* root_node;
+    BinaryNode* root_node;
 
-	std::stack<void*> unused;
+    std::stack<void*> unused;
 
-	friend class BinaryNode;
+    friend class BinaryNode;
 };
 
 class DiskNodeFileReadHandle : public NodeFileReadHandle
 {
 public:
-	DiskNodeFileReadHandle(const std::string& name, const std::vector<std::string>& acceptable_identifiers);
-	virtual ~DiskNodeFileReadHandle();
+    DiskNodeFileReadHandle(const std::string& name, const std::vector<std::string>& acceptable_identifiers);
+    virtual ~DiskNodeFileReadHandle();
 
-	virtual void close();
-	virtual BinaryNode* getRootNode();
+    virtual void close();
+    virtual BinaryNode* getRootNode();
 
-	virtual size_t size() { return file_size; }
-	virtual size_t tell() {if(file) return ftell(file); return 0; }
+    virtual size_t size() { return file_size; }
+    virtual size_t tell()
+    {
+        if (file)
+            return ftell(file);
+        return 0;
+    }
+
 protected:
-	virtual bool renewCache();
+    virtual bool renewCache();
 
-	size_t file_size;
+    size_t file_size;
 };
 
 class MemoryNodeFileReadHandle : public NodeFileReadHandle
 {
 public:
-	// Does NOT claim ownership of the memory it is given.
-	MemoryNodeFileReadHandle(const uint8_t* data, size_t size);
-	virtual ~MemoryNodeFileReadHandle();
+    // Does NOT claim ownership of the memory it is given.
+    MemoryNodeFileReadHandle(const uint8_t* data, size_t size);
+    virtual ~MemoryNodeFileReadHandle();
 
-	void assign(const uint8_t* data, size_t size);
+    void assign(const uint8_t* data, size_t size);
 
-	virtual void close();
-	virtual BinaryNode* getRootNode();
+    virtual void close();
+    virtual BinaryNode* getRootNode();
 
-	virtual size_t size() { return cache_size; }
-	virtual size_t tell() { return local_read_index; }
-	virtual bool isOk() { return true; }
+    virtual size_t size() { return cache_size; }
+    virtual size_t tell() { return local_read_index; }
+    virtual bool isOk() { return true; }
+
 protected:
-	virtual bool renewCache();
+    virtual bool renewCache();
 
-	uint8_t* index;
+    uint8_t* index;
 };
 
 class FileWriteHandle : public FileHandle
 {
 public:
-	explicit FileWriteHandle(const std::string& name);
-	virtual ~FileWriteHandle();
+    explicit FileWriteHandle(const std::string& name);
+    virtual ~FileWriteHandle();
 
-	FORCEINLINE bool addU8(uint8_t u8) { return addType(u8); }
-	FORCEINLINE bool addByte(uint8_t u8) { return addType(u8); }
-	FORCEINLINE bool addU16(uint16_t u16) { return addType(u16); }
-	FORCEINLINE bool addU32(uint32_t u32) { return addType(u32); }
-	FORCEINLINE bool addU64(uint64_t u64) { return addType(u64); }
-	bool addString(const std::string& str);
-	bool addString(const char* str);
-	bool addLongString(const std::string& str);
-	bool addRAW(const std::string& str);
-	bool addRAW(const uint8_t* ptr, size_t sz);
-	bool addRAW(const char* c) { return addRAW(reinterpret_cast<const uint8_t*>(c), strlen(c)); }
-	void flush();
+    FORCEINLINE bool addU8(uint8_t u8) { return addType(u8); }
+    FORCEINLINE bool addByte(uint8_t u8) { return addType(u8); }
+    FORCEINLINE bool addU16(uint16_t u16) { return addType(u16); }
+    FORCEINLINE bool addU32(uint32_t u32) { return addType(u32); }
+    FORCEINLINE bool addU64(uint64_t u64) { return addType(u64); }
+    bool addString(const std::string& str);
+    bool addString(const char* str);
+    bool addLongString(const std::string& str);
+    bool addRAW(const std::string& str);
+    bool addRAW(const uint8_t* ptr, size_t sz);
+    bool addRAW(const char* c) { return addRAW(reinterpret_cast<const uint8_t*>(c), strlen(c)); }
+    void flush();
 
 protected:
-	template<class T>
-	bool addType(T ref) {
-		fwrite(&ref, sizeof(ref), 1, file);
-		return ferror(file) == 0;
-	}
+    template <class T>
+    bool addType(T ref)
+    {
+        fwrite(&ref, sizeof(ref), 1, file);
+        return ferror(file) == 0;
+    }
 };
 
 class NodeFileWriteHandle : public FileHandle
 {
 public:
-	NodeFileWriteHandle();
-	virtual ~NodeFileWriteHandle();
+    NodeFileWriteHandle();
+    virtual ~NodeFileWriteHandle();
 
-	bool addNode(uint8_t nodetype);
-	bool endNode();
+    bool addNode(uint8_t nodetype);
+    bool endNode();
 
-	bool addU8(uint8_t u8);
-	bool addByte(uint8_t u8);
-	bool addU16(uint16_t u16);
-	bool addU32(uint32_t u32);
-	bool addU64(uint64_t u64);
-	bool addString(const std::string& str);
-	bool addLongString(const std::string& str);
-	bool addRAW(std::string& str);
-	bool addRAW(const uint8_t* ptr, size_t sz);
-	bool addRAW(const char* c) { return addRAW(reinterpret_cast<const uint8_t*>(c), strlen(c)); }
+    bool addU8(uint8_t u8);
+    bool addByte(uint8_t u8);
+    bool addU16(uint16_t u16);
+    bool addU32(uint32_t u32);
+    bool addU64(uint64_t u64);
+    bool addString(const std::string& str);
+    bool addLongString(const std::string& str);
+    bool addRAW(std::string& str);
+    bool addRAW(const uint8_t* ptr, size_t sz);
+    bool addRAW(const char* c) { return addRAW(reinterpret_cast<const uint8_t*>(c), strlen(c)); }
 
 protected:
-	virtual void renewCache() = 0;
+    virtual void renewCache() = 0;
 
-	static uint8_t NODE_START;
-	static uint8_t NODE_END;
-	static uint8_t ESCAPE_CHAR;
+    static uint8_t NODE_START;
+    static uint8_t NODE_END;
+    static uint8_t ESCAPE_CHAR;
 
-	uint8_t* cache;
-	size_t cache_size;
-	size_t local_write_index;
+    uint8_t* cache;
+    size_t cache_size;
+    size_t local_write_index;
 
-	FORCEINLINE void writeBytes(const uint8_t* ptr, size_t sz) {
-		if(sz) {
-			do {
-				if(*ptr == NODE_START || *ptr == NODE_END || *ptr == ESCAPE_CHAR) {
-					cache[local_write_index++] = ESCAPE_CHAR;
-					if(local_write_index >= cache_size) {
-						renewCache();
-					}
-				}
-				cache[local_write_index++] = *ptr;
-				if(local_write_index >= cache_size) {
-					renewCache();
-				}
-				++ptr;
-				--sz;
-			} while(sz != 0);
-		}
-	}
+    FORCEINLINE void writeBytes(const uint8_t* ptr, size_t sz)
+    {
+        if (sz)
+        {
+            do
+            {
+                if (*ptr == NODE_START || *ptr == NODE_END || *ptr == ESCAPE_CHAR)
+                {
+                    cache[local_write_index++] = ESCAPE_CHAR;
+                    if (local_write_index >= cache_size)
+                    {
+                        renewCache();
+                    }
+                }
+                cache[local_write_index++] = *ptr;
+                if (local_write_index >= cache_size)
+                {
+                    renewCache();
+                }
+                ++ptr;
+                --sz;
+            } while (sz != 0);
+        }
+    }
 };
 
 class DiskNodeFileWriteHandle : public NodeFileWriteHandle
 {
 public:
-	DiskNodeFileWriteHandle(const std::string& name, const std::string& identifier);
-	virtual ~DiskNodeFileWriteHandle();
+    DiskNodeFileWriteHandle(const std::string& name, const std::string& identifier);
+    virtual ~DiskNodeFileWriteHandle();
 
-	virtual void close();
+    virtual void close();
 
 protected:
-	virtual void renewCache();
+    virtual void renewCache();
 };
 
 class MemoryNodeFileWriteHandle : public NodeFileWriteHandle
 {
 public:
-	MemoryNodeFileWriteHandle();
-	virtual ~MemoryNodeFileWriteHandle();
+    MemoryNodeFileWriteHandle();
+    virtual ~MemoryNodeFileWriteHandle();
 
-	void reset();
-	virtual void close();
+    void reset();
+    virtual void close();
 
-	uint8_t* getMemory();
-	size_t getSize();
+    uint8_t* getMemory();
+    size_t getSize();
 
 protected:
-	virtual void renewCache();
+    virtual void renewCache();
 };
 
 #endif

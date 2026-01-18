@@ -28,36 +28,35 @@ class ContainerItemPopupMenu;
 class OldPropertiesWindow : public ObjectPropertiesWindowBase
 {
 public:
-	OldPropertiesWindow(wxWindow* parent, const Map* map, const Tile* tile, Item* item, wxPoint = wxDefaultPosition);
-	OldPropertiesWindow(wxWindow* parent, const Map* map, const Tile* tile, Creature* creature, wxPoint = wxDefaultPosition);
-	OldPropertiesWindow(wxWindow* parent, const Map* map, const Tile* tile, Spawn* spawn, wxPoint = wxDefaultPosition);
-	virtual ~OldPropertiesWindow();
+    OldPropertiesWindow(wxWindow* parent, const Map* map, const Tile* tile, Item* item, wxPoint = wxDefaultPosition);
+    OldPropertiesWindow(wxWindow* parent, const Map* map, const Tile* tile, Creature* creature, wxPoint = wxDefaultPosition);
+    OldPropertiesWindow(wxWindow* parent, const Map* map, const Tile* tile, Spawn* spawn, wxPoint = wxDefaultPosition);
+    virtual ~OldPropertiesWindow();
 
-	void OnFocusChange(wxFocusEvent&);
+    void OnFocusChange(wxFocusEvent&);
 
-	void OnClickOK(wxCommandEvent&);
-	void OnClickCancel(wxCommandEvent&);
+    void OnClickOK(wxCommandEvent&);
+    void OnClickCancel(wxCommandEvent&);
 
-	void Update();
+    void Update();
 
 protected:
-	wxSpinCtrl* count_field;
-	wxChoice* direction_field;
-	wxSpinCtrl* action_id_field;
-	wxSpinCtrl* unique_id_field;
-	wxSpinCtrl* door_id_field;
-	wxChoice* depot_id_field;
-	PositionCtrl* destination_field;
-	wxChoice* splash_type_field;
-	wxTextCtrl* text_field;
-	wxTextCtrl* description_field;
-	std::vector<ContainerItemButton*> container_items;
+    wxSpinCtrl* count_field;
+    wxChoice* direction_field;
+    wxSpinCtrl* action_id_field;
+    wxSpinCtrl* unique_id_field;
+    wxSpinCtrl* door_id_field;
+    wxChoice* depot_id_field;
+    PositionCtrl* destination_field;
+    wxChoice* splash_type_field;
+    wxTextCtrl* text_field;
+    wxTextCtrl* description_field;
+    std::vector<ContainerItemButton*> container_items;
 
-	friend class ContainerItemButton;
-	friend class ContainerItemPopupMenu;
+    friend class ContainerItemButton;
+    friend class ContainerItemPopupMenu;
 
-	DECLARE_EVENT_TABLE();
+    DECLARE_EVENT_TABLE();
 };
 
 #endif
-

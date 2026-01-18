@@ -20,8 +20,9 @@
 
 #include "json/json_spirit.h"
 
-namespace json {
-	using namespace json_spirit;
+namespace json
+{
+    using namespace json_spirit;
 }
 
 #endif
