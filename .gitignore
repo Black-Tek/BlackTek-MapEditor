@@ -51,3 +51,8 @@ xcuserdata
 # CLion
 .idea/
 cmake-build-debug/
+
+# Agent workflows
+/.agent/*
+!/.agent/workflows/
+!/.agent/workflows/format-code.md
