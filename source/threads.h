@@ -20,28 +20,35 @@
 
 #include "main.h"
 
-class Thread : public wxThread {
+class Thread : public wxThread
+{
 public:
-	Thread(wxThreadKind);
+    Thread(wxThreadKind);
 
-	void Execute(); // Calls "Create" and then "Run"
+    void Execute(); // Calls "Create" and then "Run"
 };
 
-class JoinableThread : public Thread {
+class JoinableThread : public Thread
+{
 public:
-	JoinableThread() : Thread(wxTHREAD_JOINABLE) {}
+    JoinableThread() :
+        Thread(wxTHREAD_JOINABLE) { }
 };
 
-class DetachedThread : public Thread {
+class DetachedThread : public Thread
+{
 public:
-	DetachedThread() : Thread(wxTHREAD_DETACHED) {}
+    DetachedThread() :
+        Thread(wxTHREAD_DETACHED) { }
 };
 
-inline Thread::Thread(wxThreadKind kind) : wxThread(kind) {}
+inline Thread::Thread(wxThreadKind kind) :
+    wxThread(kind) { }
 
-inline void Thread::Execute() {
-	Create();
-	Run();
+inline void Thread::Execute()
+{
+    Create();
+    Run();
 }
 
 #endif

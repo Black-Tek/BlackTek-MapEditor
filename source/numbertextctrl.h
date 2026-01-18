@@ -22,30 +22,30 @@
 class NumberTextCtrl : public wxTextCtrl
 {
 public:
-	NumberTextCtrl(wxWindow* parent, wxWindowID id = wxID_ANY,
-		long value = 0, long minvalue = 0, long maxvalue = 100,
-		const wxPoint& pos = wxDefaultPosition, const wxSize& sz = wxDefaultSize,
-		long style = 0, const wxString& name = wxTextCtrlNameStr);
-	NumberTextCtrl(wxWindow* parent, wxWindowID id = wxID_ANY,
-		long value = 0, long minvalue = 0, long maxvalue = 100,
-		long style = 0, const wxString& name = wxTextCtrlNameStr,
-		const wxPoint& pos = wxDefaultPosition, const wxSize& sz = wxDefaultSize);
-	~NumberTextCtrl();
+    NumberTextCtrl(wxWindow* parent, wxWindowID id = wxID_ANY,
+        long value = 0, long minvalue = 0, long maxvalue = 100,
+        const wxPoint& pos = wxDefaultPosition, const wxSize& sz = wxDefaultSize,
+        long style = 0, const wxString& name = wxTextCtrlNameStr);
+    NumberTextCtrl(wxWindow* parent, wxWindowID id = wxID_ANY,
+        long value = 0, long minvalue = 0, long maxvalue = 100,
+        long style = 0, const wxString& name = wxTextCtrlNameStr,
+        const wxPoint& pos = wxDefaultPosition, const wxSize& sz = wxDefaultSize);
+    ~NumberTextCtrl();
 
-	void OnKillFocus(wxFocusEvent&);
-	void OnTextEnter(wxCommandEvent&);
+    void OnKillFocus(wxFocusEvent&);
+    void OnTextEnter(wxCommandEvent&);
 
-	long GetIntValue();
-	void SetIntValue(long value);
+    long GetIntValue();
+    void SetIntValue(long value);
 
-	void SetMinValue(long value);
-	void SetMaxValue(long value);
+    void SetMinValue(long value);
+    void SetMaxValue(long value);
 
 protected:
-	void CheckRange();
+    void CheckRange();
 
-	long minval, maxval, lastval;
-	DECLARE_EVENT_TABLE();
+    long minval, maxval, lastval;
+    DECLARE_EVENT_TABLE();
 };
 
 #endif

@@ -60,28 +60,28 @@ typedef std::multimap<std::string, Brush*> BrushMap;
 class Brushes
 {
 public:
-	Brushes();
-	~Brushes();
+    Brushes();
+    ~Brushes();
 
-	void init();
-	void clear();
+    void init();
+    void clear();
 
-	Brush* getBrush(const std::string& name) const;
+    Brush* getBrush(const std::string& name) const;
 
-	void addBrush(Brush* brush);
+    void addBrush(Brush* brush);
 
-	bool unserializeBorder(pugi::xml_node node, wxArrayString& warnings);
-	bool unserializeBrush(pugi::xml_node node, wxArrayString& warnings);
+    bool unserializeBorder(pugi::xml_node node, wxArrayString& warnings);
+    bool unserializeBrush(pugi::xml_node node, wxArrayString& warnings);
 
-	const BrushMap& getMap() const noexcept { return brushes; }
+    const BrushMap& getMap() const noexcept { return brushes; }
 
 protected:
-	typedef std::map<uint32_t, AutoBorder*> BorderMap;
-	BrushMap brushes;
-	BorderMap borders;
+    typedef std::map<uint32_t, AutoBorder*> BorderMap;
+    BrushMap brushes;
+    BorderMap borders;
 
-	friend class AutoBorder;
-	friend class GroundBrush;
+    friend class AutoBorder;
+    friend class GroundBrush;
 };
 
 extern Brushes g_brushes;
@@ -92,79 +92,81 @@ extern Brushes g_brushes;
 class Brush
 {
 public:
-	Brush();
-	virtual ~Brush();
+    Brush();
+    virtual ~Brush();
 
-	virtual bool load(pugi::xml_node node, wxArrayString& warnings) {
-		return true;
-	}
+    virtual bool load(pugi::xml_node node, wxArrayString& warnings)
+    {
+        return true;
+    }
 
-	virtual void draw(BaseMap* map, Tile* tile, void* parameter = nullptr) = 0;
-	virtual void undraw(BaseMap* map, Tile* tile) = 0;
-	virtual bool canDraw(BaseMap* map, const Position& position) const = 0;
+    virtual void draw(BaseMap* map, Tile* tile, void* parameter = nullptr) = 0;
+    virtual void undraw(BaseMap* map, Tile* tile) = 0;
+    virtual bool canDraw(BaseMap* map, const Position& position) const = 0;
 
-	//
-	uint32_t getID() const noexcept { return id; }
+    //
+    uint32_t getID() const noexcept { return id; }
 
-	virtual std::string getName() const = 0;
-	virtual void setName(const std::string& newName) {
-		ASSERT(_MSG("setName attempted on nameless brush!"));
-	}
+    virtual std::string getName() const = 0;
+    virtual void setName(const std::string& newName)
+    {
+        ASSERT(_MSG("setName attempted on nameless brush!"));
+    }
 
-	virtual int getLookID() const = 0;
+    virtual int getLookID() const = 0;
 
-	virtual bool needBorders() const { return false; }
+    virtual bool needBorders() const { return false; }
 
-	virtual bool canDrag() const { return false; }
-	virtual bool canSmear() const { return true; }
+    virtual bool canDrag() const { return false; }
+    virtual bool canSmear() const { return true; }
 
-	virtual bool oneSizeFitsAll() const { return false; }
+    virtual bool oneSizeFitsAll() const { return false; }
 
-	virtual int32_t getMaxVariation() const { return 0; }
+    virtual int32_t getMaxVariation() const { return 0; }
 
-	virtual bool isRaw() const { return false; }
-	virtual bool isDoodad() const { return false; }
-	virtual bool isTerrain() const { return false; }
-	virtual bool isGround() const { return false; }
-	virtual bool isWall() const { return false; }
-	virtual bool isWallDecoration() const { return false; }
-	virtual bool isTable() const { return false; }
-	virtual bool isCarpet() const { return false; }
-	virtual bool isDoor() const { return false; }
-	virtual bool isOptionalBorder() const { return false; }
-	virtual bool isCreature() const { return false; }
-	virtual bool isSpawn() const { return false; }
-	virtual bool isHouse() const { return false; }
-	virtual bool isHouseExit() const { return false; }
-	virtual bool isWaypoint() const { return false; }
-	virtual bool isFlag() const { return false; }
-	virtual bool isEraser() const { return false; }
+    virtual bool isRaw() const { return false; }
+    virtual bool isDoodad() const { return false; }
+    virtual bool isTerrain() const { return false; }
+    virtual bool isGround() const { return false; }
+    virtual bool isWall() const { return false; }
+    virtual bool isWallDecoration() const { return false; }
+    virtual bool isTable() const { return false; }
+    virtual bool isCarpet() const { return false; }
+    virtual bool isDoor() const { return false; }
+    virtual bool isOptionalBorder() const { return false; }
+    virtual bool isCreature() const { return false; }
+    virtual bool isSpawn() const { return false; }
+    virtual bool isHouse() const { return false; }
+    virtual bool isHouseExit() const { return false; }
+    virtual bool isWaypoint() const { return false; }
+    virtual bool isFlag() const { return false; }
+    virtual bool isEraser() const { return false; }
 
-	virtual RAWBrush* asRaw() { return nullptr; }
-	virtual DoodadBrush* asDoodad() { return nullptr; }
-	virtual TerrainBrush* asTerrain() { return nullptr; }
-	virtual GroundBrush* asGround() { return nullptr; }
-	virtual WallBrush* asWall() { return nullptr; }
-	virtual WallDecorationBrush* asWallDecoration() { return nullptr; }
-	virtual TableBrush* asTable() { return nullptr; }
-	virtual CarpetBrush* asCarpet() { return nullptr; }
-	virtual DoorBrush* asDoor() { return nullptr; }
-	virtual OptionalBorderBrush* asOptionalBorder() { return nullptr; }
-	virtual CreatureBrush* asCreature() { return nullptr; }
-	virtual SpawnBrush* asSpawn() { return nullptr; }
-	virtual HouseBrush* asHouse() { return nullptr; }
-	virtual HouseExitBrush* asHouseExit() { return nullptr; }
-	virtual WaypointBrush* asWaypoint() { return nullptr; }
-	virtual FlagBrush* asFlag() { return nullptr; }
-	virtual EraserBrush* asEraser() { return nullptr; }
+    virtual RAWBrush* asRaw() { return nullptr; }
+    virtual DoodadBrush* asDoodad() { return nullptr; }
+    virtual TerrainBrush* asTerrain() { return nullptr; }
+    virtual GroundBrush* asGround() { return nullptr; }
+    virtual WallBrush* asWall() { return nullptr; }
+    virtual WallDecorationBrush* asWallDecoration() { return nullptr; }
+    virtual TableBrush* asTable() { return nullptr; }
+    virtual CarpetBrush* asCarpet() { return nullptr; }
+    virtual DoorBrush* asDoor() { return nullptr; }
+    virtual OptionalBorderBrush* asOptionalBorder() { return nullptr; }
+    virtual CreatureBrush* asCreature() { return nullptr; }
+    virtual SpawnBrush* asSpawn() { return nullptr; }
+    virtual HouseBrush* asHouse() { return nullptr; }
+    virtual HouseExitBrush* asHouseExit() { return nullptr; }
+    virtual WaypointBrush* asWaypoint() { return nullptr; }
+    virtual FlagBrush* asFlag() { return nullptr; }
+    virtual EraserBrush* asEraser() { return nullptr; }
 
-	bool visibleInPalette() const { return visible; }
-	void flagAsVisible() { visible = true; }
+    bool visibleInPalette() const { return visible; }
+    void flagAsVisible() { visible = true; }
 
 protected:
-	static uint32_t id_counter;
-	uint32_t id;
-	bool visible; // Visible in any palette?
+    static uint32_t id_counter;
+    uint32_t id;
+    bool visible; // Visible in any palette?
 };
 
 //=============================================================================
@@ -173,30 +175,30 @@ protected:
 class TerrainBrush : public Brush
 {
 public:
-	TerrainBrush();
-	virtual ~TerrainBrush();
+    TerrainBrush();
+    virtual ~TerrainBrush();
 
-	bool isTerrain() const { return true; }
-	TerrainBrush* asTerrain() { return static_cast<TerrainBrush*>(this); }
+    bool isTerrain() const { return true; }
+    TerrainBrush* asTerrain() { return static_cast<TerrainBrush*>(this); }
 
-	virtual bool canDraw(BaseMap* map, const Position& position) const { return true; }
+    virtual bool canDraw(BaseMap* map, const Position& position) const { return true; }
 
-	virtual std::string getName() const { return name; }
-	virtual void setName(const std::string& newName) { name = newName; }
+    virtual std::string getName() const { return name; }
+    virtual void setName(const std::string& newName) { name = newName; }
 
-	virtual int32_t getZ() const { return 0; }
-	virtual int32_t getLookID() const { return look_id; }
+    virtual int32_t getZ() const { return 0; }
+    virtual int32_t getLookID() const { return look_id; }
 
-	virtual bool needBorders() const { return true; }
-	virtual bool canDrag() const { return true; }
+    virtual bool needBorders() const { return true; }
+    virtual bool canDrag() const { return true; }
 
-	bool friendOf(TerrainBrush* other);
+    bool friendOf(TerrainBrush* other);
 
 protected:
-	std::vector<uint32_t> friends;
-	std::string name;
-	uint16_t look_id;
-	bool hate_friends;
+    std::vector<uint32_t> friends;
+    std::string name;
+    uint16_t look_id;
+    bool hate_friends;
 };
 
 //=============================================================================
@@ -205,24 +207,24 @@ protected:
 class FlagBrush : public Brush
 {
 public:
-	FlagBrush(uint32_t _flag);
-	virtual ~FlagBrush();
+    FlagBrush(uint32_t _flag);
+    virtual ~FlagBrush();
 
-	bool isFlag() const { return true; }
-	FlagBrush* asFlag() { return static_cast<FlagBrush*>(this); }
+    bool isFlag() const { return true; }
+    FlagBrush* asFlag() { return static_cast<FlagBrush*>(this); }
 
-	virtual bool canDraw(BaseMap* map, const Position& position) const;
-	virtual void draw(BaseMap* map, Tile* tile, void* parameter);
-	virtual void undraw(BaseMap* map, Tile* tile);
+    virtual bool canDraw(BaseMap* map, const Position& position) const;
+    virtual void draw(BaseMap* map, Tile* tile, void* parameter);
+    virtual void undraw(BaseMap* map, Tile* tile);
 
-	virtual bool canDrag() const { return true; }
-	virtual int getLookID() const;
-	virtual std::string getName() const;
-	void setZoneId(uint16_t _zoneId) { zoneId = _zoneId; }
+    virtual bool canDrag() const { return true; }
+    virtual int getLookID() const;
+    virtual std::string getName() const;
+    void setZoneId(uint16_t _zoneId) { zoneId = _zoneId; }
 
 protected:
-	uint32_t flag;
-	uint16_t zoneId;
+    uint32_t flag;
+    uint16_t zoneId;
 };
 
 //=============================================================================
@@ -231,24 +233,24 @@ protected:
 class DoorBrush : public Brush
 {
 public:
-	DoorBrush(DoorType _doortype);
-	virtual ~DoorBrush();
+    DoorBrush(DoorType _doortype);
+    virtual ~DoorBrush();
 
-	bool isDoor() const { return true; }
-	DoorBrush* asDoor() { return static_cast<DoorBrush*>(this); }
+    bool isDoor() const { return true; }
+    DoorBrush* asDoor() { return static_cast<DoorBrush*>(this); }
 
-	static void switchDoor(Item* door);
+    static void switchDoor(Item* door);
 
-	virtual bool canDraw(BaseMap* map, const Position& position) const;
-	virtual void draw(BaseMap* map, Tile* tile, void* parameter);
-	virtual void undraw(BaseMap* map, Tile* tile);
+    virtual bool canDraw(BaseMap* map, const Position& position) const;
+    virtual void draw(BaseMap* map, Tile* tile, void* parameter);
+    virtual void undraw(BaseMap* map, Tile* tile);
 
-	virtual int getLookID() const;
-	virtual std::string getName() const;
-	virtual bool oneSizeFitsAll() const { return true; }
+    virtual int getLookID() const;
+    virtual std::string getName() const;
+    virtual bool oneSizeFitsAll() const { return true; }
 
 protected:
-	DoorType doortype;
+    DoorType doortype;
 };
 
 //=============================================================================
@@ -257,19 +259,19 @@ protected:
 class OptionalBorderBrush : public Brush
 {
 public:
-	OptionalBorderBrush();
-	virtual ~OptionalBorderBrush();
+    OptionalBorderBrush();
+    virtual ~OptionalBorderBrush();
 
-	bool isOptionalBorder() const { return true; }
-	OptionalBorderBrush* asOptionalBorder() { return static_cast<OptionalBorderBrush*>(this); }
+    bool isOptionalBorder() const { return true; }
+    OptionalBorderBrush* asOptionalBorder() { return static_cast<OptionalBorderBrush*>(this); }
 
-	virtual bool canDraw(BaseMap* map, const Position& position) const;
-	virtual void draw(BaseMap* map, Tile* tile, void* parameter);
-	virtual void undraw(BaseMap* map, Tile* tile);
+    virtual bool canDraw(BaseMap* map, const Position& position) const;
+    virtual void draw(BaseMap* map, Tile* tile, void* parameter);
+    virtual void undraw(BaseMap* map, Tile* tile);
 
-	virtual bool canDrag() const { return true; }
-	virtual int getLookID() const;
-	virtual std::string getName() const;
+    virtual bool canDrag() const { return true; }
+    virtual int getLookID() const;
+    virtual std::string getName() const;
 };
 
 //=============================================================================
@@ -278,20 +280,20 @@ public:
 class EraserBrush : public Brush
 {
 public:
-	EraserBrush();
-	virtual ~EraserBrush();
+    EraserBrush();
+    virtual ~EraserBrush();
 
-	bool isEraser() const { return true; }
-	EraserBrush* asEraser() { return static_cast<EraserBrush*>(this); }
+    bool isEraser() const { return true; }
+    EraserBrush* asEraser() { return static_cast<EraserBrush*>(this); }
 
-	virtual bool canDraw(BaseMap* map, const Position& position) const;
-	virtual void draw(BaseMap* map, Tile* tile, void* parameter);
-	virtual void undraw(BaseMap* map, Tile* tile);
+    virtual bool canDraw(BaseMap* map, const Position& position) const;
+    virtual void draw(BaseMap* map, Tile* tile, void* parameter);
+    virtual void undraw(BaseMap* map, Tile* tile);
 
-	virtual bool needBorders() const { return true; }
-	virtual bool canDrag() const { return true; }
-	virtual int getLookID() const;
-	virtual std::string getName() const;
+    virtual bool needBorders() const { return true; }
+    virtual bool canDrag() const { return true; }
+    virtual int getLookID() const;
+    virtual std::string getName() const;
 };
 
 //=============================================================================
@@ -300,19 +302,21 @@ public:
 class AutoBorder
 {
 public:
-	AutoBorder(int _id) : id(_id), group(0), ground(false) {
-		for(int i = 0; i < 13; i++) tiles[i] = 0;
-	}
-	~AutoBorder() {}
+    AutoBorder(int _id) :
+        id(_id), group(0), ground(false)
+    {
+        for (int i = 0; i < 13; i++)
+            tiles[i] = 0;
+    }
+    ~AutoBorder() { }
 
-	static int edgeNameToID(const std::string& edgename);
-	bool load(pugi::xml_node node, wxArrayString& warnings, GroundBrush* owner = nullptr, uint16_t ground_equivalent = 0);
+    static int edgeNameToID(const std::string& edgename);
+    bool load(pugi::xml_node node, wxArrayString& warnings, GroundBrush* owner = nullptr, uint16_t ground_equivalent = 0);
 
-	uint32_t tiles[13];
-	uint32_t id;
-	uint16_t group;
-	bool ground;
+    uint32_t tiles[13];
+    uint32_t id;
+    uint16_t group;
+    bool ground;
 };
 
 #endif
-

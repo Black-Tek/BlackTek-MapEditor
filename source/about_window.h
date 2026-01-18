@@ -22,21 +22,23 @@
 
 class GamePanel;
 
-class AboutWindow : public wxDialog {
+class AboutWindow : public wxDialog
+{
 public:
-	AboutWindow(wxWindow* parent);
-	~AboutWindow();
+    AboutWindow(wxWindow* parent);
+    ~AboutWindow();
 
-	void OnClickOK(wxCommandEvent&);
-	void OnClickLicense(wxCommandEvent&);
+    void OnClickOK(wxCommandEvent&);
+    void OnClickLicense(wxCommandEvent&);
 
-	void OnTetris(wxCommandEvent&);
-	void OnSnake(wxCommandEvent&);
+    void OnTetris(wxCommandEvent&);
+    void OnSnake(wxCommandEvent&);
+
 private:
-	wxSizer* topsizer;
-	GamePanel* game_panel;
+    wxSizer* topsizer;
+    GamePanel* game_panel;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 #endif

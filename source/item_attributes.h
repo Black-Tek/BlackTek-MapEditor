@@ -18,8 +18,8 @@
 #ifndef RME_ITEM_ATTRIBUTES_H_
 #define RME_ITEM_ATTRIBUTES_H_
 
-#include <string>
 #include <map>
+#include <string>
 
 #include "filehandle.h"
 
@@ -32,41 +32,42 @@ class PropStream;
 class ItemAttribute
 {
 public:
-	ItemAttribute();
-	ItemAttribute(const std::string& str);
-	ItemAttribute(int32_t i);
-	ItemAttribute(double f);
-	ItemAttribute(bool b);
-	ItemAttribute(const ItemAttribute& o);
-	ItemAttribute& operator=(const ItemAttribute& o);
-	~ItemAttribute();
+    ItemAttribute();
+    ItemAttribute(const std::string& str);
+    ItemAttribute(int32_t i);
+    ItemAttribute(double f);
+    ItemAttribute(bool b);
+    ItemAttribute(const ItemAttribute& o);
+    ItemAttribute& operator=(const ItemAttribute& o);
+    ~ItemAttribute();
 
-	enum Type {
-		STRING = 1,
-		INTEGER = 2,
-		FLOAT = 3,
-		BOOLEAN = 4,
-		DOUBLE = 5,
-		NONE = 0
-	} type;
+    enum Type
+    {
+        STRING = 1,
+        INTEGER = 2,
+        FLOAT = 3,
+        BOOLEAN = 4,
+        DOUBLE = 5,
+        NONE = 0
+    } type;
 
-	void serialize(const IOMap& maphandle, NodeFileWriteHandle& f) const;
-	bool unserialize(const IOMap& maphandle, BinaryNode* f);
+    void serialize(const IOMap& maphandle, NodeFileWriteHandle& f) const;
+    bool unserialize(const IOMap& maphandle, BinaryNode* f);
 
-	void clear();
+    void clear();
 
-	void set(const std::string& str);
-	void set(int32_t i);
-	void set(double f);
-	void set(bool b);
+    void set(const std::string& str);
+    void set(int32_t i);
+    void set(double f);
+    void set(bool b);
 
-	const std::string* getString() const;
-	const int32_t* getInteger() const;
-	const double* getFloat() const;
-	const bool* getBoolean() const;
+    const std::string* getString() const;
+    const int32_t* getInteger() const;
+    const double* getFloat() const;
+    const bool* getBoolean() const;
 
 private:
-	char data[sizeof(std::string) > sizeof(double) ? sizeof(std::string) : sizeof(double)];
+    char data[sizeof(std::string) > sizeof(double) ? sizeof(std::string) : sizeof(double)];
 };
 
 typedef std::map<std::string, ItemAttribute> ItemAttributeMap;
@@ -74,42 +75,42 @@ typedef std::map<std::string, ItemAttribute> ItemAttributeMap;
 class ItemAttributes
 {
 public:
-	ItemAttributes();
-	ItemAttributes(const ItemAttributes &i);
-	virtual ~ItemAttributes();
+    ItemAttributes();
+    ItemAttributes(const ItemAttributes& i);
+    virtual ~ItemAttributes();
 
-	// Save / load
-	void serializeAttributeMap(const IOMap& maphandle, NodeFileWriteHandle& f) const;
-	bool unserializeAttributeMap(const IOMap& maphandle, BinaryNode* node);
+    // Save / load
+    void serializeAttributeMap(const IOMap& maphandle, NodeFileWriteHandle& f) const;
+    bool unserializeAttributeMap(const IOMap& maphandle, BinaryNode* node);
 
 public:
-	void setAttribute(const std::string& key, const ItemAttribute& attr);
-	void setAttribute(const std::string& key, const std::string& value);
-	void setAttribute(const std::string& key, int32_t value);
-	void setAttribute(const std::string& key, double value);
-	void setAttribute(const std::string& key, bool set);
+    void setAttribute(const std::string& key, const ItemAttribute& attr);
+    void setAttribute(const std::string& key, const std::string& value);
+    void setAttribute(const std::string& key, int32_t value);
+    void setAttribute(const std::string& key, double value);
+    void setAttribute(const std::string& key, bool set);
 
-	// returns nullptr if the attribute is not set
-	const std::string* getStringAttribute(const std::string& key) const;
-	const int32_t* getIntegerAttribute(const std::string& key) const;
-	const double* getFloatAttribute(const std::string& key) const;
-	const bool* getBooleanAttribute(const std::string& key) const;
+    // returns nullptr if the attribute is not set
+    const std::string* getStringAttribute(const std::string& key) const;
+    const int32_t* getIntegerAttribute(const std::string& key) const;
+    const double* getFloatAttribute(const std::string& key) const;
+    const bool* getBooleanAttribute(const std::string& key) const;
 
-	// Returns true if the attribute (of that type) exists
-	bool hasStringAttribute(const std::string& key) const;
-	bool hasIntegerAttribute(const std::string& key) const;
-	bool hasFloatAttribute(const std::string& key) const;
-	bool hasBooleanAttribute(const std::string& key) const;
+    // Returns true if the attribute (of that type) exists
+    bool hasStringAttribute(const std::string& key) const;
+    bool hasIntegerAttribute(const std::string& key) const;
+    bool hasFloatAttribute(const std::string& key) const;
+    bool hasBooleanAttribute(const std::string& key) const;
 
-	void eraseAttribute(const std::string& key);
+    void eraseAttribute(const std::string& key);
 
-	void clearAllAttributes();
-	ItemAttributeMap getAttributes() const;
+    void clearAllAttributes();
+    ItemAttributeMap getAttributes() const;
 
 protected:
-	ItemAttributeMap* attributes;
+    ItemAttributeMap* attributes;
 
-	void createAttributes();
+    void createAttributes();
 };
 
 #endif

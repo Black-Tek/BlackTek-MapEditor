@@ -17,56 +17,59 @@
 
 #include "main.h"
 
-#include "spawn_brush.h"
 #include "basemap.h"
 #include "spawn.h"
+#include "spawn_brush.h"
 
 //=============================================================================
 // Spawn brush
 
 SpawnBrush::SpawnBrush() :
-	Brush()
+    Brush()
 {
-	////
+    ////
 }
 
 SpawnBrush::~SpawnBrush()
 {
-	////
+    ////
 }
 
 int SpawnBrush::getLookID() const
 {
-	return 0;
+    return 0;
 }
 
 std::string SpawnBrush::getName() const
 {
-	return "Spawn Brush";
+    return "Spawn Brush";
 }
 
 bool SpawnBrush::canDraw(BaseMap* map, const Position& position) const
 {
-	Tile* tile = map->getTile(position);
-	if(tile) {
-		if(tile->spawn) {
-			return false;
-		}
-	}
-	return true;
+    Tile* tile = map->getTile(position);
+    if (tile)
+    {
+        if (tile->spawn)
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 void SpawnBrush::undraw(BaseMap* map, Tile* tile)
 {
-	delete tile->spawn;
-	tile->spawn = nullptr;
+    delete tile->spawn;
+    tile->spawn = nullptr;
 }
 
 void SpawnBrush::draw(BaseMap* map, Tile* tile, void* parameter)
 {
-	ASSERT(tile);
-	ASSERT(parameter); // Should contain an int which is the size of the newd spawn
-	if(tile->spawn == nullptr) {
-		tile->spawn = newd Spawn(std::max(1, *(int*)parameter));
-	}
+    ASSERT(tile);
+    ASSERT(parameter); // Should contain an int which is the size of the newd spawn
+    if (tile->spawn == nullptr)
+    {
+        tile->spawn = newd Spawn(std::max(1, *(int*)parameter));
+    }
 }

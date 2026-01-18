@@ -22,93 +22,97 @@
 
 class House;
 
-class HousePalettePanel : public PalettePanel {
+class HousePalettePanel : public PalettePanel
+{
 public:
-	HousePalettePanel(wxWindow* parent, wxWindowID id = wxID_ANY);
-	~HousePalettePanel();
+    HousePalettePanel(wxWindow* parent, wxWindowID id = wxID_ANY);
+    ~HousePalettePanel();
 
-	PaletteType GetType() const;
+    PaletteType GetType() const;
 
-	// Select the first brush
-	void SelectFirstBrush();
-	// Returns the currently selected brush (first brush if panel is not loaded)
-	Brush* GetSelectedBrush() const;
-	// Returns the currently selected brush size
-	int GetSelectedBrushSize() const;
-	// Select the brush in the parameter, this only changes the look of the panel
-	bool SelectBrush(const Brush* whatbrush);
+    // Select the first brush
+    void SelectFirstBrush();
+    // Returns the currently selected brush (first brush if panel is not loaded)
+    Brush* GetSelectedBrush() const;
+    // Returns the currently selected brush size
+    int GetSelectedBrushSize() const;
+    // Select the brush in the parameter, this only changes the look of the panel
+    bool SelectBrush(const Brush* whatbrush);
 
-	// Called sometimes?
-	void OnUpdate();
-	// Called when this page is about to be displayed
-	void OnSwitchIn();
+    // Called sometimes?
+    void OnUpdate();
+    // Called when this page is about to be displayed
+    void OnSwitchIn();
 
-	void OnLayoutFixTimer(wxTimerEvent& event);
+    void OnLayoutFixTimer(wxTimerEvent& event);
 
-	void SetMap(Map* map);
-protected:
-	// Internal use
-	void SaveHouse();
-	void SelectTown(size_t index);
-	void SelectHouse(size_t index);
-
-	House* GetCurrentlySelectedHouse() const;
-
-	void SelectHouseBrush();
-	void SelectExitBrush();
-public:
-	// wxWidgets event handling
-	void OnTownChange(wxCommandEvent& event);
-	void OnListBoxChange(wxCommandEvent& event);
-	void OnListBoxDoubleClick(wxCommandEvent& event);
-	void OnClickHouseBrushButton(wxCommandEvent& event);
-	void OnClickSelectExitButton(wxCommandEvent& event);
-	void OnClickAddHouse(wxCommandEvent& event);
-	void OnClickEditHouse(wxCommandEvent& event);
-	void OnClickRemoveHouse(wxCommandEvent& event);
-
-	#ifdef __APPLE__
-	//Used for detecting a deselect
-	void OnListBoxClick(wxMouseEvent& event);
-	#endif
+    void SetMap(Map* map);
 
 protected:
-	Map* map;
-	wxChoice* town_choice;
-	SortableListBox* house_list;
-	wxToggleButton* house_brush_button;
-	wxToggleButton* select_position_button;
-	wxButton* add_house_button;
-	wxButton* edit_house_button;
-	wxButton* remove_house_button;
+    // Internal use
+    void SaveHouse();
+    void SelectTown(size_t index);
+    void SelectHouse(size_t index);
 
-	// Used for ugly hack
-	bool do_resize_on_display;
-	wxTimer fix_size_timer;
+    House* GetCurrentlySelectedHouse() const;
 
-	DECLARE_EVENT_TABLE()
+    void SelectHouseBrush();
+    void SelectExitBrush();
+
+public:
+    // wxWidgets event handling
+    void OnTownChange(wxCommandEvent& event);
+    void OnListBoxChange(wxCommandEvent& event);
+    void OnListBoxDoubleClick(wxCommandEvent& event);
+    void OnClickHouseBrushButton(wxCommandEvent& event);
+    void OnClickSelectExitButton(wxCommandEvent& event);
+    void OnClickAddHouse(wxCommandEvent& event);
+    void OnClickEditHouse(wxCommandEvent& event);
+    void OnClickRemoveHouse(wxCommandEvent& event);
+
+#ifdef __APPLE__
+    // Used for detecting a deselect
+    void OnListBoxClick(wxMouseEvent& event);
+#endif
+
+protected:
+    Map* map;
+    wxChoice* town_choice;
+    SortableListBox* house_list;
+    wxToggleButton* house_brush_button;
+    wxToggleButton* select_position_button;
+    wxButton* add_house_button;
+    wxButton* edit_house_button;
+    wxButton* remove_house_button;
+
+    // Used for ugly hack
+    bool do_resize_on_display;
+    wxTimer fix_size_timer;
+
+    DECLARE_EVENT_TABLE()
 };
 
 class EditHouseDialog : public wxDialog
 {
 public:
-	EditHouseDialog(wxWindow* parent, Map* map, House* house);
-	virtual ~EditHouseDialog();
+    EditHouseDialog(wxWindow* parent, Map* map, House* house);
+    virtual ~EditHouseDialog();
 
-	void OnClickOK(wxCommandEvent&);
-	void OnClickCancel(wxCommandEvent&);
+    void OnClickOK(wxCommandEvent&);
+    void OnClickCancel(wxCommandEvent&);
+
 protected:
-	Map* map;
-	House* what_house;
+    Map* map;
+    House* what_house;
 
-	wxString house_name, house_id, house_rent;
+    wxString house_name, house_id, house_rent;
 
-	wxTextCtrl* name_field;
-	wxTextCtrl* id_field;
-	wxTextCtrl* rent_field;
-	wxCheckBox* guildhall_field;
+    wxTextCtrl* name_field;
+    wxTextCtrl* id_field;
+    wxTextCtrl* rent_field;
+    wxCheckBox* guildhall_field;
 
-	DECLARE_EVENT_TABLE();
+    DECLARE_EVENT_TABLE();
 };
 
 #endif

@@ -18,28 +18,31 @@
 #ifndef RME_GRAPHICS_H_
 #define RME_GRAPHICS_H_
 
-#include "outfit.h"
 #include "common.h"
+#include "outfit.h"
 #include <deque>
 
 #include "client_version.h"
 
 #include <wx/artprov.h>
 
-enum SpriteSize {
-	SPRITE_SIZE_16x16,
-	//SPRITE_SIZE_24x24,
-	SPRITE_SIZE_32x32,
-	SPRITE_SIZE_COUNT
+enum SpriteSize
+{
+    SPRITE_SIZE_16x16,
+    // SPRITE_SIZE_24x24,
+    SPRITE_SIZE_32x32,
+    SPRITE_SIZE_COUNT
 };
 
-enum AnimationDirection {
-	ANIMATION_FORWARD = 0,
-	ANIMATION_BACKWARD = 1
+enum AnimationDirection
+{
+    ANIMATION_FORWARD = 0,
+    ANIMATION_BACKWARD = 1
 };
 
-enum ItemAnimationDuration {
-	ITEM_FRAME_DURATION = 500
+enum ItemAnimationDuration
+{
+    ITEM_FRAME_DURATION = 500
 };
 
 class MapCanvas;
@@ -47,337 +50,349 @@ class GraphicManager;
 class FileReadHandle;
 class Animator;
 
-struct SpriteLight {
-	uint8_t intensity = 0;
-	uint8_t color = 0;
+struct SpriteLight
+{
+    uint8_t intensity = 0;
+    uint8_t color = 0;
 };
 
 class Sprite
 {
 public:
-	Sprite() {}
+    Sprite() { }
 
-	virtual void DrawTo(wxDC* dc, SpriteSize sz, int start_x, int start_y, int width = -1, int height = -1) = 0;
-	virtual void unloadDC() = 0;
+    virtual void DrawTo(wxDC* dc, SpriteSize sz, int start_x, int start_y, int width = -1, int height = -1) = 0;
+    virtual void unloadDC() = 0;
 
 private:
-	Sprite(const Sprite&);
+    Sprite(const Sprite&);
 };
 
 class EditorSprite : public Sprite
 {
 public:
-	EditorSprite(wxBitmap* b16x16, wxBitmap* b32x32);
-	virtual ~EditorSprite();
+    EditorSprite(wxBitmap* b16x16, wxBitmap* b32x32);
+    virtual ~EditorSprite();
 
-	virtual void DrawTo(wxDC* dc, SpriteSize sz, int start_x, int start_y, int width = -1, int height = -1);
-	virtual void unloadDC();
+    virtual void DrawTo(wxDC* dc, SpriteSize sz, int start_x, int start_y, int width = -1, int height = -1);
+    virtual void unloadDC();
 
 protected:
-	wxBitmap* bm[SPRITE_SIZE_COUNT];
+    wxBitmap* bm[SPRITE_SIZE_COUNT];
 };
 
 class GameSprite : public Sprite
 {
 public:
-	GameSprite();
-	virtual ~GameSprite();
+    GameSprite();
+    virtual ~GameSprite();
 
-	int getIndex(int width, int height, int layer, int pattern_x, int pattern_y, int pattern_z, int frame) const;
-	GLuint getHardwareID(int _x, int _y, int _layer, int _subtype, int _pattern_x, int _pattern_y, int _pattern_z, int _frame);
-	GLuint getHardwareID(int _x, int _y, int _dir, int _addon, int _pattern_z, const Outfit& _outfit, int _frame); // CreatureDatabase
-	virtual void DrawTo(wxDC* dc, SpriteSize sz, int start_x, int start_y, int width = -1, int height = -1);
-	void DrawTo(wxDC* context, const wxRect& rect, const Outfit& outfit);
+    int getIndex(int width, int height, int layer, int pattern_x, int pattern_y, int pattern_z, int frame) const;
+    GLuint getHardwareID(int _x, int _y, int _layer, int _subtype, int _pattern_x, int _pattern_y, int _pattern_z, int _frame);
+    GLuint getHardwareID(int _x, int _y, int _dir, int _addon, int _pattern_z, const Outfit& _outfit, int _frame); // CreatureDatabase
+    virtual void DrawTo(wxDC* dc, SpriteSize sz, int start_x, int start_y, int width = -1, int height = -1);
+    void DrawTo(wxDC* context, const wxRect& rect, const Outfit& outfit);
 
-	virtual void unloadDC();
+    virtual void unloadDC();
 
-	void clean(int time);
+    void clean(int time);
 
-	uint16_t getDrawHeight() const noexcept { return draw_height; }
-	const wxPoint& getDrawOffset() const noexcept { return draw_offset; }
-	uint8_t getMiniMapColor() const noexcept { return minimap_color; }
+    uint16_t getDrawHeight() const noexcept { return draw_height; }
+    const wxPoint& getDrawOffset() const noexcept { return draw_offset; }
+    uint8_t getMiniMapColor() const noexcept { return minimap_color; }
 
-	bool hasLight() const noexcept { return has_light; }
-	const SpriteLight& getLight() const noexcept { return light; }
+    bool hasLight() const noexcept { return has_light; }
+    const SpriteLight& getLight() const noexcept { return light; }
 
-	static GameSprite* createFromBitmap(const wxArtID& bitmapId);
+    static GameSprite* createFromBitmap(const wxArtID& bitmapId);
 
 protected:
-	class Image;
-	class NormalImage;
-	class TemplateImage;
+    class Image;
+    class NormalImage;
+    class TemplateImage;
 
-	wxMemoryDC* getDC(SpriteSize size);
-	wxMemoryDC* getDC(const Outfit& outfit);
-	TemplateImage* getTemplateImage(int sprite_index, const Outfit& outfit);
+    wxMemoryDC* getDC(SpriteSize size);
+    wxMemoryDC* getDC(const Outfit& outfit);
+    TemplateImage* getTemplateImage(int sprite_index, const Outfit& outfit);
 
-	class Image {
-	public:
-		Image();
-		virtual ~Image();
+    class Image
+    {
+    public:
+        Image();
+        virtual ~Image();
 
-		bool isGLLoaded;
-		int lastaccess;
+        bool isGLLoaded;
+        int lastaccess;
 
-		void visit();
-		virtual void clean(int time);
+        void visit();
+        virtual void clean(int time);
 
-		virtual GLuint getHardwareID() = 0;
-		virtual uint8_t* getRGBData() = 0;
-		virtual uint8_t* getRGBAData() = 0;
+        virtual GLuint getHardwareID() = 0;
+        virtual uint8_t* getRGBData() = 0;
+        virtual uint8_t* getRGBAData() = 0;
 
-	protected:
-		virtual void createGLTexture(GLuint textureId);
-		virtual void unloadGLTexture(GLuint textureId);
-	};
+    protected:
+        virtual void createGLTexture(GLuint textureId);
+        virtual void unloadGLTexture(GLuint textureId);
+    };
 
-	class NormalImage : public Image {
-	public:
-		NormalImage();
-		virtual ~NormalImage();
+    class NormalImage : public Image
+    {
+    public:
+        NormalImage();
+        virtual ~NormalImage();
 
-		// We use the sprite id as GL texture id
-		uint32_t id;
+        // We use the sprite id as GL texture id
+        uint32_t id;
 
-		// This contains the pixel data
-		uint16_t size;
-		uint8_t* dump;
+        // This contains the pixel data
+        uint16_t size;
+        uint8_t* dump;
 
-		virtual void clean(int time);
+        virtual void clean(int time);
 
-		virtual GLuint getHardwareID();
-		virtual uint8_t* getRGBData();
-		virtual uint8_t* getRGBAData();
+        virtual GLuint getHardwareID();
+        virtual uint8_t* getRGBData();
+        virtual uint8_t* getRGBAData();
 
-	protected:
-		virtual void createGLTexture(GLuint textureId = 0);
-		virtual void unloadGLTexture(GLuint textureId = 0);
-	};
+    protected:
+        virtual void createGLTexture(GLuint textureId = 0);
+        virtual void unloadGLTexture(GLuint textureId = 0);
+    };
 
-	class EditorImage : public NormalImage {
-	public:
-		EditorImage(const wxArtID& bitmapId);
-	protected:
-		void createGLTexture(GLuint textureId) override;
-		void unloadGLTexture(GLuint textureId) override;
-	private:
-		wxArtID bitmapId;
-	};
+    class EditorImage : public NormalImage
+    {
+    public:
+        EditorImage(const wxArtID& bitmapId);
 
-	class TemplateImage : public Image {
-	public:
-		TemplateImage(GameSprite* parent, int v, const Outfit& outfit);
-		virtual ~TemplateImage();
+    protected:
+        void createGLTexture(GLuint textureId) override;
+        void unloadGLTexture(GLuint textureId) override;
 
-		virtual GLuint getHardwareID();
-		virtual uint8_t* getRGBData();
-		virtual uint8_t* getRGBAData();
+    private:
+        wxArtID bitmapId;
+    };
 
-		GLuint gl_tid;
-		GameSprite* parent;
-		int sprite_index;
-		uint8_t lookHead;
-		uint8_t lookBody;
-		uint8_t lookLegs;
-		uint8_t lookFeet;
-	protected:
-		void colorizePixel(uint8_t color, uint8_t &r, uint8_t &b, uint8_t &g);
+    class TemplateImage : public Image
+    {
+    public:
+        TemplateImage(GameSprite* parent, int v, const Outfit& outfit);
+        virtual ~TemplateImage();
 
-		virtual void createGLTexture(GLuint ignored = 0);
-		virtual void unloadGLTexture(GLuint ignored = 0);
-	};
+        virtual GLuint getHardwareID();
+        virtual uint8_t* getRGBData();
+        virtual uint8_t* getRGBAData();
 
-	uint32_t id;
-	wxMemoryDC* dc[SPRITE_SIZE_COUNT];
+        GLuint gl_tid;
+        GameSprite* parent;
+        int sprite_index;
+        uint8_t lookHead;
+        uint8_t lookBody;
+        uint8_t lookLegs;
+        uint8_t lookFeet;
+
+    protected:
+        void colorizePixel(uint8_t color, uint8_t& r, uint8_t& b, uint8_t& g);
+
+        virtual void createGLTexture(GLuint ignored = 0);
+        virtual void unloadGLTexture(GLuint ignored = 0);
+    };
+
+    uint32_t id;
+    wxMemoryDC* dc[SPRITE_SIZE_COUNT];
 
 public:
-	// GameSprite info
-	uint8_t height;
-	uint8_t width;
-	uint8_t layers;
-	uint8_t pattern_x;
-	uint8_t pattern_y;
-	uint8_t pattern_z;
-	uint8_t frames;
-	uint32_t numsprites;
+    // GameSprite info
+    uint8_t height;
+    uint8_t width;
+    uint8_t layers;
+    uint8_t pattern_x;
+    uint8_t pattern_y;
+    uint8_t pattern_z;
+    uint8_t frames;
+    uint32_t numsprites;
 
-	Animator* animator;
+    Animator* animator;
 
-	uint16_t ground_speed;
-	uint16_t draw_height;
-	wxPoint draw_offset;
-	uint16_t minimap_color;
+    uint16_t ground_speed;
+    uint16_t draw_height;
+    wxPoint draw_offset;
+    uint16_t minimap_color;
 
-	bool has_light = false;
-	SpriteLight light;
+    bool has_light = false;
+    SpriteLight light;
 
-	std::vector<NormalImage*> spriteList;
-	std::list<TemplateImage*> instanced_templates; // Templates that use this sprite
+    std::vector<NormalImage*> spriteList;
+    std::list<TemplateImage*> instanced_templates; // Templates that use this sprite
 
-	friend class GraphicManager;
+    friend class GraphicManager;
 };
 
 struct FrameDuration
 {
-	int min;
-	int max;
+    int min;
+    int max;
 
-	FrameDuration(int min, int max) : min(min), max(max)
-	{
-		ASSERT(min <= max);
-	}
+    FrameDuration(int min, int max) :
+        min(min), max(max)
+    {
+        ASSERT(min <= max);
+    }
 
-	int getDuration() const
-	{
-		if(min == max)
-			return min;
-		return uniform_random(min, max);
-	};
+    int getDuration() const
+    {
+        if (min == max)
+            return min;
+        return uniform_random(min, max);
+    };
 
-	void setValues(int min, int max)
-	{
-		ASSERT(min <= max);
-		this->min = min;
-		this->max = max;
-	}
+    void setValues(int min, int max)
+    {
+        ASSERT(min <= max);
+        this->min = min;
+        this->max = max;
+    }
 };
 
 class Animator
 {
 public:
-	Animator(int frames, int start_frame, int loop_count, bool async);
-	~Animator();
+    Animator(int frames, int start_frame, int loop_count, bool async);
+    ~Animator();
 
-	int getStartFrame() const;
+    int getStartFrame() const;
 
-	FrameDuration* getFrameDuration(int frame);
+    FrameDuration* getFrameDuration(int frame);
 
-	int getFrame();
-	void setFrame(int frame);
+    int getFrame();
+    void setFrame(int frame);
 
-	void reset();
+    void reset();
 
 private:
-	int getDuration(int frame) const;
-	int getPingPongFrame();
-	int getLoopFrame();
-	void calculateSynchronous();
+    int getDuration(int frame) const;
+    int getPingPongFrame();
+    int getLoopFrame();
+    void calculateSynchronous();
 
-	int frame_count;
-	int start_frame;
-	int loop_count;
-	bool async;
-	std::vector<FrameDuration*> durations;
-	int current_frame;
-	int current_loop;
-	int current_duration;
-	int total_duration;
-	AnimationDirection direction;
-	long last_time;
-	bool is_complete;
+    int frame_count;
+    int start_frame;
+    int loop_count;
+    bool async;
+    std::vector<FrameDuration*> durations;
+    int current_frame;
+    int current_loop;
+    int current_duration;
+    int total_duration;
+    AnimationDirection direction;
+    long last_time;
+    bool is_complete;
 };
 
 struct SignatureData
 {
-	int protocolVersion = 0;
-	uint32_t majorVersion = 0;
-	uint32_t minorVersion = 0;
+    int protocolVersion = 0;
+    uint32_t majorVersion = 0;
+    uint32_t minorVersion = 0;
 };
-constexpr SignatureData SignatureDataPlaceHolder{1098, 3, 57};
+constexpr SignatureData SignatureDataPlaceHolder { 1098, 3, 57 };
 
 class GraphicManager
 {
 public:
-	GraphicManager();
-	~GraphicManager();
+    GraphicManager();
+    ~GraphicManager();
 
-	void clear();
-	void cleanSoftwareSprites();
+    void clear();
+    void cleanSoftwareSprites();
 
-	Sprite* getSprite(int id);
-	GameSprite* getCreatureSprite(int id);
-	GameSprite* getEditorSprite(int id);
+    Sprite* getSprite(int id);
+    GameSprite* getCreatureSprite(int id);
+    GameSprite* getEditorSprite(int id);
 
-	long getElapsedTime() const { return (animation_timer->TimeInMicro() / 1000).ToLong(); }
+    long getElapsedTime() const { return (animation_timer->TimeInMicro() / 1000).ToLong(); }
 
-	uint16_t getItemSpriteMinID() const noexcept { return 100; }
-	uint16_t getItemSpriteMaxID() const noexcept { return item_count; }
-	uint16_t getCreatureSpriteMaxID() const noexcept { return creature_count; }
+    uint16_t getItemSpriteMinID() const noexcept { return 100; }
+    uint16_t getItemSpriteMaxID() const noexcept { return item_count; }
+    uint16_t getCreatureSpriteMaxID() const noexcept { return creature_count; }
 
-	// Get an unused texture id (this is acquired by simply increasing a value starting from 0x10000000)
-	GLuint getFreeTextureID();
+    // Get an unused texture id (this is acquired by simply increasing a value starting from 0x10000000)
+    GLuint getFreeTextureID();
 
-	// This is part of the binary
-	bool loadEditorSprites();
-	// Metadata should be loaded first
-	// This fills the item / creature adress space
-	bool loadOTFI(const FileName& filename, wxString& error, wxArrayString& warnings);
+    // This is part of the binary
+    bool loadEditorSprites();
+    // Metadata should be loaded first
+    // This fills the item / creature adress space
+    bool loadOTFI(const FileName& filename, wxString& error, wxArrayString& warnings);
 
-	// datOnlyLoad - we load items.dat, meaning we will be ignoring .otb, and so we want full info from dat.
-	bool loadSpriteMetadata(const FileName& datafile, wxString& error, wxArrayString& warnings, bool datOnlyLoad);
-	bool loadSpriteMetadataFlags(FileReadHandle& file, GameSprite* sType, wxString& error, wxArrayString& warnings, bool datOnlyLoad, ItemType* iType);
+    // datOnlyLoad - we load items.dat, meaning we will be ignoring .otb, and so we want full info from dat.
+    bool loadSpriteMetadata(const FileName& datafile, wxString& error, wxArrayString& warnings, bool datOnlyLoad);
+    bool loadSpriteMetadataFlags(FileReadHandle& file, GameSprite* sType, wxString& error, wxArrayString& warnings, bool datOnlyLoad, ItemType* iType);
 
-	bool loadSpriteData(const FileName& datafile, wxString& error, wxArrayString& warnings);
+    bool loadSpriteData(const FileName& datafile, wxString& error, wxArrayString& warnings);
 
-	// Cleans old & unused textures according to config settings
-	void garbageCollection();
-	void addSpriteToCleanup(GameSprite* spr);
+    // Cleans old & unused textures according to config settings
+    void garbageCollection();
+    void addSpriteToCleanup(GameSprite* spr);
 
-	wxFileName getMetadataFileName() const { return metadata_file; }
-	wxFileName getSpritesFileName() const { return sprites_file; }
+    wxFileName getMetadataFileName() const { return metadata_file; }
+    wxFileName getSpritesFileName() const { return sprites_file; }
 
-	bool hasTransparency() const;
-	bool isUnloaded() const;
+    bool hasTransparency() const;
+    bool isUnloaded() const;
 
-	ClientVersion *client_version;
+    ClientVersion* client_version;
 
-	// Basically, signatures is used for predicting protocol version (unless somebody has custom signature...)
-	// There is getLoadedVersion() method, which also seems to be doing that (?), however who understands
-	// that RME code, can then confirm it and remove those methods below. May light lead you.
-	bool loadSignatures(const std::string& filename, wxString& error);
-	SignatureData getSignatureData(uint32_t signature) {
-		auto it = signatureDatas.find(signature);
-		return it != signatureDatas.end() ? it->second : SignatureDataPlaceHolder;
-	}
-	SignatureData getSignatureData() {
-		return getSignatureData(datSignature);
-	}
+    // Basically, signatures is used for predicting protocol version (unless somebody has custom signature...)
+    // There is getLoadedVersion() method, which also seems to be doing that (?), however who understands
+    // that RME code, can then confirm it and remove those methods below. May light lead you.
+    bool loadSignatures(const std::string& filename, wxString& error);
+    SignatureData getSignatureData(uint32_t signature)
+    {
+        auto it = signatureDatas.find(signature);
+        return it != signatureDatas.end() ? it->second : SignatureDataPlaceHolder;
+    }
+    SignatureData getSignatureData()
+    {
+        return getSignatureData(datSignature);
+    }
 
-private:;
-	std::unordered_map<uint32_t, SignatureData> signatureDatas;
-	uint32_t datSignature = 0;
+private:
+    ;
+    std::unordered_map<uint32_t, SignatureData> signatureDatas;
+    uint32_t datSignature = 0;
 
-	bool unloaded;
-	// This is used if memcaching is NOT on
-	std::string spritefile;
-	bool loadSpriteDump(uint8_t*& target, uint16_t& size, int sprite_id);
+    bool unloaded;
+    // This is used if memcaching is NOT on
+    std::string spritefile;
+    bool loadSpriteDump(uint8_t*& target, uint16_t& size, int sprite_id);
 
-	typedef std::map<int, Sprite*> SpriteMap;
-	SpriteMap sprite_space;
-	typedef std::map<int, GameSprite::Image*> ImageMap;
-	ImageMap image_space;
-	std::deque<GameSprite*> cleanup_list;
+    typedef std::map<int, Sprite*> SpriteMap;
+    SpriteMap sprite_space;
+    typedef std::map<int, GameSprite::Image*> ImageMap;
+    ImageMap image_space;
+    std::deque<GameSprite*> cleanup_list;
 
-	DatFormat dat_format;
-	uint16_t item_count;
-	uint16_t creature_count;
-	bool otfi_found;
-	bool is_extended;
-	bool has_transparency;
-	bool has_frame_durations;
-	bool has_frame_groups;
-	wxFileName metadata_file;
-	wxFileName sprites_file;
+    DatFormat dat_format;
+    uint16_t item_count;
+    uint16_t creature_count;
+    bool otfi_found;
+    bool is_extended;
+    bool has_transparency;
+    bool has_frame_durations;
+    bool has_frame_groups;
+    wxFileName metadata_file;
+    wxFileName sprites_file;
 
-	int loaded_textures;
-	int lastclean;
+    int loaded_textures;
+    int lastclean;
 
-	wxStopWatch* animation_timer;
+    wxStopWatch* animation_timer;
 
-	friend class GameSprite::Image;
-	friend class GameSprite::NormalImage;
-	friend class GameSprite::EditorImage;
-	friend class GameSprite::TemplateImage;
+    friend class GameSprite::Image;
+    friend class GameSprite::NormalImage;
+    friend class GameSprite::EditorImage;
+    friend class GameSprite::TemplateImage;
 };
 
 #endif

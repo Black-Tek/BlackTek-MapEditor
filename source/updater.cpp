@@ -27,66 +27,69 @@ const wxEventType EVT_UPDATE_CHECK_FINISHED = wxNewEventType();
 
 UpdateChecker::UpdateChecker()
 {
-	////
+    ////
 }
 
 UpdateChecker::~UpdateChecker()
 {
-	////
+    ////
 }
 
 void UpdateChecker::connect(wxEvtHandler* receiver)
 {
-	wxString address = "http://www.remeresmapeditor.com/update.php";
-	address << "?os=" <<
+    wxString address = "http://www.remeresmapeditor.com/update.php";
+    address << "?os=" <<
 #ifdef __WINDOWS__
-	"windows";
+        "windows";
 #elif __LINUX__
-	"linux";
+        "linux";
 #else
-	"unknown";
+        "unknown";
 #endif
-	address << "&verid=" << __RME_VERSION_ID__;
+    address << "&verid=" << __RME_VERSION_ID__;
 #ifdef __EXPERIMENTAL__
-	address << "&beta";
+    address << "&beta";
 #endif
-	wxURL* url = newd wxURL(address);
-	UpdateConnectionThread* connection = newd UpdateConnectionThread(receiver, url);
-	connection->Execute();
+    wxURL* url = newd wxURL(address);
+    UpdateConnectionThread* connection = newd UpdateConnectionThread(receiver, url);
+    connection->Execute();
 }
 
 UpdateConnectionThread::UpdateConnectionThread(wxEvtHandler* receiver, wxURL* url) :
-	receiver(receiver),
-	url(url)
+    receiver(receiver),
+    url(url)
 {
-	////
+    ////
 }
 
 UpdateConnectionThread::~UpdateConnectionThread()
 {
-	////
+    ////
 }
 
 wxThread::ExitCode UpdateConnectionThread::Entry()
 {
-	wxInputStream* input = url->GetInputStream();
-	if(!input) {
-		delete input;
-		delete url;
-		return 0;
-	}
+    wxInputStream* input = url->GetInputStream();
+    if (!input)
+    {
+        delete input;
+        delete url;
+        return 0;
+    }
 
-	std::string data;
-	while(!input->Eof()) {
-		data += input->GetC();
-	}
+    std::string data;
+    while (!input->Eof())
+    {
+        data += input->GetC();
+    }
 
-	delete input;
-	delete url;
-	wxCommandEvent event(EVT_UPDATE_CHECK_FINISHED);
-	event.SetClientData(newd std::string(data));
-	if(receiver) receiver->AddPendingEvent(event);
-	return 0;
+    delete input;
+    delete url;
+    wxCommandEvent event(EVT_UPDATE_CHECK_FINISHED);
+    event.SetClientData(newd std::string(data));
+    if (receiver)
+        receiver->AddPendingEvent(event);
+    return 0;
 }
 
 #endif

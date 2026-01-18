@@ -20,10 +20,10 @@
 
 #include "main.h"
 
-#include "dcbutton.h"
-#include "tileset.h"
-#include "gui_ids.h"
 #include "common_windows.h"
+#include "dcbutton.h"
+#include "gui_ids.h"
+#include "tileset.h"
 
 class GUI;
 class BrushButton;
@@ -34,246 +34,254 @@ class PaletteWindow;
 
 typedef TilesetCategoryType PaletteType;
 
-class BrushButton : public ItemToggleButton {
+class BrushButton : public ItemToggleButton
+{
 public:
-	BrushButton(wxWindow* parent, Brush* brush, RenderSize, uint32_t id = wxID_ANY);
-	BrushButton(wxWindow* parent, Brush* brush, RenderSize, EditorSprite* espr, uint32_t id = wxID_ANY);
-	virtual ~BrushButton();
+    BrushButton(wxWindow* parent, Brush* brush, RenderSize, uint32_t id = wxID_ANY);
+    BrushButton(wxWindow* parent, Brush* brush, RenderSize, EditorSprite* espr, uint32_t id = wxID_ANY);
+    virtual ~BrushButton();
 
-	Brush* brush;
+    Brush* brush;
 
-	void OnKey(wxKeyEvent& event);
+    void OnKey(wxKeyEvent& event);
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
-class PalettePanel : public wxPanel {
+class PalettePanel : public wxPanel
+{
 public:
-	PalettePanel(wxWindow* parent, wxWindowID id = wxID_ANY, long style = wxTAB_TRAVERSAL);
-	~PalettePanel();
+    PalettePanel(wxWindow* parent, wxWindowID id = wxID_ANY, long style = wxTAB_TRAVERSAL);
+    ~PalettePanel();
 
-	// Interface
-	// Flushes this panel and consequent views will feature reloaded data
-	virtual void InvalidateContents();
-	// Loads the currently displayed page
-	virtual void LoadCurrentContents();
-	// Loads all content in this panel
-	virtual void LoadAllContents();
+    // Interface
+    // Flushes this panel and consequent views will feature reloaded data
+    virtual void InvalidateContents();
+    // Loads the currently displayed page
+    virtual void LoadCurrentContents();
+    // Loads all content in this panel
+    virtual void LoadAllContents();
 
-	PaletteWindow* GetParentPalette() const;
-	virtual wxString GetName() const;
-	virtual PaletteType GetType() const;
+    PaletteWindow* GetParentPalette() const;
+    virtual wxString GetName() const;
+    virtual PaletteType GetType() const;
 
-	// Add a tool panel!
-	virtual void AddToolPanel(PalettePanel* panel);
-	// Sets the style for this toolbar and child toolabrs
-	virtual void SetToolbarIconSize(bool large_icons);
+    // Add a tool panel!
+    virtual void AddToolPanel(PalettePanel* panel);
+    // Sets the style for this toolbar and child toolabrs
+    virtual void SetToolbarIconSize(bool large_icons);
 
-	// Select the first brush
-	virtual void SelectFirstBrush();
-	// Returns the currently selected brush (First brush if panel is not loaded)
-	virtual Brush* GetSelectedBrush() const;
-	// Returns the currently selected brush size
-	virtual int GetSelectedBrushSize() const;
-	// Select the brush in the parameter, this only changes the look of the panel
-	virtual bool SelectBrush(const Brush* whatbrush);
+    // Select the first brush
+    virtual void SelectFirstBrush();
+    // Returns the currently selected brush (First brush if panel is not loaded)
+    virtual Brush* GetSelectedBrush() const;
+    // Returns the currently selected brush size
+    virtual int GetSelectedBrushSize() const;
+    // Select the brush in the parameter, this only changes the look of the panel
+    virtual bool SelectBrush(const Brush* whatbrush);
 
-	virtual void DeselectAll() {}
-	// Updates the palette window to use the current brush size
-	virtual void OnUpdateBrushSize(BrushShape shape, int size);
-	// Called when this page is about to be displayed
-	virtual void OnSwitchIn();
-	// Called when this page is hidden
-	virtual void OnSwitchOut();
-	// Called sometimes
-	virtual void OnUpdate();
-	// When the palette should do a delayed refresh (necessary for multiple palettes)
-	void OnRefreshTimer(wxTimerEvent&);
+    virtual void DeselectAll() { }
+    // Updates the palette window to use the current brush size
+    virtual void OnUpdateBrushSize(BrushShape shape, int size);
+    // Called when this page is about to be displayed
+    virtual void OnSwitchIn();
+    // Called when this page is hidden
+    virtual void OnSwitchOut();
+    // Called sometimes
+    virtual void OnUpdate();
+    // When the palette should do a delayed refresh (necessary for multiple palettes)
+    void OnRefreshTimer(wxTimerEvent&);
 
-	void RefreshOtherPalettes();
-protected:
-	typedef std::vector<PalettePanel*> ToolBarList;
-	ToolBarList tool_bars;
-	wxTimer refresh_timer;
-	int last_brush_size;
-
-	DECLARE_EVENT_TABLE();
-};
-
-class ZoneBrushPanel : public PalettePanel {
-	public:
-	ZoneBrushPanel(wxWindow* parent);
-	~ZoneBrushPanel() {}
-
-	// Interface
-	// Flushes this panel and consequent views will feature reloaded data
-	void InvalidateContents();
-	// Loads the currently displayed page
-	void LoadCurrentContents();
-	// Loads all content in this panel
-	void LoadAllContents();
-
-	// Returns the currently selected brush (First brush if panel is not loaded)
-	Brush* GetSelectedBrush() const;
-	// Select the brush in the parameter, this only changes the look of the panel
-	bool SelectBrush(const Brush* whatbrush);
-
-	wxString GetName() const;
-	void SetToolbarIconSize(bool large);
-	void OnZoneIdChange(wxCommandEvent& WXUNUSED(event));
-
-	// Called when this page is displayed
-	void OnSwitchIn();
-
-	// wxWidgets event handling
-	void OnClickZoneBrushButton(wxCommandEvent& event);
-	void DeselectAll();
-
-	protected:
-	bool loaded;
-	bool large_icons;
-
-	BrushButton* zoneButton;
-	wxSpinCtrl* zoneIdSpin;
-
-	DECLARE_EVENT_TABLE()
-};
-
-class BrushSizePanel : public PalettePanel {
-public:
-	BrushSizePanel(wxWindow* parent);
-	~BrushSizePanel() {}
-
-
-	// Interface
-	// Flushes this panel and consequent views will feature reloaded data
-	void InvalidateContents();
-	// Loads the currently displayed page
-	void LoadCurrentContents();
-	// Loads all content in this panel
-	void LoadAllContents();
-
-	wxString GetName() const;
-	void SetToolbarIconSize(bool large);
-
-	// Updates the palette window to use the current brush size
-	void OnUpdateBrushSize(BrushShape shape, int size);
-	// Called when this page is displayed
-	void OnSwitchIn();
-
-	// wxWidgets event handling
-	void OnClickSquareBrush(wxCommandEvent& event);
-	void OnClickCircleBrush(wxCommandEvent& event);
-
-	void OnClickBrushSize(int which);
-	void OnClickBrushSize0(wxCommandEvent& event) { OnClickBrushSize(0); }
-	void OnClickBrushSize1(wxCommandEvent& event) { OnClickBrushSize(1); }
-	void OnClickBrushSize2(wxCommandEvent& event) { OnClickBrushSize(2); }
-	void OnClickBrushSize4(wxCommandEvent& event) { OnClickBrushSize(4); }
-	void OnClickBrushSize6(wxCommandEvent& event) { OnClickBrushSize(6); }
-	void OnClickBrushSize8(wxCommandEvent& event) { OnClickBrushSize(8); }
-	void OnClickBrushSize11(wxCommandEvent& event){ OnClickBrushSize(11); }
+    void RefreshOtherPalettes();
 
 protected:
-	bool loaded;
-	bool large_icons;
+    typedef std::vector<PalettePanel*> ToolBarList;
+    ToolBarList tool_bars;
+    wxTimer refresh_timer;
+    int last_brush_size;
 
-	DCButton* brushshapeSquareButton;
-	DCButton* brushshapeCircleButton;
-
-	DCButton* brushsize0Button;
-	DCButton* brushsize1Button;
-	DCButton* brushsize2Button;
-	DCButton* brushsize4Button;
-	DCButton* brushsize6Button;
-	DCButton* brushsize8Button;
-	DCButton* brushsize11Button;
-
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE();
 };
 
-class BrushToolPanel : public PalettePanel {
+class ZoneBrushPanel : public PalettePanel
+{
 public:
-	BrushToolPanel(wxWindow* parent);
-	~BrushToolPanel();
+    ZoneBrushPanel(wxWindow* parent);
+    ~ZoneBrushPanel() { }
 
-	// Interface
-	// Flushes this panel and consequent views will feature reloaded data
-	void InvalidateContents();
-	// Loads the currently displayed page
-	void LoadCurrentContents();
-	// Loads all content in this panel
-	void LoadAllContents();
+    // Interface
+    // Flushes this panel and consequent views will feature reloaded data
+    void InvalidateContents();
+    // Loads the currently displayed page
+    void LoadCurrentContents();
+    // Loads all content in this panel
+    void LoadAllContents();
 
-	wxString GetName() const;
-	void SetToolbarIconSize(bool large);
+    // Returns the currently selected brush (First brush if panel is not loaded)
+    Brush* GetSelectedBrush() const;
+    // Select the brush in the parameter, this only changes the look of the panel
+    bool SelectBrush(const Brush* whatbrush);
 
-	// Returns the currently selected brush (First brush if panel is not loaded)
-	Brush* GetSelectedBrush() const;
-	// Select the brush in the parameter, this only changes the look of the panel
-	bool SelectBrush(const Brush* whatbrush);
+    wxString GetName() const;
+    void SetToolbarIconSize(bool large);
+    void OnZoneIdChange(wxCommandEvent& WXUNUSED(event));
 
-	// Called when this page is displayed
-	void OnSwitchIn();
+    // Called when this page is displayed
+    void OnSwitchIn();
 
-	// wxWidgets event handling
-	void OnClickGravelButton(wxCommandEvent& event);
-	void OnClickEraserButton(wxCommandEvent& event);
-	// ----
-	void OnClickNormalDoorButton(wxCommandEvent& event);
-	void OnClickLockedDoorButton(wxCommandEvent& event);
-	void OnClickMagicDoorButton(wxCommandEvent& event);
-	void OnClickQuestDoorButton(wxCommandEvent& event);
-	void OnClickHatchDoorButton(wxCommandEvent& event);
-	void OnClickWindowDoorButton(wxCommandEvent& event);
-	// ----
-	void OnClickPZBrushButton(wxCommandEvent& event);
-	void OnClickNOPVPBrushButton(wxCommandEvent& event);
-	void OnClickNoLogoutBrushButton(wxCommandEvent& event);
-	void OnClickPVPZoneBrushButton(wxCommandEvent& event);
-public:
-	void DeselectAll();
+    // wxWidgets event handling
+    void OnClickZoneBrushButton(wxCommandEvent& event);
+    void DeselectAll();
 
-	bool loaded;
-	bool large_icons;
+protected:
+    bool loaded;
+    bool large_icons;
 
-	BrushButton* optionalBorderButton;
-	BrushButton* eraserButton;
-	// ----
-	BrushButton* normalDoorButton;
-	BrushButton* lockedDoorButton;
-	BrushButton* magicDoorButton;
-	BrushButton* questDoorButton;
-	BrushButton* hatchDoorButton;
-	BrushButton* windowDoorButton;
-	// ----
-	BrushButton* pzBrushButton;
-	BrushButton* nopvpBrushButton;
-	BrushButton* nologBrushButton;
-	BrushButton* pvpzoneBrushButton;
+    BrushButton* zoneButton;
+    wxSpinCtrl* zoneIdSpin;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
-class BrushThicknessPanel : public PalettePanel {
+class BrushSizePanel : public PalettePanel
+{
 public:
-	BrushThicknessPanel(wxWindow* parent);
-	~BrushThicknessPanel();
+    BrushSizePanel(wxWindow* parent);
+    ~BrushSizePanel() { }
 
-	// Interface
-	wxString GetName() const;
+    // Interface
+    // Flushes this panel and consequent views will feature reloaded data
+    void InvalidateContents();
+    // Loads the currently displayed page
+    void LoadCurrentContents();
+    // Loads all content in this panel
+    void LoadAllContents();
 
-	// Called when this page is displayed
-	void OnSwitchIn();
+    wxString GetName() const;
+    void SetToolbarIconSize(bool large);
 
-	// wxWidgets event handling
-	void OnScroll(wxScrollEvent& event);
-	void OnClickCustomThickness(wxCommandEvent& event);
+    // Updates the palette window to use the current brush size
+    void OnUpdateBrushSize(BrushShape shape, int size);
+    // Called when this page is displayed
+    void OnSwitchIn();
+
+    // wxWidgets event handling
+    void OnClickSquareBrush(wxCommandEvent& event);
+    void OnClickCircleBrush(wxCommandEvent& event);
+
+    void OnClickBrushSize(int which);
+    void OnClickBrushSize0(wxCommandEvent& event) { OnClickBrushSize(0); }
+    void OnClickBrushSize1(wxCommandEvent& event) { OnClickBrushSize(1); }
+    void OnClickBrushSize2(wxCommandEvent& event) { OnClickBrushSize(2); }
+    void OnClickBrushSize4(wxCommandEvent& event) { OnClickBrushSize(4); }
+    void OnClickBrushSize6(wxCommandEvent& event) { OnClickBrushSize(6); }
+    void OnClickBrushSize8(wxCommandEvent& event) { OnClickBrushSize(8); }
+    void OnClickBrushSize11(wxCommandEvent& event) { OnClickBrushSize(11); }
+
+protected:
+    bool loaded;
+    bool large_icons;
+
+    DCButton* brushshapeSquareButton;
+    DCButton* brushshapeCircleButton;
+
+    DCButton* brushsize0Button;
+    DCButton* brushsize1Button;
+    DCButton* brushsize2Button;
+    DCButton* brushsize4Button;
+    DCButton* brushsize6Button;
+    DCButton* brushsize8Button;
+    DCButton* brushsize11Button;
+
+    DECLARE_EVENT_TABLE()
+};
+
+class BrushToolPanel : public PalettePanel
+{
 public:
-	wxSlider* slider;
-	wxCheckBox* use_button;
+    BrushToolPanel(wxWindow* parent);
+    ~BrushToolPanel();
 
-	DECLARE_EVENT_TABLE()
+    // Interface
+    // Flushes this panel and consequent views will feature reloaded data
+    void InvalidateContents();
+    // Loads the currently displayed page
+    void LoadCurrentContents();
+    // Loads all content in this panel
+    void LoadAllContents();
+
+    wxString GetName() const;
+    void SetToolbarIconSize(bool large);
+
+    // Returns the currently selected brush (First brush if panel is not loaded)
+    Brush* GetSelectedBrush() const;
+    // Select the brush in the parameter, this only changes the look of the panel
+    bool SelectBrush(const Brush* whatbrush);
+
+    // Called when this page is displayed
+    void OnSwitchIn();
+
+    // wxWidgets event handling
+    void OnClickGravelButton(wxCommandEvent& event);
+    void OnClickEraserButton(wxCommandEvent& event);
+    // ----
+    void OnClickNormalDoorButton(wxCommandEvent& event);
+    void OnClickLockedDoorButton(wxCommandEvent& event);
+    void OnClickMagicDoorButton(wxCommandEvent& event);
+    void OnClickQuestDoorButton(wxCommandEvent& event);
+    void OnClickHatchDoorButton(wxCommandEvent& event);
+    void OnClickWindowDoorButton(wxCommandEvent& event);
+    // ----
+    void OnClickPZBrushButton(wxCommandEvent& event);
+    void OnClickNOPVPBrushButton(wxCommandEvent& event);
+    void OnClickNoLogoutBrushButton(wxCommandEvent& event);
+    void OnClickPVPZoneBrushButton(wxCommandEvent& event);
+
+public:
+    void DeselectAll();
+
+    bool loaded;
+    bool large_icons;
+
+    BrushButton* optionalBorderButton;
+    BrushButton* eraserButton;
+    // ----
+    BrushButton* normalDoorButton;
+    BrushButton* lockedDoorButton;
+    BrushButton* magicDoorButton;
+    BrushButton* questDoorButton;
+    BrushButton* hatchDoorButton;
+    BrushButton* windowDoorButton;
+    // ----
+    BrushButton* pzBrushButton;
+    BrushButton* nopvpBrushButton;
+    BrushButton* nologBrushButton;
+    BrushButton* pvpzoneBrushButton;
+
+    DECLARE_EVENT_TABLE()
+};
+
+class BrushThicknessPanel : public PalettePanel
+{
+public:
+    BrushThicknessPanel(wxWindow* parent);
+    ~BrushThicknessPanel();
+
+    // Interface
+    wxString GetName() const;
+
+    // Called when this page is displayed
+    void OnSwitchIn();
+
+    // wxWidgets event handling
+    void OnScroll(wxScrollEvent& event);
+    void OnClickCustomThickness(wxCommandEvent& event);
+
+public:
+    wxSlider* slider;
+    wxCheckBox* use_button;
+
+    DECLARE_EVENT_TABLE()
 };
 
 #endif

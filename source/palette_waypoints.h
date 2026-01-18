@@ -20,48 +20,51 @@
 
 #include <wx/listctrl.h>
 
-#include "waypoints.h"
 #include "palette_common.h"
+#include "waypoints.h"
 
-class WaypointPalettePanel : public PalettePanel {
+class WaypointPalettePanel : public PalettePanel
+{
 public:
-	WaypointPalettePanel(wxWindow* parent, wxWindowID id = wxID_ANY);
-	~WaypointPalettePanel();
+    WaypointPalettePanel(wxWindow* parent, wxWindowID id = wxID_ANY);
+    ~WaypointPalettePanel();
 
-	wxString GetName() const;
-	PaletteType GetType() const;
+    wxString GetName() const;
+    PaletteType GetType() const;
 
-	// Select the first brush
-	void SelectFirstBrush();
-	// Returns the currently selected brush (first brush if panel is not loaded)
-	Brush* GetSelectedBrush() const;
-	// Returns the currently selected brush size
-	int GetSelectedBrushSize() const;
-	// Select the brush in the parameter, this only changes the look of the panel
-	bool SelectBrush(const Brush* whatbrush);
+    // Select the first brush
+    void SelectFirstBrush();
+    // Returns the currently selected brush (first brush if panel is not loaded)
+    Brush* GetSelectedBrush() const;
+    // Returns the currently selected brush size
+    int GetSelectedBrushSize() const;
+    // Select the brush in the parameter, this only changes the look of the panel
+    bool SelectBrush(const Brush* whatbrush);
 
-	// Called sometimes?
-	void OnUpdate();
-	// Called when this page is about to be displayed
-	void OnSwitchIn();
-	// Called when this page is hidden
-	void OnSwitchOut();
+    // Called sometimes?
+    void OnUpdate();
+    // Called when this page is about to be displayed
+    void OnSwitchIn();
+    // Called when this page is hidden
+    void OnSwitchOut();
+
 public:
-	// wxWidgets event handling
-	void OnClickWaypoint(wxListEvent& event);
-	void OnBeginEditWaypointLabel(wxListEvent& event);
-	void OnEditWaypointLabel(wxListEvent& event);
-	void OnClickAddWaypoint(wxCommandEvent& event);
-	void OnClickRemoveWaypoint(wxCommandEvent& event);
+    // wxWidgets event handling
+    void OnClickWaypoint(wxListEvent& event);
+    void OnBeginEditWaypointLabel(wxListEvent& event);
+    void OnEditWaypointLabel(wxListEvent& event);
+    void OnClickAddWaypoint(wxCommandEvent& event);
+    void OnClickRemoveWaypoint(wxCommandEvent& event);
 
-	void SetMap(Map* map);
+    void SetMap(Map* map);
+
 protected:
-	Map* map;
-	wxListCtrl* waypoint_list;
-	wxButton* add_waypoint_button;
-	wxButton* remove_waypoint_button;
+    Map* map;
+    wxListCtrl* waypoint_list;
+    wxButton* add_waypoint_button;
+    wxButton* remove_waypoint_button;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 #endif

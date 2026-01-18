@@ -23,20 +23,20 @@
 class SearchResultWindow : public wxPanel
 {
 public:
-	SearchResultWindow(wxWindow* parent);
-	virtual ~SearchResultWindow();
+    SearchResultWindow(wxWindow* parent);
+    virtual ~SearchResultWindow();
 
-	void Clear();
-	void AddPosition(wxString description, Position pos);
+    void Clear();
+    void AddPosition(wxString description, Position pos);
 
-	void OnClickResult(wxCommandEvent&);
-	void OnClickExport(wxCommandEvent&);
-	void OnClickClear(wxCommandEvent&);
+    void OnClickResult(wxCommandEvent&);
+    void OnClickExport(wxCommandEvent&);
+    void OnClickClear(wxCommandEvent&);
 
 protected:
-	wxListBox* result_list;
+    wxListBox* result_list;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 #endif

@@ -27,23 +27,22 @@ class BrowseTileListBox;
 class BrowseTileWindow : public wxDialog
 {
 public:
-	BrowseTileWindow(wxWindow* parent, Tile* tile, wxPoint position = wxDefaultPosition);
-	~BrowseTileWindow();
+    BrowseTileWindow(wxWindow* parent, Tile* tile, wxPoint position = wxDefaultPosition);
+    ~BrowseTileWindow();
 
-	void OnItemSelected(wxCommandEvent&);
-	void OnClickDelete(wxCommandEvent&);
-	void OnClickSelectRaw(wxCommandEvent&);
-	void OnClickOK(wxCommandEvent&);
-	void OnClickCancel(wxCommandEvent&);
+    void OnItemSelected(wxCommandEvent&);
+    void OnClickDelete(wxCommandEvent&);
+    void OnClickSelectRaw(wxCommandEvent&);
+    void OnClickOK(wxCommandEvent&);
+    void OnClickCancel(wxCommandEvent&);
 
 protected:
-	BrowseTileListBox* item_list;
-	wxStaticText* item_count_txt;
-	wxButton* delete_button;
-	wxButton* select_raw_button;
+    BrowseTileListBox* item_list;
+    wxStaticText* item_count_txt;
+    wxButton* delete_button;
+    wxButton* select_raw_button;
 
-	DECLARE_EVENT_TABLE();
+    DECLARE_EVENT_TABLE();
 };
 
 #endif
-

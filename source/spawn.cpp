@@ -17,34 +17,35 @@
 
 #include "main.h"
 
-#include "tile.h"
 #include "spawn.h"
+#include "tile.h"
 
 Spawn::Spawn(int size) :
-	size(0),
-	selected(false)
+    size(0),
+    selected(false)
 {
-	setSize(size);
+    setSize(size);
 }
 
 Spawn* Spawn::deepCopy() const
 {
-	Spawn* copy = new Spawn(size);
-	copy->selected = selected;
-	return copy;
+    Spawn* copy = new Spawn(size);
+    copy->selected = selected;
+    return copy;
 }
 
 void Spawns::addSpawn(Tile* tile)
 {
-	ASSERT(tile->spawn);
+    ASSERT(tile->spawn);
 
-	auto it = spawns.insert(tile->getPosition());
-	ASSERT(it.second);
+    auto it = spawns.insert(tile->getPosition());
+    ASSERT(it.second);
 }
 
-void Spawns::removeSpawn(Tile* tile) {
-	ASSERT(tile->spawn);
-	spawns.erase(tile->getPosition());
+void Spawns::removeSpawn(Tile* tile)
+{
+    ASSERT(tile->spawn);
+    spawns.erase(tile->getPosition());
 #if 0
 	SpawnPositionList::iterator iter = begin();
 	while(iter != end()) {
@@ -58,7 +59,8 @@ void Spawns::removeSpawn(Tile* tile) {
 #endif
 }
 
-std::ostream& operator<<(std::ostream& os, const Spawn& spawn) {
-	os << &spawn << ":: -> " << spawn.getSize() << std::endl;
-	return os;
+std::ostream& operator<<(std::ostream& os, const Spawn& spawn)
+{
+    os << &spawn << ":: -> " << spawn.getSize() << std::endl;
+    return os;
 }

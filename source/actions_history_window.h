@@ -18,50 +18,50 @@
 #ifndef RME_ACTIONS_HISTORY_WINDOW_H_
 #define RME_ACTIONS_HISTORY_WINDOW_H_
 
-#include "main.h"
 #include "action.h"
+#include "main.h"
 
 class HistoryListBox : public wxVListBox
 {
 public:
-	HistoryListBox(wxWindow *parent);
+    HistoryListBox(wxWindow* parent);
 
-	void OnDrawItem(wxDC& dc, const wxRect& rect, size_t index) const override;
-	wxCoord OnMeasureItem(size_t index) const override;
+    void OnDrawItem(wxDC& dc, const wxRect& rect, size_t index) const override;
+    wxCoord OnMeasureItem(size_t index) const override;
 
 private:
-	const wxBitmap& getIconBitmap(ActionIdentifier identifier) const;
+    const wxBitmap& getIconBitmap(ActionIdentifier identifier) const;
 
-	wxBitmap open_bitmap;
-	wxBitmap move_bitmap;
-	wxBitmap remote_bitmap;
-	wxBitmap select_bitmap;
-	wxBitmap unselect_bitmap;
-	wxBitmap delete_bitmap;
-	wxBitmap cut_bitmap;
-	wxBitmap paste_bitmap;
-	wxBitmap randomize_bitmap;
-	wxBitmap borderize_bitmap;
-	wxBitmap draw_bitmap;
-	wxBitmap erase_bitmap;
-	wxBitmap switch_bitmap;
-	wxBitmap rotate_bitmap;
-	wxBitmap replace_bitmap;
-	wxBitmap change_bitmap;
+    wxBitmap open_bitmap;
+    wxBitmap move_bitmap;
+    wxBitmap remote_bitmap;
+    wxBitmap select_bitmap;
+    wxBitmap unselect_bitmap;
+    wxBitmap delete_bitmap;
+    wxBitmap cut_bitmap;
+    wxBitmap paste_bitmap;
+    wxBitmap randomize_bitmap;
+    wxBitmap borderize_bitmap;
+    wxBitmap draw_bitmap;
+    wxBitmap erase_bitmap;
+    wxBitmap switch_bitmap;
+    wxBitmap rotate_bitmap;
+    wxBitmap replace_bitmap;
+    wxBitmap change_bitmap;
 };
 
 class ActionsHistoryWindow : public wxPanel
 {
 public:
-	ActionsHistoryWindow(wxWindow* parent);
-	virtual ~ActionsHistoryWindow();
+    ActionsHistoryWindow(wxWindow* parent);
+    virtual ~ActionsHistoryWindow();
 
-	void RefreshActions();
+    void RefreshActions();
 
-	void OnListSelected(wxCommandEvent& event);
+    void OnListSelected(wxCommandEvent& event);
 
 protected:
-	HistoryListBox* list;
+    HistoryListBox* list;
 };
 
 #endif

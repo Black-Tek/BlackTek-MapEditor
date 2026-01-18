@@ -26,38 +26,39 @@ class MapTab;
 
 class DuplicatedItemsWindow : public wxPanel
 {
-	struct DuplicatedItem {
-		DuplicatedItem(const Position& position, uint16_t itemId, uint16_t count) :
-			position(position), itemId(itemId), count(count) {}
+    struct DuplicatedItem
+    {
+        DuplicatedItem(const Position& position, uint16_t itemId, uint16_t count) :
+            position(position), itemId(itemId), count(count) { }
 
-		Position position;
-		uint16_t itemId;
-		uint16_t count;
-	};
+        Position position;
+        uint16_t itemId;
+        uint16_t count;
+    };
 
 public:
-	DuplicatedItemsWindow(wxWindow* parent);
-	virtual ~DuplicatedItemsWindow();
+    DuplicatedItemsWindow(wxWindow* parent);
+    virtual ~DuplicatedItemsWindow();
 
-	MapTab* GetMapTab() const noexcept { return map_tab; }
+    MapTab* GetMapTab() const noexcept { return map_tab; }
 
-	void StartSearch(MapTab* tab, bool selection);
-	void Clear();
-	void UpdateButtons();
+    void StartSearch(MapTab* tab, bool selection);
+    void Clear();
+    void UpdateButtons();
 
-	void OnClickResult(wxCommandEvent&);
-	void OnClickRemove(wxCommandEvent&);
-	void OnClickRemoveAll(wxCommandEvent&);
-	void OnClickExport(wxCommandEvent&);
+    void OnClickResult(wxCommandEvent&);
+    void OnClickRemove(wxCommandEvent&);
+    void OnClickRemoveAll(wxCommandEvent&);
+    void OnClickExport(wxCommandEvent&);
 
 protected:
-	bool removeItem(DuplicatedItem* data, Action* action);
+    bool removeItem(DuplicatedItem* data, Action* action);
 
-	MapTab* map_tab;
-	wxListBox* items_list;
-	wxButton* remove_button;
-	wxButton* remove_all_button;
-	wxBitmapButton* export_button;
+    MapTab* map_tab;
+    wxListBox* items_list;
+    wxButton* remove_button;
+    wxButton* remove_all_button;
+    wxBitmapButton* export_button;
 };
 
 #endif

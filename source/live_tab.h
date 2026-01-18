@@ -20,8 +20,8 @@
 
 #include "main.h"
 
-#include "editor_tabs.h"
 #include "application.h"
+#include "editor_tabs.h"
 #include "live_server.h"
 
 class wxGrid;
@@ -30,43 +30,44 @@ class MapTabbook;
 class LiveSocket;
 class LiveServer;
 
-class LiveLogTab : public EditorTab, public wxPanel {
+class LiveLogTab : public EditorTab, public wxPanel
+{
 public:
-	LiveLogTab(MapTabbook* aui, LiveSocket* socket);
-	~LiveLogTab();
+    LiveLogTab(MapTabbook* aui, LiveSocket* socket);
+    ~LiveLogTab();
 
-	bool IsCurrent() const;
+    bool IsCurrent() const;
 
-	void Message(const wxString& str);
-	void Chat(const wxString& speaker, const wxString& str);
+    void Message(const wxString& str);
+    void Chat(const wxString& speaker, const wxString& str);
 
-	virtual wxWindow* GetWindow() const { return (wxPanel*)this; }
-	virtual wxString GetTitle() const;
+    virtual wxWindow* GetWindow() const { return (wxPanel*)this; }
+    virtual wxString GetTitle() const;
 
-	bool IsConnected() const { return socket != nullptr; }
-	void Disconnect();
+    bool IsConnected() const { return socket != nullptr; }
+    void Disconnect();
 
-	LiveSocket* GetSocket() { return socket; }
+    LiveSocket* GetSocket() { return socket; }
 
-	void UpdateClientList(const std::unordered_map<uint32_t, LivePeer*>& updatedClients);
+    void UpdateClientList(const std::unordered_map<uint32_t, LivePeer*>& updatedClients);
 
-	void OnSelectChatbox(wxFocusEvent& evt);
-	void OnDeselectChatbox(wxFocusEvent& evt);
+    void OnSelectChatbox(wxFocusEvent& evt);
+    void OnDeselectChatbox(wxFocusEvent& evt);
 
-	void OnChat(wxCommandEvent& evt);
-	void OnResizeChat(wxSizeEvent& evt);
-	void OnResizeClientList(wxSizeEvent& evt);
+    void OnChat(wxCommandEvent& evt);
+    void OnResizeChat(wxSizeEvent& evt);
+    void OnResizeClientList(wxSizeEvent& evt);
 
 protected:
-	MapTabbook* aui;
-	LiveSocket* socket;
-	wxGrid* log;
-	wxTextCtrl* input;
-	wxGrid* user_list;
+    MapTabbook* aui;
+    LiveSocket* socket;
+    wxGrid* log;
+    wxTextCtrl* input;
+    wxGrid* user_list;
 
-	std::unordered_map<uint32_t, LivePeer*> clients;
+    std::unordered_map<uint32_t, LivePeer*> clients;
 
-	DECLARE_EVENT_TABLE();
+    DECLARE_EVENT_TABLE();
 };
 
 #endif

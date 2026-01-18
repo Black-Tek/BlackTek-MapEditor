@@ -20,34 +20,35 @@
 
 #include "extension.h"
 
-class Materials {
+class Materials
+{
 public:
-	Materials();
-	~Materials();
+    Materials();
+    ~Materials();
 
-	void clear();
+    void clear();
 
-	const MaterialsExtensionList& getExtensions();
-	MaterialsExtensionList getExtensionsByVersion(uint16_t version_id);
+    const MaterialsExtensionList& getExtensions();
+    MaterialsExtensionList getExtensionsByVersion(uint16_t version_id);
 
-	TilesetContainer tilesets;
+    TilesetContainer tilesets;
 
-	bool loadMaterials(const FileName& identifier, wxString& error, wxArrayString& warnings);
-	bool loadExtensions(FileName identifier, wxString& error, wxArrayString& warnings);
-	void createOtherTileset();
+    bool loadMaterials(const FileName& identifier, wxString& error, wxArrayString& warnings);
+    bool loadExtensions(FileName identifier, wxString& error, wxArrayString& warnings);
+    void createOtherTileset();
 
-	bool isInTileset(Item* item, std::string tileset) const;
-	bool isInTileset(Brush* brush, std::string tileset) const;
+    bool isInTileset(Item* item, std::string tileset) const;
+    bool isInTileset(Brush* brush, std::string tileset) const;
 
 protected:
-	bool unserializeMaterials(const FileName& filename, pugi::xml_node node, wxString& error, wxArrayString& warnings);
-	bool unserializeTileset(pugi::xml_node node, wxArrayString& warnings);
+    bool unserializeMaterials(const FileName& filename, pugi::xml_node node, wxString& error, wxArrayString& warnings);
+    bool unserializeTileset(pugi::xml_node node, wxArrayString& warnings);
 
-	MaterialsExtensionList extensions;
+    MaterialsExtensionList extensions;
 
 private:
-	Materials(const Materials&);
-	Materials& operator=(const Materials&);
+    Materials(const Materials&);
+    Materials& operator=(const Materials&);
 };
 
 extern Materials g_materials;

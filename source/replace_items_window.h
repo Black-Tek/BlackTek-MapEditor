@@ -18,24 +18,24 @@
 #ifndef RME_REPLACE_ITEMS_WINDOW_H_
 #define RME_REPLACE_ITEMS_WINDOW_H_
 
-#include "main.h"
 #include "common_windows.h"
 #include "editor.h"
+#include "main.h"
 
 struct ReplacingItem
 {
-	ReplacingItem() :
-		replaceId(0), withId(0), total(0), complete(false) { }
+    ReplacingItem() :
+        replaceId(0), withId(0), total(0), complete(false) { }
 
-	bool operator==(const ReplacingItem& other) const
-	{
-		return replaceId == other.replaceId && withId == other.withId;
-	}
+    bool operator==(const ReplacingItem& other) const
+    {
+        return replaceId == other.replaceId && withId == other.withId;
+    }
 
-	uint16_t replaceId;
-	uint16_t withId;
-	uint32_t total;
-	bool complete;
+    uint16_t replaceId;
+    uint16_t withId;
+    uint32_t total;
+    bool complete;
 };
 
 // ============================================================================
@@ -44,15 +44,15 @@ struct ReplacingItem
 class ReplaceItemsButton : public DCButton
 {
 public:
-	ReplaceItemsButton(wxWindow* parent);
-	~ReplaceItemsButton() { }
+    ReplaceItemsButton(wxWindow* parent);
+    ~ReplaceItemsButton() { }
 
-	ItemGroup_t GetGroup() const;
-	uint16_t GetItemId() const { return m_id; }
-	void SetItemId(uint16_t id);
+    ItemGroup_t GetGroup() const;
+    uint16_t GetItemId() const { return m_id; }
+    void SetItemId(uint16_t id);
 
 private:
-	uint16_t m_id;
+    uint16_t m_id;
 };
 
 // ============================================================================
@@ -61,23 +61,23 @@ private:
 class ReplaceItemsListBox : public wxVListBox
 {
 public:
-	ReplaceItemsListBox(wxWindow* parent);
+    ReplaceItemsListBox(wxWindow* parent);
 
-	bool AddItem(const ReplacingItem& item);
-	void MarkAsComplete(const ReplacingItem& item, uint32_t total);
-	void RemoveSelected();
-	bool CanAdd(uint16_t replaceId, uint16_t withId) const;
+    bool AddItem(const ReplacingItem& item);
+    void MarkAsComplete(const ReplacingItem& item, uint32_t total);
+    void RemoveSelected();
+    bool CanAdd(uint16_t replaceId, uint16_t withId) const;
 
-	void OnDrawItem(wxDC& dc, const wxRect& rect, size_t index) const;
-	wxCoord OnMeasureItem(size_t index) const;
+    void OnDrawItem(wxDC& dc, const wxRect& rect, size_t index) const;
+    wxCoord OnMeasureItem(size_t index) const;
 
-	const std::vector<ReplacingItem>& GetItems() const { return m_items; }
-	size_t GetCount() const { return m_items.size(); }
+    const std::vector<ReplacingItem>& GetItems() const { return m_items; }
+    size_t GetCount() const { return m_items.size(); }
 
 private:
-	std::vector<ReplacingItem> m_items;
-	wxBitmap m_arrow_bitmap;
-	wxBitmap m_flag_bitmap;
+    std::vector<ReplacingItem> m_items;
+    wxBitmap m_arrow_bitmap;
+    wxBitmap m_flag_bitmap;
 };
 
 // ============================================================================
@@ -85,54 +85,57 @@ private:
 
 struct ItemFinder
 {
-	ItemFinder(uint16_t itemid, int32_t limit = -1) : itemid(itemid), limit(limit), exceeded(false) {}
+    ItemFinder(uint16_t itemid, int32_t limit = -1) :
+        itemid(itemid), limit(limit), exceeded(false) { }
 
-	void operator()(Map& map, Tile* tile, Item* item, long long done) {
-		if(exceeded)
-			return;
+    void operator()(Map& map, Tile* tile, Item* item, long long done)
+    {
+        if (exceeded)
+            return;
 
-		if(item->getID() == itemid) {
-			result.push_back(std::make_pair(tile, item));
-			if(limit > 0 && result.size() >= size_t(limit))
-				exceeded = true;
-		}
-	}
+        if (item->getID() == itemid)
+        {
+            result.push_back(std::make_pair(tile, item));
+            if (limit > 0 && result.size() >= size_t(limit))
+                exceeded = true;
+        }
+    }
 
-	std::vector<std::pair<Tile*, Item*>> result;
+    std::vector<std::pair<Tile*, Item*>> result;
 
 private:
-	uint16_t itemid;
-	int32_t limit;
-	bool exceeded;
+    uint16_t itemid;
+    int32_t limit;
+    bool exceeded;
 };
 
 class ReplaceItemsDialog : public wxDialog
 {
 public:
-	ReplaceItemsDialog(wxWindow* parent, bool selectionOnly);
-	~ReplaceItemsDialog();
+    ReplaceItemsDialog(wxWindow* parent, bool selectionOnly);
+    ~ReplaceItemsDialog();
 
-	void OnListSelected(wxCommandEvent& event);
-	void OnReplaceItemClicked(wxMouseEvent& event);
-	void OnWithItemClicked(wxMouseEvent& event);
-	void OnAddButtonClicked(wxCommandEvent& event);
-	void OnRemoveButtonClicked(wxCommandEvent& event);
-	void OnExecuteButtonClicked(wxCommandEvent& event);
-	void OnCancelButtonClicked(wxCommandEvent& event);
+    void OnListSelected(wxCommandEvent& event);
+    void OnReplaceItemClicked(wxMouseEvent& event);
+    void OnWithItemClicked(wxMouseEvent& event);
+    void OnAddButtonClicked(wxCommandEvent& event);
+    void OnRemoveButtonClicked(wxCommandEvent& event);
+    void OnExecuteButtonClicked(wxCommandEvent& event);
+    void OnCancelButtonClicked(wxCommandEvent& event);
 
 private:
-	void UpdateWidgets();
+    void UpdateWidgets();
 
-	ReplaceItemsListBox* list;
-	ReplaceItemsButton* replace_button;
-	ReplaceItemsButton* with_button;
-	wxGauge* progress;
-	wxStaticBitmap* arrow_bitmap;
-	wxButton* add_button;
-	wxButton* remove_button;
-	wxButton* execute_button;
-	wxButton* close_button;
-	bool selectionOnly;
+    ReplaceItemsListBox* list;
+    ReplaceItemsButton* replace_button;
+    ReplaceItemsButton* with_button;
+    wxGauge* progress;
+    wxStaticBitmap* arrow_bitmap;
+    wxButton* add_button;
+    wxButton* remove_button;
+    wxButton* execute_button;
+    wxButton* close_button;
+    bool selectionOnly;
 };
 
 #endif

@@ -19,23 +19,27 @@
 #define RME_MAIN_H_
 
 #ifdef _WIN32
-#	define WIN32_LEAN_AND_MEAN
-#	ifdef _WIN32_WINNT
-#		undef _WIN32_WINNT
-#	endif
-#	define _WIN32_WINNT 0x0501
+#define WIN32_LEAN_AND_MEAN
+#ifdef _WIN32_WINNT
+#undef _WIN32_WINNT
+#endif
+#define _WIN32_WINNT 0x0501
 #endif
 
 #ifdef DEBUG_MEM
 
 #define _CRTDBG_MAP_ALLOC
 
-#pragma warning(disable: 4291)
-_Ret_bytecap_(_Size) inline void * __CRTDECL operator new(size_t _Size, const char* file, int line)
-        { return ::operator new(_Size, _NORMAL_BLOCK, file, line); }
+#pragma warning(disable : 4291)
+_Ret_bytecap_(_Size) inline void* __CRTDECL operator new(size_t _Size, const char* file, int line)
+{
+    return ::operator new(_Size, _NORMAL_BLOCK, file, line);
+}
 _Ret_bytecap_(_Size) inline void* __CRTDECL operator new[](size_t _Size, const char* file, int line)
-        { return ::operator new[](_Size, _NORMAL_BLOCK, file, line); }
-#define newd new(__FILE__, __LINE__)
+{
+    return ::operator new[](_Size, _NORMAL_BLOCK, file, line);
+}
+#define newd new (__FILE__, __LINE__)
 
 #else
 
@@ -43,8 +47,8 @@ _Ret_bytecap_(_Size) inline void* __CRTDECL operator new[](size_t _Size, const c
 
 #endif
 
-#include <wx/defs.h>
 #include "definitions.h"
+#include <wx/defs.h>
 
 #include <asio.hpp>
 #include <fmt/core.h>
@@ -52,32 +56,32 @@ _Ret_bytecap_(_Size) inline void* __CRTDECL operator new[](size_t _Size, const c
 
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
-#   include <wx/wx.h>
+#include <wx/wx.h>
 #endif
-#include <wx/thread.h>
-#include <wx/utils.h>
-#include <wx/progdlg.h>
-#include <wx/glcanvas.h>
-#include <wx/debugrpt.h>
-#include <wx/minifram.h>
-#include <wx/gbsizer.h>
-#include <wx/choicebk.h>
-#include <wx/tglbtn.h>
-#include <wx/dcbuffer.h>
+#include <wx/arrstr.h>
 #include <wx/aui/aui.h>
+#include <wx/choicebk.h>
+#include <wx/clipbrd.h>
 #include <wx/cmdline.h>
+#include <wx/dcbuffer.h>
+#include <wx/debugrpt.h>
 #include <wx/filename.h>
 #include <wx/filepicker.h>
-#include <wx/arrstr.h>
+#include <wx/gbsizer.h>
+#include <wx/glcanvas.h>
+#include <wx/grid.h>
+#include <wx/ipc.h>
+#include <wx/minifram.h>
+#include <wx/progdlg.h>
 #include <wx/slider.h>
 #include <wx/spinctrl.h>
-#include <wx/wxhtml.h>
-#include <wx/vlbox.h>
 #include <wx/stdpaths.h>
+#include <wx/tglbtn.h>
+#include <wx/thread.h>
 #include <wx/url.h>
-#include <wx/ipc.h>
-#include <wx/grid.h>
-#include <wx/clipbrd.h>
+#include <wx/utils.h>
+#include <wx/vlbox.h>
+#include <wx/wxhtml.h>
 
 // PugiXML
 #include "ext/pugixml.hpp"
@@ -94,9 +98,9 @@ _Ret_bytecap_(_Size) inline void* __CRTDECL operator new[](size_t _Size, const c
 #include <assert.h>
 #define _MSG(msg) !bool(msg)
 #ifdef __DEBUG__
-#   define ASSERT assert
+#define ASSERT assert
 #else
-#   define ASSERT(...)
+#define ASSERT(...)
 #endif
 
 #ifdef _WIN32
@@ -104,44 +108,44 @@ _Ret_bytecap_(_Size) inline void* __CRTDECL operator new[](size_t _Size, const c
 #endif
 
 // The complete STL ?, well, almost ;)
-#include <math.h>
-#include <list>
-#include <vector>
-#include <map>
-#include <string>
-#include <istream>
-#include <ostream>
-#include <sstream>
-#include <iostream>
-#include <iomanip>
 #include <algorithm>
-#include <limits>
-#include <set>
-#include <queue>
-#include <stdexcept>
-#include <stdlib.h>
-#include <time.h>
-#include <fstream>
-#include <memory>
-#include <exception>
 #include <cmath>
+#include <exception>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <istream>
+#include <limits>
+#include <list>
+#include <map>
+#include <math.h>
+#include <memory>
+#include <ostream>
+#include <queue>
 #include <ranges>
 #include <regex>
+#include <set>
+#include <sstream>
+#include <stdexcept>
+#include <stdlib.h>
+#include <string>
+#include <time.h>
+#include <vector>
 
 typedef std::vector<std::string> StringVector;
 typedef wxFileName FileName;
 
-#include "con_vector.h"
 #include "common.h"
+#include "con_vector.h"
 #include "threads.h"
 
 #include "const.h"
 #include "rme_forward_declarations.h"
 
 #if wxCHECK_VERSION(3, 1, 0)
-        #define FROM_DIP(widget, size) widget->FromDIP(size)
+#define FROM_DIP(widget, size) widget->FromDIP(size)
 #else
-        #define FROM_DIP(widget, size) size
+#define FROM_DIP(widget, size) size
 #endif
 
 #endif

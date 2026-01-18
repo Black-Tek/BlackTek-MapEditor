@@ -22,45 +22,49 @@
 
 class NetworkedActionQueue;
 
-class NetworkedAction : public Action {
+class NetworkedAction : public Action
+{
 protected:
-	NetworkedAction(Editor& editor, ActionIdentifier ident);
-	~NetworkedAction();
-public:
-	uint32_t owner;
+    NetworkedAction(Editor& editor, ActionIdentifier ident);
+    ~NetworkedAction();
 
-	friend class NetworkedActionQueue;
+public:
+    uint32_t owner;
+
+    friend class NetworkedActionQueue;
 };
 
-class NetworkedBatchAction : public BatchAction {
-	NetworkedActionQueue& queue;
+class NetworkedBatchAction : public BatchAction
+{
+    NetworkedActionQueue& queue;
+
 protected:
-	NetworkedBatchAction(Editor& editor, NetworkedActionQueue& queue, ActionIdentifier ident);
-	~NetworkedBatchAction();
+    NetworkedBatchAction(Editor& editor, NetworkedActionQueue& queue, ActionIdentifier ident);
+    ~NetworkedBatchAction();
 
 public:
-	void addAndCommitAction(Action* action);
+    void addAndCommitAction(Action* action);
 
 protected:
-	void commit();
-	void undo();
-	void redo();
+    void commit();
+    void undo();
+    void redo();
 
-	friend class NetworkedActionQueue;
+    friend class NetworkedActionQueue;
 };
 
 class NetworkedActionQueue : public ActionQueue
 {
 public:
-	NetworkedActionQueue(Editor& editor);
+    NetworkedActionQueue(Editor& editor);
 
-	Action* createAction(ActionIdentifier identifier) const;
-	BatchAction* createBatch(ActionIdentifier identifier);
+    Action* createAction(ActionIdentifier identifier) const;
+    BatchAction* createBatch(ActionIdentifier identifier);
 
 protected:
-	void broadcast(DirtyList& dirty_list);
+    void broadcast(DirtyList& dirty_list);
 
-	friend class NetworkedBatchAction;
+    friend class NetworkedBatchAction;
 };
 
 #endif
