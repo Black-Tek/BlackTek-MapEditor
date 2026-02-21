@@ -216,6 +216,7 @@ void applyZonesToTiles(const std::map<uint16_t, std::vector<Position>>& zoneMap,
 				Tile* tile = map.getTile(pos);
 				if (tile)
 				{
+					tile->setMapFlags(tile->getMapFlags() | TILESTATE_ZONE_BRUSH);
 					tile->addZoneId(zoneId);
 				}
 			}
