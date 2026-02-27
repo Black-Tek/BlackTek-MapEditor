@@ -19,8 +19,9 @@
 #define RME_DISPLAY_WINDOW_H_
 
 #include "action.h"
-#include "tile.h"
 #include "creature.h"
+#include "lasso_selection.h"
+#include "tile.h"
 
 class Item;
 class Creature;
@@ -28,75 +29,79 @@ class MapWindow;
 class MapPopupMenu;
 class AnimationTimer;
 class MapDrawer;
+class HuntingCalculatorWindow;
+class LassoSelection;
 
-class MapCanvas : public wxGLCanvas
-{
-public:
-	MapCanvas(MapWindow* parent, Editor& editor, int* attriblist);
+class MapCanvas : public wxGLCanvas {
+  public:
+	MapCanvas(MapWindow *parent, Editor &editor, int *attriblist);
 	virtual ~MapCanvas();
 	void Reset();
 
 	// All events
-	void OnPaint(wxPaintEvent& event);
-	void OnEraseBackground(wxEraseEvent& event) {}
+	void OnPaint(wxPaintEvent &event);
+	void OnEraseBackground(wxEraseEvent &event) {}
 
-	void OnMouseMove(wxMouseEvent& event);
-	void OnMouseLeftRelease(wxMouseEvent& event);
-	void OnMouseLeftClick(wxMouseEvent& event);
-	void OnMouseLeftDoubleClick(wxMouseEvent& event);
-	void OnMouseCenterClick(wxMouseEvent& event);
-	void OnMouseCenterRelease(wxMouseEvent& event);
-	void OnMouseRightClick(wxMouseEvent& event);
-	void OnMouseRightRelease(wxMouseEvent& event);
+	void OnMouseMove(wxMouseEvent &event);
+	void OnMouseLeftRelease(wxMouseEvent &event);
+	void OnMouseLeftClick(wxMouseEvent &event);
+	void OnMouseLeftDoubleClick(wxMouseEvent &event);
+	void OnMouseCenterClick(wxMouseEvent &event);
+	void OnMouseCenterRelease(wxMouseEvent &event);
+	void OnMouseRightClick(wxMouseEvent &event);
+	void OnMouseRightRelease(wxMouseEvent &event);
 
-	void OnKeyDown(wxKeyEvent& event);
-	void OnKeyUp(wxKeyEvent& event);
-	void OnWheel(wxMouseEvent& event);
-	void OnGainMouse(wxMouseEvent& event);
-	void OnLoseMouse(wxMouseEvent& event);
+	void OnKeyDown(wxKeyEvent &event);
+	void OnKeyUp(wxKeyEvent &event);
+	void OnWheel(wxMouseEvent &event);
+	void OnGainMouse(wxMouseEvent &event);
+	void OnLoseMouse(wxMouseEvent &event);
 
 	// Mouse events handlers (called by the above)
-	void OnMouseActionRelease(wxMouseEvent& event);
-	void OnMouseActionClick(wxMouseEvent& event);
-	void OnMouseCameraClick(wxMouseEvent& event);
-	void OnMouseCameraRelease(wxMouseEvent& event);
-	void OnMousePropertiesClick(wxMouseEvent& event);
-	void OnMousePropertiesRelease(wxMouseEvent& event);
+	void OnMouseActionRelease(wxMouseEvent &event);
+	void OnMouseActionClick(wxMouseEvent &event);
+	void OnMouseCameraClick(wxMouseEvent &event);
+	void OnMouseCameraRelease(wxMouseEvent &event);
+	void OnMousePropertiesClick(wxMouseEvent &event);
+	void OnMousePropertiesRelease(wxMouseEvent &event);
 
 	//
-	void OnCut(wxCommandEvent& event);
-	void OnCopy(wxCommandEvent& event);
-	void OnCopyPosition(wxCommandEvent& event);
-	void OnCopyServerId(wxCommandEvent& event);
-	void OnCopyClientId(wxCommandEvent& event);
-	void OnCopyName(wxCommandEvent& event);
-	void OnBrowseTile(wxCommandEvent& event);
-	void OnPaste(wxCommandEvent& event);
-	void OnDelete(wxCommandEvent& event);
+	void OnCut(wxCommandEvent &event);
+	void OnCopy(wxCommandEvent &event);
+	void OnCopyPosition(wxCommandEvent &event);
+	void OnCopyServerId(wxCommandEvent &event);
+	void OnCopyClientId(wxCommandEvent &event);
+	void OnCopyName(wxCommandEvent &event);
+	void OnBrowseTile(wxCommandEvent &event);
+	void OnPaste(wxCommandEvent &event);
+	void OnDelete(wxCommandEvent &event);
 	// ----
-	void OnGotoDestination(wxCommandEvent& event);
-	void OnCopyDestination(wxCommandEvent& event);
-	void OnRotateItem(wxCommandEvent& event);
-	void OnSwitchDoor(wxCommandEvent& event);
+	void OnGotoDestination(wxCommandEvent &event);
+	void OnCopyDestination(wxCommandEvent &event);
+	void OnRotateItem(wxCommandEvent &event);
+	void OnSwitchDoor(wxCommandEvent &event);
 	// ----
-	void OnSelectRAWBrush(wxCommandEvent& event);
-	void OnSelectGroundBrush(wxCommandEvent& event);
-	void OnSelectDoodadBrush(wxCommandEvent& event);
-	void OnSelectDoorBrush(wxCommandEvent& event);
-	void OnSelectWallBrush(wxCommandEvent& event);
-	void OnSelectCarpetBrush(wxCommandEvent& event);
-	void OnSelectTableBrush(wxCommandEvent& event);
-	void OnSelectCreatureBrush(wxCommandEvent& event);
-	void OnSelectSpawnBrush(wxCommandEvent& event);
-	void OnSelectHouseBrush(wxCommandEvent& event);
+	void OnSelectRAWBrush(wxCommandEvent &event);
+	void OnSelectGroundBrush(wxCommandEvent &event);
+	void OnSelectDoodadBrush(wxCommandEvent &event);
+	void OnSelectDoorBrush(wxCommandEvent &event);
+	void OnSelectWallBrush(wxCommandEvent &event);
+	void OnSelectCarpetBrush(wxCommandEvent &event);
+	void OnSelectTableBrush(wxCommandEvent &event);
+	void OnSelectCreatureBrush(wxCommandEvent &event);
+	void OnSelectSpawnBrush(wxCommandEvent &event);
+	void OnSelectHouseBrush(wxCommandEvent &event);
 	// ---
-	void OnProperties(wxCommandEvent& event);
+	void OnProperties(wxCommandEvent &event);
+	void OnHuntingCalculator(wxCommandEvent &event);
 
 	void Refresh();
 
-	void ScreenToMap(int screen_x, int screen_y, int* map_x, int* map_y);
-	void MouseToMap(int* map_x, int* map_y) { ScreenToMap(cursor_x, cursor_y, map_x, map_y); }
-	void GetScreenCenter(int* map_x, int* map_y);
+	void ScreenToMap(int screen_x, int screen_y, int *map_x, int *map_y);
+	void MouseToMap(int *map_x, int *map_y) {
+		ScreenToMap(cursor_x, cursor_y, map_x, map_y);
+	}
+	void GetScreenCenter(int *map_x, int *map_y);
 
 	void StartPasting();
 	void EndPasting();
@@ -110,74 +115,83 @@ public:
 	int GetFloor() const noexcept { return floor; }
 	double GetZoom() const noexcept { return zoom; }
 	void SetZoom(double value);
-	void GetViewBox(int* view_scroll_x, int* view_scroll_y, int* screensize_x, int* screensize_y) const;
+	void GetViewBox(int *view_scroll_x, int *view_scroll_y, int *screensize_x,
+					int *screensize_y) const;
 
-	MapWindow* GetMapWindow() const;
+	MapWindow *GetMapWindow() const;
 	Position GetCursorPosition() const;
 
-	void ShowPositionIndicator(const Position& position);
+	void ShowPositionIndicator(const Position &position);
 	void TakeScreenshot(wxFileName path, wxString format);
 
-protected:
-	void getTilesToDraw(int mouse_map_x, int mouse_map_y, int floor, PositionVector* tilestodraw, PositionVector* tilestoborder, bool fill = false);
-	bool floodFill(Map *map, const Position& center, int x, int y, GroundBrush* brush, PositionVector* positions);
+  protected:
+	void getTilesToDraw(int mouse_map_x, int mouse_map_y, int floor,
+						PositionVector *tilestodraw,
+						PositionVector *tilestoborder, bool fill = false);
+	bool floodFill(Map *map, const Position &center, int x, int y,
+				   GroundBrush *brush, PositionVector *positions);
 
-private:
-	enum {
-		BLOCK_SIZE = 64
-	};
+  private:
+	enum { BLOCK_SIZE = 64 };
 
-	inline int getFillIndex(int x, int y) const noexcept { return ((y % BLOCK_SIZE) * BLOCK_SIZE) + (x % BLOCK_SIZE); }
+	inline int getFillIndex(int x, int y) const noexcept {
+		return ((y % BLOCK_SIZE) * BLOCK_SIZE) + (x % BLOCK_SIZE);
+	}
 
-	static bool processed[BLOCK_SIZE*BLOCK_SIZE];
+	static bool processed[BLOCK_SIZE * BLOCK_SIZE];
 
-	Editor& editor;
-	MapDrawer *drawer;
-	int keyCode;
+	Editor &editor;
+	MapDrawer *drawer =
+		nullptr; // Initialize to nullptr to prevent crash on first use
+	int keyCode = WXK_NONE;
 
-// View related
-	int floor;
-	double zoom;
-	int cursor_x;
-	int cursor_y;
+	// View related
+	int floor = rme::MapGroundLayer;
+	double zoom = 1.0;
+	int cursor_x = -1;
+	int cursor_y = -1;
 
-	bool dragging;
-	bool boundbox_selection;
-	bool screendragging;
+	bool dragging = false;
+	bool boundbox_selection = false;
+	bool lasso_selection = false;
+	bool screendragging = false;
 	bool isPasting() const;
-	bool drawing;
-	bool dragging_draw;
-	bool replace_dragging;
+	bool drawing = false;
+	bool dragging_draw = false;
+	bool replace_dragging = false;
 
-	uint8_t* screenshot_buffer;
+	uint8_t *screenshot_buffer = nullptr;
+	LassoSelection *m_lasso = nullptr;
 
-	int drag_start_x;
-	int drag_start_y;
-	int drag_start_z;
+	int drag_start_x = -1;
+	int drag_start_y = -1;
+	int drag_start_z = -1;
 
-	int last_cursor_map_x;
-	int last_cursor_map_y;
-	int last_cursor_map_z;
+	int last_cursor_map_x = -1;
+	int last_cursor_map_y = -1;
+	int last_cursor_map_z = -1;
 
-	int last_click_map_x;
-	int last_click_map_y;
-	int last_click_map_z;
-	int last_click_abs_x;
-	int last_click_abs_y;
-	int last_click_x;
-	int last_click_y;
+	int last_click_map_x = -1;
+	int last_click_map_y = -1;
+	int last_click_map_z = -1;
+	int last_click_abs_x = -1;
+	int last_click_abs_y = -1;
+	int last_click_x = -1;
+	int last_click_y = -1;
 
-	int last_mmb_click_x;
-	int last_mmb_click_y;
+	int last_mmb_click_x = -1;
+	int last_mmb_click_y = -1;
 
-	int view_scroll_x;
-	int view_scroll_y;
+	int view_scroll_x = 0;
+	int view_scroll_y = 0;
 
-	uint32_t current_house_id;
+	uint32_t current_house_id = 0;
 
 	wxStopWatch refresh_watch;
-	MapPopupMenu* popup_menu;
-	AnimationTimer* animation_timer;
+	MapPopupMenu *popup_menu =
+		nullptr; // Initialize to nullptr to prevent crash on first use
+	AnimationTimer *animation_timer =
+		nullptr; // Initialize to nullptr to prevent crash on first use
 
 	friend class MapDrawer;
 
@@ -186,26 +200,25 @@ private:
 
 // Right-click popup menu
 class MapPopupMenu : public wxMenu {
-public:
-	MapPopupMenu(Editor& editor);
+  public:
+	MapPopupMenu(Editor &editor);
 	virtual ~MapPopupMenu();
 
 	void Update();
 
-protected:
-	Editor& editor;
+  protected:
+	Editor &editor;
 };
 
-class AnimationTimer : public wxTimer
-{
-public:
+class AnimationTimer : public wxTimer {
+  public:
 	AnimationTimer(MapCanvas *canvas);
 
 	void Notify();
 	void Start();
 	void Stop();
 
-private:
+  private:
 	MapCanvas *map_canvas;
 	bool started;
 };
