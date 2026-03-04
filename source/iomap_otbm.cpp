@@ -1281,6 +1281,12 @@ bool IOMapOTBM::saveMap(Map& map, NodeFileWriteHandle& f)
 	 * format.
 	 */
 
+	// Clear the zoneMap before collecting zones from tiles to avoid duplicates
+	// TODO this is to be refactored - ::saveMap, the zoneMap shouldn't be like that..
+	// clear and detecting tiles to append to zoneMap, it should be done directly on adding zone
+	// not only at saving time.
+	zoneMap.clear();
+
 	const IOMapOTBM& self = *this;
 
 	FileName tmpName;
@@ -1363,6 +1369,9 @@ bool IOMapOTBM::saveMap(Map& map, NodeFileWriteHandle& f)
 				if(save_tile->getMapFlags()) {
 					f.addByte(OTBM_ATTR_TILE_FLAGS);
 					f.addU32(save_tile->getMapFlags());
+					// TODO this is to be refactored - ::saveMap, the zoneMap shouldn't be like that..
+					// clear and detecting tiles to append to zoneMap, it should be done directly on adding zone
+					// not only at saving time.
 					if (save_tile->getMapFlags() & TILESTATE_ZONE_BRUSH)
 					{
 						for (const auto& zoneId : save_tile->getZoneIds())
