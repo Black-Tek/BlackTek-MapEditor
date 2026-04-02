@@ -46,7 +46,7 @@ workspace "Black-Tek-Mapeditor"
          openmp "On"
          characterset "MBCS"
          debugformat "c7"
-         vsprops { VcpkgEnableManifest = "true" }
+         -- vsprops { VcpkgEnableManifest = "true" } -- Requires premake5-alpha
          buildoptions { "/bigobj", "/utf-8" }
          linkoptions { "/IGNORE:4099" }
       filter {}
